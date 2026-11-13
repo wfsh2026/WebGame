@@ -1,0 +1,8 @@
+{
+  "id": "forest-survival:support/haste",
+  "kind": "support",
+  "name": "迅捷",
+  "host": "both",
+  "effect": "haste",
+  "description": "缩短执行间隔，增加持续供能需求。3/5/10/15/20级解锁阶段效果，详情见成长路线。战旗：缩短重新布置间隔、加快落旗展开；不会额外加速受益者攻击。"
+}

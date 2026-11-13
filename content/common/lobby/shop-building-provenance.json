@@ -1,0 +1,12 @@
+{
+  "generator": "image_gen.imagegen",
+  "mode": "built-in",
+  "reference": "camp-background.webp",
+  "output": "shop-building.png",
+  "width": 1254,
+  "height": 1254,
+  "format": "PNG RGBA",
+  "prompt": "Use case: stylized-concept. Asset type: a single production-ready transparent PNG building sprite for a 2D fantasy multiplayer game's forest camp. Input image 1 is a STYLE AND CAMERA REFERENCE ONLY, showing the existing painted forest camp. Generate a NEW standalone shop building. Match that reference's detailed hand-painted storybook game art, warm textured timber, subdued forest teal and cream canvas, muted moss green accents, soft golden lantern lighting, painterly material shading and carefully finished organic edges. Camera: elevated front three-quarter orthographic-like game view, approximately 30 degrees looking down, with front entrance facing the bottom-left, matching buildings in the camp reference. Subject: a compact inviting timber merchant shop with a modest moss-touched shingled roof, a cream canvas awning on wooden supports, open front sales counter, shelves holding bound skill tomes and rolled parchment scrolls, a few small potion bottles, sturdy wooden crates beside the entrance, and two warm hanging lanterns. Give it clear architectural volume and material detail at small in-game scale. One cohesive building asset with its attached props closely contained around its footprint. Show the whole roof, facade, counter, and base fully within the frame, with comfortable transparent padding on every side. Square 1024x1024 composition. Background must be genuinely transparent RGBA alpha, including the space around and underneath the building, suitable to overlay onto the existing camp. Keep any contact shadow small, soft, and translucent. Do not add a landscape, grass tile, scenery background, scenery platform, people, characters, floating signs, UI labels, lettering, logos, or watermark. Render as detailed painterly bitmap art, never a geometric placeholder, vector icon, wireframe, or low-poly diagram.",
+  "usage": "商店建筑独立贴图，透明底，匹配现有林间营地视角与手绘风格。",
+  "createdAt": "2026-11-12"
+}

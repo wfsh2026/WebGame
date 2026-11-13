@@ -1,0 +1,13 @@
+{
+  "id": "forest-survival:skill/banner-wind",
+  "kind": "skill",
+  "name": "疾羽战旗",
+  "effect": "banner-wind",
+  "interval": 3,
+  "cost": 9,
+  "coefficient": 0,
+  "range": 10,
+  "supportSlots": 1,
+  "delivery": "nova",
+  "description": "布旗后加快近战起手与收招、投射飞行20%，不增加出手次数。5级扩大范围，10级阵内投射物加速，15级改善追星转向，20级结束后留下短时风场。"
+}

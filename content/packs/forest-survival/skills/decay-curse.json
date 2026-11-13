@@ -1,0 +1,14 @@
+{
+  "id": "forest-survival:skill/decay-curse",
+  "kind": "skill",
+  "name": "蚀骨咒",
+  "effect": "decay-curse",
+  "interval": 1.85,
+  "cost": 7,
+  "coefficient": 1.7,
+  "range": 8,
+  "speed": 13,
+  "supportSlots": 1,
+  "delivery": "nova",
+  "description": "施加4秒侵蚀，每0.65秒造成22%伤害，不叠层。5级死亡传播；10级最多3代；15级成熟传播增强；20级末代死亡毒爆。"
+}

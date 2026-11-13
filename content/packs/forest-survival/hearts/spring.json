@@ -1,0 +1,13 @@
+{
+  "id": "forest-survival:heart/spring",
+  "kind": "heart",
+  "name": "涌泉心法",
+  "slots": 1,
+  "capacity": 20,
+  "interval": 0.5,
+  "recovery": 5,
+  "manaCost": 2.5,
+  "capacityGrowth": 2,
+  "recoveryGrowth": 0.25,
+  "description": "5/10/15/20级解锁能力槽，升级提高容量和供能；恢复时涌泉短脉冲上涌后汇入，5/10级强化动态层次。按实际转换量消耗魔法。"
+}

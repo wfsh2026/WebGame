@@ -1,0 +1,8 @@
+{
+  "id": "forest-survival:support/aftershock",
+  "kind": "support",
+  "name": "余震",
+  "host": "both",
+  "effect": "aftershock",
+  "description": "火球或重锤在0.45秒后追加45%伤害余震；3级扩大范围，5级改为向外扩散。初始主伤害降低20%，耗能增加30%；不递归触发。升级减轻伤害折损。"
+}

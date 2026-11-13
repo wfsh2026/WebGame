@@ -1,0 +1,12 @@
+.tools { display: grid; gap: 16px; }
+.tools > p { margin: 0; }
+.tools > button { justify-self: start; }
+.form { display: grid; gap: 20px; }
+.form label { display: grid; grid-template-columns: 1fr auto; gap: 10px; font-size: 15px; }
+.form label span { font-size: 13px; opacity: .8; }
+.form input { grid-column: 1 / -1; width: 100%; padding: 12px; background: #13241d; border: 1px solid #69785b; color: inherit; border-radius: 4px; }
+.form button { justify-self: start; }
+
+.inventory { margin-top: 24px; padding-top: 16px; border-top: 1px solid #a58d5955; }
+.inventory h3 { color: #ebd8ad; margin: 0 0 10px; }
+.inventory p { color: #b7c2ae; font-size: 13px; line-height: 1.7; }

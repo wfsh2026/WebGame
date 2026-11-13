@@ -1,0 +1,6 @@
+{
+  "source": "Built-in image_gen, 2026-11-13",
+  "prompt": "Transparent 4x4 sheet, 16 successive anchored grayscale flame frames with flowing curved tongues, no labels or background, runtime tint for quality.",
+  "playback": "12 fps, 16 frames, phase offset by loot id",
+  "usage": "Ground loot flame loop; potions and weapons reuse icons with animated cropped highlights"
+}

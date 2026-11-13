@@ -1,0 +1,14 @@
+import { z } from 'zod';
+const identifier = z.string().min(1).max(150);
+const lootFields = { id: identifier, definitionId: identifier, name: z.string().max(40), category: z.enum(['consumable', 'insured', 'temporary']), kind: z.string().max(30), effect: z.string().max(40), level: z.number().int().min(1).max(20), wave: z.number().int().positive(), x: z.number().finite(), y: z.number().finite() };
+export const lootItemSchema = z.object(lootFields).strict();
+export type LootItemData = z.infer<typeof lootItemSchema>;
+const pickupFields = { item: lootItemSchema, playerId: identifier };
+export const lootPickupSchema = z.object(pickupFields).strict();
+export type LootPickupData = z.infer<typeof lootPickupSchema>;
+const lootList = z.array(lootItemSchema);
+const lootStateFields = { revision: z.number().int(), safe: lootList, consumables: lootList };
+export const lootStateSchema = z.object(lootStateFields).strict();
+export type LootStateData = z.infer<typeof lootStateSchema>;
+const consumeFields = { id: identifier };
+export const consumeLootSchema = z.object(consumeFields).strict();

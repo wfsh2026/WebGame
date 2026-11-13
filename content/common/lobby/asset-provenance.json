@@ -1,0 +1,11 @@
+{
+  "generator": "image_gen.imagegen",
+  "mode": "built-in",
+  "reference": "approved-concept.png",
+  "referenceApproval": "用户在会话中确认效果图后要求实现",
+  "output": "camp-background.png",
+  "prompt": "Edit this approved game lobby concept into its production BACKGROUND TEXTURE. Keep the EXACT original composition, camera, framing, colors, environment painting, positions and sizes of all buildings, paths, campfire, gateway, mirror tent left, rune pedestal right, logbook desk bottom left. Remove ALL UI: top-left portrait and name panel, top-right currency/settings, ALL floating Chinese facility signs/labels (replace with the environment naturally behind), bottom instruction strip. Remove central circular player token and its name/shadow, replace with natural grass ground. Remove mouse cursor and gold hover outline around right rune altar; keep blue magical book glow. No text, no UI, no characters, no border. Preserve original 16:9 aspect ratio. This must align with interactive overlay coordinates from original image, do not redesign or move features.",
+  "usage": "用户确认后迁入正式客户端的大厅背景；原效果图同时用于运行时头像裁切与视觉对照",
+  "release": "20261106-01-lobby",
+  "clientVersion": "0.2.0"
+}

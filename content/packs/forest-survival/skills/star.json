@@ -1,0 +1,14 @@
+{
+  "id": "forest-survival:skill/star",
+  "kind": "skill",
+  "name": "星芒术",
+  "interval": 0.65,
+  "cost": 3.714,
+  "coefficient": 1.3929,
+  "range": 9,
+  "speed": 14,
+  "supportSlots": 1,
+  "delivery": "projectile",
+  "effect": "star",
+  "description": "追踪目标；5级弹射1次，10级弹射2次，每次伤害减半，优先未命中目标。"
+}

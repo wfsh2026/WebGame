@@ -1,0 +1,75 @@
+.root { position: relative; isolation: isolate; min-height: 100dvh; overflow: hidden; display: flex; align-items: center; justify-content: flex-end; padding: 70px 5.5% 75px; background: #10231e; color: #f1e7c9; font: 16px/1.6 'Microsoft YaHei', 'PingFang SC', sans-serif; color-scheme: dark; }
+.root *, .root *::before, .root *::after { box-sizing: border-box; }
+.root button, .root input { font: inherit; }
+.root button { cursor: pointer; }
+.root button:disabled { cursor: wait; opacity: .6; }
+.root button:focus-visible, .root input:focus-visible { outline: 2px solid #ffe1a0; outline-offset: 5px; }
+.scenery { position: absolute; inset: 0; z-index: -2; overflow: hidden; background: #142c25; }
+.landscape { position: absolute; width: 100%; height: 100%; object-fit: cover; object-position: center; transform: scale(1.06); }
+.shade { position: absolute; inset: 0; background: linear-gradient(90deg, #071d1608 35%, #07171133 80%), linear-gradient(0deg, #05171088, transparent 24%, transparent 80%, #07171233); }
+.portal { position: absolute; left: 30%; top: 36%; width: 12%; height: 19%; border-radius: 50%; background: radial-gradient(ellipse, #45e6c128, transparent 70%); mix-blend-mode: screen; animation: breathe 5s ease-in-out infinite; }
+.fire { position: absolute; left: 24%; top: 64%; width: 15%; height: 23%; border-radius: 50%; background: radial-gradient(ellipse, #ffb14738, transparent 68%); mix-blend-mode: screen; animation: flicker 1.7s ease-in-out infinite alternate; }
+.mist { position: absolute; left: -15%; top: 48%; width: 100%; height: 30%; opacity: .14; background: radial-gradient(ellipse, #c6e3d4 0, transparent 65%); filter: blur(25px); animation: drift 24s ease-in-out infinite alternate; pointer-events: none; }
+.leaves { position: absolute; inset: -8%; box-shadow: inset 0 0 100px 35px #061b15a0; pointer-events: none; }
+.motes { position: absolute; inset: 0; }
+.motes i { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #ffe9a4; box-shadow: 0 0 9px 3px #f4ce7166; animation: float 6s ease-in-out infinite; }
+.title { position: absolute; top: 7%; left: 9%; width: 46%; text-align: center; text-shadow: 0 3px 18px #071711; }
+.titleMark { display: block; height: 25px; color: #d4b576; font: 44px/1 Georgia, serif; }
+.title h1 { color: #f5d799; font: 500 clamp(38px, 5.5vw, 92px)/1.4 'Songti SC', SimSun, serif; letter-spacing: .08em; margin: 10px 0 8px; }
+.title p { margin: 0; color: #eddaad; font: 19px/1.7 'Songti SC', SimSun, serif; letter-spacing: .13em; }
+.title p span { font-size: 13px; margin: 0 9px; }
+.card { position: relative; width: min(35vw, 510px); padding: 46px 40px 35px; margin: 25px 0 0; border: 3px ridge #c7a15e; border-radius: 28px 28px 22px 22px; background: radial-gradient(ellipse at 50% 0, #3d523c77, transparent 70%), linear-gradient(125deg, #213b2cf5, #142b22fa); box-shadow: 0 0 0 3px #182a21, 0 0 0 5px #ab8a4c, inset 0 0 0 5px #9e824a30, inset 0 0 45px #071a1780, 0 18px 60px #02100c77; animation: panelIn .7s ease both; }
+.banner { position: absolute; top: -38px; left: calc(50% - 27px); width: 54px; height: 72px; padding-top: 8px; text-align: center; font-size: 34px; background: linear-gradient(90deg, #215450, #33766b, #215450); color: #dfbc70; border: 2px solid #c6a560; clip-path: polygon(0 0, 100% 0, 100% 72%, 50% 100%, 0 72%); }
+.card h2 { margin: 3px -10px 18px; padding: 4px 10px; background: linear-gradient(110deg, #ceb17a, #f3deac 50%, #d6bb84); color: #3e301e; border: 3px ridge #d7b777; clip-path: polygon(5% 0, 95% 0, 100% 50%, 95% 100%, 5% 100%, 0 50%); font: 600 clamp(25px, 2.8vw, 42px)/1.5 'Songti SC', SimSun, serif; letter-spacing: .12em; text-align: center; text-shadow: 0 1px #fff6; }
+.ornament { text-align: center; color: #cbb275; font: 17px/1.5 Georgia, serif; margin: 15px 0 22px; }
+.card fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.field { display: block; color: #e8dbb4; font: 22px/1.5 'Songti SC', SimSun, serif; letter-spacing: 2px; margin: 18px 0 8px; }
+.card input { display: block; width: 100%; min-width: 0; height: 49px; padding: 10px 16px; color: #f7edcf; border: 1px solid #c3a565; border-radius: 6px; background: linear-gradient(110deg, #1b2d25, #10251f); box-shadow: inset 0 2px 9px #0004; }
+.card input::placeholder { color: #a7b0a0; }
+.password { position: relative; }
+.password input { padding-right: 53px; }
+.eye { position: absolute; top: 3px; bottom: 3px; right: 4px; width: 42px; border: 0; background: transparent; color: #ead6a7; display: grid; place-items: center; }
+.eye svg { width: 23px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.feedback { min-height: 60px; padding: 9px 0 8px; display: flex; align-items: center; }
+.feedback p { margin: 0; color: #ffd5a7; font-size: 13px; line-height: 1.6; }
+.feedback .hint { color: #b4bea5; font-size: 12px; }
+.primary { display: block; width: 100%; min-height: 59px; border: 3px ridge #ebc37e; border-radius: 8px; background: linear-gradient(#f1d395, #d3aa5e 55%, #bb8d47); color: #392a16; font: 600 clamp(22px, 2.4vw, 34px)/1.5 'Songti SC', SimSun, serif !important; letter-spacing: .1em; text-shadow: 0 1px #fff6; box-shadow: inset 0 0 0 2px #f7dc9b77, 0 4px 12px #0007; transition: filter .15s, transform .15s; }
+.primary:hover:not(:disabled) { filter: brightness(1.12); }
+.primary:active:not(:disabled) { transform: translateY(2px); }
+.switch { display: block; margin: 19px auto 0; padding: 4px 0; background: none; border: 0; border-bottom: 1px solid #bba26a; color: #e9d9ac; font: 19px/1.6 'Songti SC', SimSun, serif !important; }
+.switch:hover { color: #ffedbd; }
+.cornerLeft, .cornerRight { position: absolute; bottom: 0; color: #b1ab65; width: 58px; height: 58px; pointer-events: none; }
+.cornerLeft { left: 0; }.cornerRight { right: 0; transform: scaleX(-1); }
+.cornerLeft svg, .cornerRight svg { width: 100%; fill: currentColor; stroke: currentColor; stroke-width: 1; }
+:global([inert]) .card { animation-play-state: paused; }
+.restoring { min-height: 280px; display: grid; place-items: center; color: #dfd1ad; }
+.footer { position: absolute; bottom: 20px; left: 25px; right: 25px; display: flex; justify-content: space-between; align-items: center; gap: 14px; color: #d6cfb2; font-size: 12px; text-shadow: 0 2px 5px #071711; }
+.footer div { display: flex; gap: 20px; }.footer button { padding: 8px 0; background: none; color: #eadbb5; border: 0; font-size: 14px; }
+.opening { position: fixed; inset: 0; z-index: 100; padding: 0; }
+.opening .title { top: 23%; left: 23%; width: 54%; opacity: 0; }
+.opening .scenery { opacity: 0; }
+.opening.running .scenery { animation: reveal 7s ease-out both; }
+.opening.running .landscape { animation: approach 7s cubic-bezier(.15,.4,.4,1) both; }
+.opening.running .title { animation: titleIn 7s ease both; }
+.openingCaption { position: absolute; bottom: 12%; width: 100%; text-align: center; font: 18px/1.7 'Songti SC', SimSun, serif; letter-spacing: .15em; text-shadow: 0 2px 8px #000; }
+.skip { position: absolute; top: 25px; right: 30px; border: 1px solid #b79b6580; border-radius: 5px; background: #142b22cc; color: #f0ddb1; padding: 10px 20px; }
+@keyframes reveal { 0% { opacity: 0; } 18%,100% { opacity: 1; } }
+@keyframes approach { from { transform: scale(1); filter: brightness(.65); } to { transform: scale(1.06); filter: brightness(1); } }
+@keyframes titleIn { 0%,55% { opacity: 0; transform: translateY(12px); } 82%,100% { opacity: 1; transform: translateY(0); } }
+@keyframes panelIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes breathe { 50% { opacity: .35; transform: scale(.9); } }
+@keyframes flicker { 0%,100% { opacity: .55; } 35% { opacity: .95; } 70% { opacity: .65; } }
+@keyframes drift { to { transform: translateX(23%); opacity: .08; } }
+@keyframes float { 0%,100% { opacity: .15; transform: translate(0, 12px); } 50% { opacity: .8; transform: translate(14px, -24px); } }
+@media (min-aspect-ratio: 2/1) { .title { top: 5%; }.card { padding-top: 32px; padding-bottom: 24px; }.field { margin-top: 12px; } }
+@media (max-width: 900px) { .root { padding-right: 5%; }.card { width: 42vw; padding: 38px 25px 28px; }.title { left: 3%; width: 47%; }.title p { font-size: 15px; letter-spacing: 0; }.title p span { margin: 0 3px; }.card h2 { font-size: 30px; } }
+@media (max-width: 600px) {
+  .root { min-height: 100dvh; padding: 172px 20px 90px; justify-content: center; }
+  .landscape { object-position: 37% center; }.shade { background: linear-gradient(#081e1622, #071c1566); }
+  .title { top: 18px; left: 0; width: 100%; }.title h1 { font-size: 44px; margin-top: 5px; }.titleMark { font-size: 32px; height: 20px; }.title p { font-size: 15px; }
+  .card { width: min(100%, 390px); padding: 32px 23px 27px; margin: 12px 0 0; }.card h2 { font-size: 29px; }.banner { width: 44px; height: 58px; left: calc(50% - 22px); top: -30px; font-size: 26px; }
+  .ornament { margin: 10px 0 15px; }.field { font-size: 19px; margin-top: 14px; }.card input { height: 46px; font-size: 16px; }.feedback { min-height: 54px; }.primary { min-height: 52px; font-size: 26px !important; }.switch { font-size: 17px !important; margin-top: 16px; }
+  .footer { bottom: 13px; left: 20px; right: 20px; flex-wrap: wrap; justify-content: center; gap: 0; }.footer > span { width: 100%; text-align: center; font-size: 10px; }.footer div { gap: 25px; }.footer button { font-size: 12px; padding: 6px 0; }
+  .opening { padding: 0; }.opening .title { top: 30%; left: 0; width: 100%; }.openingCaption { font-size: 14px; padding: 0 15px; }.skip { top: 16px; right: 16px; padding: 8px 15px; }
+}
+@media (prefers-reduced-motion: reduce) { .root *, .root *::before, .root *::after { animation: none !important; transition: none !important; }.opening.running .scenery, .opening.running .title { opacity: 1; } }

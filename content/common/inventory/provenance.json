@@ -1,0 +1,17 @@
+{
+  "source": "Generated with built-in image generation for WebGameWorld",
+  "asset": "item-atlas.png",
+  "layout": "3 columns x 3 rows",
+  "cells": [
+    "bag",
+    "wind-scroll",
+    "frost-scroll",
+    "bow",
+    "armor",
+    "dagger",
+    "herb",
+    "ore",
+    "wood"
+  ],
+  "prompt": "Hand-painted forest fantasy inventory atlas, nine equally spaced cells, dark green background, natural materials, antique gold and turquoise accents; leather backpack, wind and frost scrolls, bow, leather armor, dagger, herbs, iron ore, timber. No text or geometric placeholder icons."
+}

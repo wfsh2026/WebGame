@@ -1,0 +1,1 @@
+ALTER TABLE "PersonalRoundRecord" ADD COLUMN "assists" INTEGER NOT NULL DEFAULT 0;

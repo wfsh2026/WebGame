@@ -1,0 +1,8 @@
+{
+  "id": "forest-survival:support/economy",
+  "kind": "support",
+  "name": "节能",
+  "host": "both",
+  "effect": "economy",
+  "description": "降低灵力消耗，略微降低伤害。3/5/10/15/20级解锁阶段效果，详情见成长路线。战旗：降低布旗成本与增益强度；10级持续守阵后补旗折扣，20级折扣增强。"
+}

@@ -1,0 +1,14 @@
+{
+  "id": "forest-survival:skill/thunder-seal",
+  "kind": "skill",
+  "name": "雷印符",
+  "effect": "thunder-seal",
+  "interval": 1.25,
+  "cost": 6.25,
+  "coefficient": 0.8125,
+  "range": 8,
+  "speed": 12,
+  "supportSlots": 1,
+  "delivery": "projectile",
+  "description": "命中附加个人雷印6秒，长棍引爆造成符弹伤害2倍；5级目标死亡转移雷印一次，继承剩余时间；10级命中2个目标、雷印8秒。"
+}

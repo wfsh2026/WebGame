@@ -1,0 +1,11 @@
+{
+  "id": "forest-survival:weapon/blade",
+  "kind": "weapon",
+  "name": "飞刃",
+  "interval": 1,
+  "cost": 8,
+  "damage": 40,
+  "supportSlots": 1,
+  "speed": 14,
+  "range": 9
+}

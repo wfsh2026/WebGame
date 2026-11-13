@@ -1,0 +1,1 @@
+{"name":"@web-game-world/room-server","private":true,"version":"0.1.0","type":"module","scripts":{"start":"tsx src/index.ts"},"dependencies":{"@web-game-world/contracts":"workspace:*","@web-game-world/simulation":"workspace:*","@web-game-world/content-schema":"workspace:*","@colyseus/core":"0.16.24","@colyseus/ws-transport":"0.16.5","zod":"4.6.7","tsx":"4.23.15"}}

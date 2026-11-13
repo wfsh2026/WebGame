@@ -1,0 +1,14 @@
+{
+  "id": "forest-survival:skill/chain-lightning",
+  "kind": "skill",
+  "name": "奔雷链",
+  "effect": "chain-lightning",
+  "interval": 1.35,
+  "cost": 8,
+  "coefficient": 1.4,
+  "range": 8,
+  "speed": 13,
+  "supportSlots": 1,
+  "delivery": "nova",
+  "description": "瞬间连锁3个目标，逐跳伤害衰减15%；5级5个目标；10级跳跃4米；15级优先自身雷印；20级末目标追加35%回击。"
+}

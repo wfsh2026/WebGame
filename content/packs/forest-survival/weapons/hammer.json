@@ -1,0 +1,16 @@
+{
+  "id": "forest-survival:weapon/hammer",
+  "kind": "weapon",
+  "name": "镇林重锤",
+  "interval": 2.45,
+  "cost": 14.972,
+  "coefficient": 2.9944,
+  "range": 2.2,
+  "supportSlots": 1,
+  "delivery": "melee",
+  "effect": "hammer",
+  "angle": 100,
+  "width": 0,
+  "knockback": 0.25,
+  "description": "扇形重击与击退；5级每第4击改为周身震击，击退距离提高50%；10级每第3击周身震击。首领免疫击退。"
+}

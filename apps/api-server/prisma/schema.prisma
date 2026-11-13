@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model Account {
+  id           String @id @default(uuid())
+  name         String @unique
+  passwordHash String
+  role         String?
+  loadout      Json?
+  loadoutRevision Int @default(0)
+  shopOffers   Json?
+  shopRevision Int @default(0)
+  character    Json?
+  coins        Int @default(0)
+  materials    Int @default(0)
+  inventory    InventoryEntry[]
+  items        AccountItem[]
+  purchases    ShopPurchase[]
+  shopRefreshes ShopRefresh[]
+  startingFunds CharacterFunding?
+  testAdjustments TestAssetAdjustment[]
+  sessions     Session[]
+  participants Participant[]
+  createdAt    DateTime @default(now())
+}
+model Session {
+  tokenHash String @id
+  accountId String
+  account Account @relation(fields: [accountId], references: [id])
+  expiresAt DateTime
+  @@index([expiresAt])
+}
+model Run {
+  id String @id
+  roomId String
+  contentVersion String
+  ruleVersion String
+  status String @default("active")
+  participants Participant[]
+  rounds RoundRecord[]
+  personalRounds PersonalRoundRecord[]
+  createdAt DateTime @default(now())
+}
+model Participant {
+  runId String
+  accountId String
+  run Run @relation(fields: [runId], references: [id])
+  account Account @relation(fields: [accountId], references: [id])
+  settled Boolean @default(false)
+  coins Int @default(0)
+  materials Int @default(0)
+  @@id([runId, accountId])
+}
+model RoundRecord {
+  runId String
+  round Int
+  run Run @relation(fields: [runId], references: [id])
+  success Boolean
+  results Json
+  @@id([runId, round])
+}
+model AssetLedger {
+  id String @id @default(uuid())
+  runId String
+  accountId String
+  coins Int
+  materials Int
+  createdAt DateTime @default(now())
+  @@unique([runId, accountId])
+}
+model PersonalRoundRecord {
+  runId String
+  round Int
+  accountId String
+  run Run @relation(fields: [runId], references: [id])
+  success Boolean
+  survivalSeconds Float
+  kills Int
+  assists Int @default(0)
+  damage Float
+  @@id([runId, round, accountId])
+}
+
+model AccountItem {
+  accountId String
+  itemId String
+  level Int @default(1)
+  account Account @relation(fields: [accountId], references: [id])
+  createdAt DateTime @default(now())
+  @@id([accountId, itemId])
+}
+model ShopPurchase {
+  accountId String
+  requestId String
+  itemId String
+  level Int @default(1)
+  shelfRevision Int @default(-1)
+  coins Int
+  materials Int
+  account Account @relation(fields: [accountId], references: [id])
+  createdAt DateTime @default(now())
+  @@id([accountId, requestId])
+  @@index([accountId, itemId])
+}
+
+model ShopRefresh {
+  accountId String
+  requestId String
+  sourceRevision Int
+  coins Int
+  account Account @relation(fields: [accountId], references: [id])
+  createdAt DateTime @default(now())
+  @@id([accountId, requestId])
+}
+
+model CharacterFunding {
+  accountId String @id
+  coins Int
+  materials Int
+  account Account @relation(fields: [accountId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model InventoryDefinition {
+  id String @id
+  name String @db.VarChar(24)
+  category String
+  effect String @db.VarChar(96)
+  entries InventoryEntry[]
+}
+
+model TestInventoryGrant {
+  accountId String
+  requestId String
+  createdAt DateTime @default(now())
+  @@id([accountId, requestId])
+}
+model InventoryEntry {
+  id String @id @default(uuid())
+  accountId String
+  definitionId String
+  quantity Int @default(1)
+  level Int @default(1)
+  sourceRunId String?
+  sourceLootId String?
+  acquiredAt DateTime @default(now())
+  account Account @relation(fields: [accountId], references: [id])
+  definition InventoryDefinition @relation(fields: [definitionId], references: [id])
+  @@index([accountId])
+  @@unique([sourceRunId, sourceLootId])
+}
+
+model TestAssetAdjustment {
+  id String @id @default(uuid())
+  accountId String
+  account Account @relation(fields: [accountId], references: [id])
+  coinsBefore Int
+  coinsAfter Int
+  materialsBefore Int
+  materialsAfter Int
+  createdAt DateTime @default(now())
+  @@index([accountId, createdAt])
+}

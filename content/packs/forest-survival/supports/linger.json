@@ -1,0 +1,8 @@
+{
+  "id": "forest-survival:support/linger",
+  "kind": "support",
+  "name": "余韵",
+  "effect": "linger",
+  "host": "skill",
+  "description": "战旗离阵保留增加1.5秒，离阵阶段保留65%强度，耗能增加15%；升级延长余韵并提高保留强度。"
+}

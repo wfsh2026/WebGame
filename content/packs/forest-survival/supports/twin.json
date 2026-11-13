@@ -1,0 +1,8 @@
+{
+  "id": "forest-survival:support/twin",
+  "kind": "support",
+  "name": "双旌",
+  "effect": "twin",
+  "host": "skill",
+  "description": "同种战旗可保留2面，每面单独付费，同类不叠加；离开原阵地后布置第二面。10级第二面布置间隔缩短15%，20级缩短25%。"
+}

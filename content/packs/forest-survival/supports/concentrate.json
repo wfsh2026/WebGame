@@ -1,0 +1,8 @@
+{
+  "id": "forest-survival:support/concentrate",
+  "kind": "support",
+  "name": "集中",
+  "effect": "concentrate",
+  "host": "both",
+  "description": "缩小范围25%，伤害或战旗增益提高25%，耗能增加20%；升级进一步压缩范围并增强效果。10级战旗驻留3秒后额外强化，20级驻留强化提高。"
+}

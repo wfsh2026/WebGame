@@ -1,0 +1,161 @@
+{
+  "tiledversion": "1.11.2",
+  "layers": [
+    {
+      "y": 0,
+      "draworder": "topdown",
+      "type": "objectgroup",
+      "opacity": 1,
+      "visible": true,
+      "id": 1,
+      "name": "points",
+      "objects": [
+        {
+          "y": 320,
+          "height": 0,
+          "type": "spawn",
+          "rotation": 0,
+          "width": 0,
+          "id": 1,
+          "name": "player-1",
+          "visible": true,
+          "x": 448
+        },
+        {
+          "y": 320,
+          "height": 0,
+          "type": "spawn",
+          "rotation": 0,
+          "width": 0,
+          "id": 2,
+          "name": "player-2",
+          "visible": true,
+          "x": 512
+        },
+        {
+          "y": 384,
+          "height": 0,
+          "type": "spawn",
+          "rotation": 0,
+          "width": 0,
+          "id": 3,
+          "name": "player-3",
+          "visible": true,
+          "x": 448
+        },
+        {
+          "y": 384,
+          "height": 0,
+          "type": "spawn",
+          "rotation": 0,
+          "width": 0,
+          "id": 4,
+          "name": "player-4",
+          "visible": true,
+          "x": 512
+        },
+        {
+          "y": 64,
+          "height": 0,
+          "type": "enemy-spawn",
+          "rotation": 0,
+          "width": 0,
+          "id": 5,
+          "name": "enemy-5",
+          "visible": true,
+          "x": 64
+        },
+        {
+          "y": 64,
+          "height": 0,
+          "type": "enemy-spawn",
+          "rotation": 0,
+          "width": 0,
+          "id": 6,
+          "name": "enemy-6",
+          "visible": true,
+          "x": 480
+        },
+        {
+          "y": 64,
+          "height": 0,
+          "type": "enemy-spawn",
+          "rotation": 0,
+          "width": 0,
+          "id": 7,
+          "name": "enemy-7",
+          "visible": true,
+          "x": 896
+        },
+        {
+          "y": 352,
+          "height": 0,
+          "type": "enemy-spawn",
+          "rotation": 0,
+          "width": 0,
+          "id": 8,
+          "name": "enemy-8",
+          "visible": true,
+          "x": 896
+        },
+        {
+          "y": 640,
+          "height": 0,
+          "type": "enemy-spawn",
+          "rotation": 0,
+          "width": 0,
+          "id": 9,
+          "name": "enemy-9",
+          "visible": true,
+          "x": 896
+        },
+        {
+          "y": 640,
+          "height": 0,
+          "type": "enemy-spawn",
+          "rotation": 0,
+          "width": 0,
+          "id": 10,
+          "name": "enemy-10",
+          "visible": true,
+          "x": 480
+        },
+        {
+          "y": 640,
+          "height": 0,
+          "type": "enemy-spawn",
+          "rotation": 0,
+          "width": 0,
+          "id": 11,
+          "name": "enemy-11",
+          "visible": true,
+          "x": 64
+        },
+        {
+          "y": 352,
+          "height": 0,
+          "type": "enemy-spawn",
+          "rotation": 0,
+          "width": 0,
+          "id": 12,
+          "name": "enemy-12",
+          "visible": true,
+          "x": 64
+        }
+      ],
+      "x": 0
+    }
+  ],
+  "version": "1.10",
+  "nextlayerid": 2,
+  "type": "map",
+  "tilewidth": 32,
+  "nextobjectid": 13,
+  "height": 22,
+  "width": 30,
+  "renderorder": "right-down",
+  "infinite": false,
+  "orientation": "orthogonal",
+  "tileheight": 32,
+  "tilesets": []
+}

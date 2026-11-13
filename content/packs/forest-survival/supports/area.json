@@ -1,0 +1,8 @@
+{
+  "id": "forest-survival:support/area",
+  "kind": "support",
+  "name": "广域",
+  "host": "both",
+  "effect": "area",
+  "description": "扩大已有攻击范围，略微降低伤害。3/5/10/15/20级解锁阶段效果，详情见成长路线。战旗：扩大覆盖并略降增益强度，10级外沿增加15%半径的半效过渡区。"
+}

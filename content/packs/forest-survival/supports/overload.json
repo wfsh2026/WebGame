@@ -1,0 +1,8 @@
+{
+  "id": "forest-survival:support/overload",
+  "kind": "support",
+  "name": "过载",
+  "host": "both",
+  "effect": "overload",
+  "description": "伤害提升，但耗能增加50%。3/5/10/15/20级解锁阶段效果，详情见成长路线。战旗：提高增益强度与布旗消耗，5级落旗后2秒额外强化15%。"
+}

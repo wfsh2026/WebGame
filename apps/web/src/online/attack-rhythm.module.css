@@ -1,0 +1,6 @@
+.panel { margin:12px 0; padding:12px; border:1px solid #8a825d; border-radius:8px; background:#14271ed9; color:#e8dfc4; font-size:13px; }
+.panel summary { cursor:pointer; font-weight:700; }.panel p { line-height:1.6; }.panel strong { color:#f0ce8d; }
+.axis { display:flex; justify-content:space-between; margin-top:12px; color:#c4bea6; font-size:11px; }
+.row { margin:10px 0; }.row b { display:block; }.row > span { font-size:12px; line-height:1.6; }
+.track { position:relative; height:24px; margin:3px 5px; border-bottom:1px solid #76745d; }.track i { position:absolute; top:4px; transform:translateX(-50%); font-style:normal; }
+.normal { color:#eadb9a; font-size:10px; }.extra { color:#8fd8cf; font-size:22px; line-height:12px; }

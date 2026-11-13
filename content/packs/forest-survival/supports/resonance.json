@@ -1,0 +1,10 @@
+{
+  "id": "forest-survival:support/resonance",
+  "kind": "support",
+  "name": "共鸣宝石",
+  "effect": "resonance",
+  "host": "both",
+  "costMultiplier": 1.15,
+  "damageMultiplier": 1,
+  "description": "所属能力命中后，强化下一次异类攻击15%，5级升至30%；持续4秒，不叠加。强化攻击不再产生共鸣，宿主卸下增益失效，灵力消耗增加15%。3/5/10/15/20级解锁阶段效果，详情见成长路线。"
+}

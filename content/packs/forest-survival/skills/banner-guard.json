@@ -1,0 +1,13 @@
+{
+  "id": "forest-survival:skill/banner-guard",
+  "kind": "skill",
+  "name": "镇岳战旗",
+  "effect": "banner-guard",
+  "interval": 3,
+  "cost": 10,
+  "coefficient": 0,
+  "range": 10,
+  "supportSlots": 1,
+  "delivery": "nova",
+  "description": "布旗后范围内减伤8%。5级扩大范围，10级驻留生成护盾，15级破盾获得短暂强化保护，20级周期坚守。当前怪物未提供击退攻击，抗击退后续接入对应攻击时生效。"
+}

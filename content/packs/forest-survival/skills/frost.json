@@ -1,0 +1,14 @@
+{
+  "id": "forest-survival:skill/frost",
+  "kind": "skill",
+  "name": "寒棘术",
+  "interval": 1.75,
+  "cost": 8.077,
+  "coefficient": 1.3462,
+  "range": 8,
+  "speed": 14,
+  "supportSlots": 1,
+  "delivery": "projectile",
+  "effect": "frost",
+  "description": "减速25%持续2秒；5级产生1.25米减速冰环；10级减速35%持续3秒，命中自身寒棘已减速目标追加40%碎冰伤害；首领减速减半。"
+}

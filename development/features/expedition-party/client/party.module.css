@@ -1,0 +1,57 @@
+.page { min-height: 100dvh; padding: 5vh 4vw 3vh; display: grid; place-items: center; background-size: cover; background-position: center; background-attachment: fixed; color: #eee3bd; font: 15px/1.5 "Microsoft YaHei", sans-serif; isolation: isolate; }
+.page::before { content: ''; position: fixed; inset: 0; z-index: -1; background: #071c1760; }
+.board { width: min(1500px, 100%); padding: 0 10px; border-style: solid; border-color: transparent; border-width: 86px 30px 34px; border-image: url('../content/assembly-board.png') 110 65 65 65 fill / 86px 30px 34px / 0 stretch; filter: drop-shadow(0 14px 25px #0009); }
+.heading { height: 86px; margin-top: -86px; display: grid; place-items: center; }
+.heading h1 { margin: 0 0 10px; color: #f9e2a0; font: bold clamp(26px, 3.3vw, 46px)/1.2 "STKaiti", "KaiTi", serif; letter-spacing: .18em; text-shadow: 0 2px 3px #172b21; }
+.content { display: grid; grid-template-columns: minmax(230px, 30%) minmax(0, 1fr); gap: 24px; }
+.destination { padding: 0 18px 0 0; border-right: 1px solid #a68c4b65; min-width: 0; }
+.destination h2 { margin: 0; text-align: center; color: #f5d38c; font: bold clamp(24px, 2.5vw, 36px)/1.4 "KaiTi", serif; letter-spacing: .12em; }
+.subtitle { display: block; text-align: center; color: #dbc58c; margin: 4px 0 12px; letter-spacing: .2em; }
+.landscape { width: 100%; height: clamp(130px, 16vw, 230px); object-fit: cover; object-position: 51% 20%; border-radius: 3px; mask-image: linear-gradient(#000 85%, transparent); }
+.destination p { margin: 8px 0 12px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; color: #d8d5a1; }
+.tags span { padding: 3px 8px; border: 1px solid #8d9b5370; border-radius: 20px; background: #3c562d70; }
+.rules { margin: 14px 0; font-size: 13px; }
+.rules summary { color: #e1c583; cursor: pointer; padding: 5px 0; }
+.rules p { color: #bfc5ac; }
+.roomCode { border-top: 1px solid #ac935a80; padding-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px; }
+.roomCode input { width: 110px; min-width: 0; flex: 1; color: #ffe3a4; background: #12271b; border: 1px solid #8e784c; padding: 7px; font: 15px monospace; }
+.board button { font: inherit; cursor: pointer; border: 1px solid #ac915e; border-radius: 5px; color: #f7e6b9; background: #453b29; padding: 10px 22px; box-shadow: inset 0 0 0 2px #d2b77722; transition: filter .15s, transform .15s; }
+.board button:hover:not(:disabled) { filter: brightness(1.18); }
+.board button:active:not(:disabled) { transform: translateY(1px); }
+.board button:disabled { cursor: default; filter: saturate(.3); opacity: .48; }
+.board button:focus-visible, .board input:focus-visible, .board summary:focus-visible { outline: 2px solid #87e9cf; outline-offset: 3px; }
+.roomCode button { padding: 6px 9px; font-size: 12px; }
+.copyStatus { display: block; min-height: 22px; margin-top: 4px; color: #a7e5cc; font-size: 12px; }
+.team { min-width: 0; }
+.teamHeading { display: flex; justify-content: space-between; align-items: center; gap: 10px; color: #e5cc8f; padding: 5px 0 15px; border-bottom: 1px solid #b69b6055; }
+.teamHeading h2 { margin: 0; font-size: clamp(18px, 2vw, 26px); font-weight: 500; }
+.teamHeading h2 span { margin-left: 10px; white-space: nowrap; }
+.teamHeading > span { white-space: nowrap; font-size: 14px; }
+.members { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; padding: 14px 0; }
+.member, .empty { min-width: 0; min-height: clamp(78px, 6.5vw, 102px); border: 1px solid #89967966; border-radius: 6px; background: #24332670; padding: 12px 8px; display: flex; align-items: center; gap: 8px; position: relative; }
+.member { animation: join .3s ease-out; }
+.mine { border-color: #ddba66; box-shadow: inset 0 0 12px #e2be4025, 0 0 6px #b7a04830; }
+.portrait { width: clamp(36px, 4vw, 62px); height: clamp(36px, 4vw, 62px); object-fit: cover; border: 2px solid #b89d59; border-radius: 50%; flex-shrink: 0; }
+.host { position: absolute; top: -9px; left: 7px; background: #265d4b; color: #f1d28f; border: 1px solid #bea05b; padding: 0 7px; font-size: 11px; }
+.memberText { min-width: 0; flex: 1; }
+.memberText b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+.memberText small { color: #e0c07b; font-size: 10px; }
+.memberText > span { display: block; font-size: 12px; margin-top: 3px; }
+.ready { color: #7fe6cd; }
+.unready { color: #b9baa0; }
+.offline .portrait { filter: grayscale(1); opacity: .55; }
+.empty { flex-direction: column; justify-content: center; gap: 3px; color: #aeb59a80; font-size: 12px; background: #1e302440; border-color: #83916c35; }
+.emptySeal { width: 28px; height: 28px; background: url('../../../../content/common/lobby/camp-portrait.webp') center/cover; border-radius: 50%; opacity: .18; filter: sepia(1); }
+.footer { display: flex; align-items: center; gap: 16px; border-top: 1px solid #b2914d66; padding: 16px 0 5px; }
+.hint { flex: 1; text-align: center; color: #e6d4a5; font-size: 14px; margin: 0; }
+.actions { display: flex; gap: 12px; }
+.board .prepare { background: #245d4e; min-width: 120px; }
+.board .start { background: #386452; min-width: 160px; font-size: 18px; }
+.feedback { padding: 8px 12px; color: #ffce9d; background: #392a20e6; border-radius: 4px; margin-top: 10px; font-size: 13px; }
+.resting .hint { color: #98f1d9; font-size: 20px; padding: 10px; }
+@keyframes join { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 1100px) { .members { grid-template-columns: repeat(3, minmax(0, 1fr)); } .content { gap: 16px; } .footer { flex-wrap: wrap; } .hint { min-width: 220px; } }
+@media (max-width: 700px) { .page { padding: 12px 8px 0; display: block; } .board { padding: 0 4px; border-width: 70px 16px 24px; border-image-width: 70px 16px 24px; } .heading { height: 70px; margin-top: -70px; } .heading h1 { margin: 0; } .content { grid-template-columns: 1fr; gap: 8px; } .destination { border: 0; padding: 0; } .destination h2 { font-size: 23px; } .subtitle { margin: 0 0 8px; } .landscape { height: 110px; object-position: center 24%; } .destination > p { font-size: 13px; } .rules { margin: 6px 0; } .roomCode { padding-top: 8px; } .teamHeading { padding-bottom: 8px; } .teamHeading > span { font-size: 12px; } .teamHeading h2 { font-size: 18px; } .members { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 8px; } .member, .empty { min-height: 76px; } .portrait { width: 38px; height: 38px; } .memberText b { font-size: 12px; } .memberText > span { font-size: 11px; } .footer { position: sticky; bottom: 0; background: #182b22f5; padding: 12px 0; gap: 8px; z-index: 2; } .hint { order: -1; flex-basis: 100%; min-width: 0; font-size: 12px; } .board button { padding: 9px 12px; font-size: 13px; } .actions { flex: 1; gap: 8px; } .actions button { flex: 1; min-width: 0; } .board .start { min-width: 0; font-size: 14px; } .board .prepare { min-width: 0; } }
+@media (prefers-reduced-motion: reduce) { .member { animation: none; } .board button { transition: none; } }
+

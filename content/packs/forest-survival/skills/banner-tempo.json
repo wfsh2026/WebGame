@@ -1,0 +1,13 @@
+{
+  "id": "forest-survival:skill/banner-tempo",
+  "kind": "skill",
+  "name": "催锋战旗",
+  "effect": "banner-tempo",
+  "interval": 3,
+  "cost": 12,
+  "coefficient": 0,
+  "range": 10,
+  "supportSlots": 1,
+  "delivery": "nova",
+  "description": "布旗后范围内出手间隔缩短10%，增加灵力需求，不加速心法和布旗。5级延长持续，10级驻留加速，15级离阵保留更久，20级周期急攻。"
+}

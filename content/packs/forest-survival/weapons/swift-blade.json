@@ -1,0 +1,11 @@
+{
+  "id": "forest-survival:weapon/swift-blade",
+  "kind": "weapon",
+  "name": "疾风刃",
+  "interval": 0.5,
+  "cost": 6,
+  "damage": 24,
+  "supportSlots": 1,
+  "speed": 14,
+  "range": 9
+}

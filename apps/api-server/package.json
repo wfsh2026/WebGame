@@ -1,0 +1,24 @@
+{
+  "name": "@web-game-world/api-server",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "db:generate": "prisma generate",
+    "db:deploy": "prisma migrate deploy"
+  },
+  "dependencies": {
+    "@web-game-world/contracts": "workspace:*",
+    "@web-game-world/simulation": "workspace:*",
+    "@prisma/client": "6.19.3",
+    "fastify": "5.12.8",
+    "@fastify/rate-limit": "10.3.0",
+    "zod": "4.6.7",
+    "tsx": "4.23.15",
+    "@web-game-world/content-schema": "workspace:*"
+  },
+  "devDependencies": {
+    "prisma": "6.19.3"
+  }
+}

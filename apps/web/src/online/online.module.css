@@ -1,0 +1,69 @@
+:global(*) { box-sizing: border-box; }
+:global(body) { margin: 0; background: #101d19; color: #e5e9db; font-family: "Microsoft YaHei", system-ui, sans-serif; }
+:global(button), :global(input) { font: inherit; }
+.shell { min-height: 100vh; }
+.characterCard { display: flex; justify-content: space-between; gap: 24px; background: linear-gradient(120deg, #263628, #19271f); border: 1px solid #635e42; border-radius: 8px; padding: 24px; margin-bottom: 28px; }
+.characterCard h3 { color: #d3ba81; margin: 6px 0; letter-spacing: 3px; }
+.characterCard p { margin: 0; }
+.characterCard .tags { margin: 12px 0 0; }
+.characterNumbers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 26px; min-width: 160px; align-content: center; font-size: 12px; color: #9cae92; }
+.characterNumbers b { color: #dedcc6; font: 20px Georgia, serif; margin-left: 8px; }
+@media (max-width: 600px) { .characterCard { flex-direction: column; }.characterNumbers { min-width: 0; } }
+.header { display: flex; justify-content: space-between; align-items: center; padding: 24px 5%; border-bottom: 1px solid #314137; gap: 16px; }
+.header h1 { margin: 5px 0 0; font-size: 25px; letter-spacing: 4px; }
+.eyebrow { color: #b9c69a; font-size: 11px; letter-spacing: 2px; }
+.account { display: flex; align-items: center; gap: 18px; font-size: 13px; flex-wrap: wrap; }
+.main { max-width: 1200px; margin: auto; padding: 32px 24px 50px; }
+.main h2 { font-size: 26px; font-weight: 500; line-height: 1.5; }
+.main h3 { font-weight: 500; font-size: 20px; }
+.main p { color: #b5c0ae; line-height: 1.9; font-size: 14px; }
+.main button, .account button { background: #c7d7a6; color: #1d3024; border: 1px solid transparent; border-radius: 6px; padding: 12px 20px; cursor: pointer; margin: 4px 8px 4px 0; }
+.main button:disabled { opacity: .45; cursor: default; }
+.main input { width: 100%; border: 1px solid #52614d; border-radius: 6px; background: #14251f; color: #edf0e4; padding: 12px; min-width: 0; }
+.main button:focus-visible, .main input:focus-visible { outline: 2px solid #e6cd8d; outline-offset: 3px; }
+.main .ghost, .account .ghost { background: transparent; color: #cbd7bc; border-color: #52614d; }
+.auth { max-width: 440px; margin: 50px auto; padding: 30px; border: 1px solid #3e5040; border-radius: 12px; background: #1a2b23; }
+.auth label { display: grid; gap: 8px; font-size: 13px; margin: 20px 0; }
+.intro { margin-bottom: 30px; }
+.columns { display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; }
+.panel { background: #1a2b23; padding: 28px; border: 1px solid #3b4d3d; border-radius: 10px; margin-bottom: 22px; }
+.tags { display: flex; flex-wrap: wrap; gap: 9px; margin: 25px 0; }
+.tags span { border: 1px solid #566848; color: #c5cfae; border-radius: 4px; padding: 5px 10px; font-size: 12px; }
+.join { display: flex; align-items: center; gap: 8px; margin-top: 15px; }
+.join button { flex-shrink: 0; }
+.roomRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px solid #354436; font-size: 13px; }
+.roomRow small { display: block; color: #a6b49a; margin-top: 8px; }
+.error { padding: 15px 20px; border: 1px solid #c88c6e; background: #402d24; border-radius: 6px; margin-bottom: 20px; line-height: 1.7; }
+.phase { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+.timer { color: #e4ce92; font-size: 16px; }
+.hud { display: flex; flex-wrap: wrap; gap: 14px; padding: 15px; border: 1px solid #52614b; border-radius: 8px 8px 0 0; font-size: 13px; background: #223428; }
+.arena { height: min(66vh, 704px); min-height: 340px; width: 100%; border: 1px solid #52614b; overflow: hidden; }
+.arena canvas { display: block; outline: none; }
+.controls { padding: 12px 0; color: #bbc7af; font-size: 12px; line-height: 1.9; }
+.players { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
+.player { display: grid; gap: 8px; min-width: 150px; padding: 15px; border: 1px solid #41553e; border-radius: 7px; font-size: 13px; }
+.player span { color: #b4c7a6; font-size: 12px; }
+.note { padding: 15px; background: #14231c; border-left: 2px solid #a9bc8a; font-size: 13px; line-height: 1.9; margin: 18px 0; }
+.growth { margin: 18px 0; }
+.footer { text-align: center; color: #84977d; padding: 24px; font-size: 11px; border-top: 1px solid #30422f; }
+@media (max-width: 680px) { .header { align-items: flex-start; padding: 18px; } .account { justify-content: flex-end; gap: 8px; max-width: 55%; } .main { padding: 24px 14px; } .columns { grid-template-columns: 1fr; } .panel { padding: 20px; } .phase { align-items: flex-start; flex-direction: column; margin-bottom: 15px; } .main h2 { font-size: 22px; } .auth { margin: 15px auto; padding: 22px; } .roomRow { flex-wrap: wrap; } .arena { min-height: 300px; height: 55vh; } }
+
+.battleShell { position: fixed; inset: 0; overflow: hidden; background: #14261c; }
+.battleShell .arena { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; border: 0; }
+.battleError, .battleConnection { position: absolute; left: 50%; top: 145px; transform: translateX(-50%); padding: 9px 15px; background: #37291de8; border: 1px solid #bc8055; border-radius: 8px; color: #ffe0be; font-size: 12px; }
+.battleConnection { top: 185px; }
+
+.soulPanel { position: absolute; z-index: 30; left: 50%; bottom: 180px; transform: translateX(-50%); width: min(380px, 90vw); padding: 16px; border: 1px solid #86bcb5; border-radius: 12px; background: #132b2cee; color: #e8f7f3; text-align: center; }
+.soulPanel button { padding: 10px 16px; cursor: pointer; }
+.soulPanel button:disabled { cursor: default; opacity: .6; }
+
+.lootNotice { position:absolute; bottom:22px; right:18px; z-index:14; max-width:42vw; padding:8px 12px; color:#ffe7a5; background:#132b25df; border-radius:8px; pointer-events:none; font-size:12px; }
+
+.loadingBattle { position: absolute; z-index: 100; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; background: #14261c; color: #ffe7a5; }
+.loadingBattle progress { width: min(320px, 85vw); }
+.loadingBattle button { padding: 12px 24px; cursor: pointer; }
+
+.feedbackSettings { position: absolute; left: 12px; bottom: 84px; z-index: 25; padding: 8px 12px; border: 1px solid #7c9277; border-radius: 8px; background: #182c28ed; color: #f4ead3; font-size: 13px; max-width: calc(100% - 24px); }
+.feedbackSettings summary { cursor: pointer; }
+.feedbackSettings label { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 10px; }
+.feedbackSettings select { color: inherit; background: #233c34; padding: 4px; }

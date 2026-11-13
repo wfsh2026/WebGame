@@ -1,0 +1,14 @@
+{
+  "id": "forest-survival:skill/star-beam",
+  "kind": "skill",
+  "name": "贯星灵束",
+  "effect": "star-beam",
+  "interval": 2.1,
+  "cost": 3,
+  "coefficient": 1.1,
+  "range": 8,
+  "speed": 13,
+  "supportSlots": 1,
+  "delivery": "nova",
+  "description": "持续1.2秒，每0.25秒消耗3基础灵力；缺能停止。5级射程10米；10级聚能；15级击杀后重锁；20级末段强化。"
+}

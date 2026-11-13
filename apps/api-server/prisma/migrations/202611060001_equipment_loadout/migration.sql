@@ -1,0 +1,1 @@
+ALTER TABLE "Account" ADD COLUMN "loadout" JSONB, ADD COLUMN "loadoutRevision" INTEGER NOT NULL DEFAULT 0;

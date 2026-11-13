@@ -1,0 +1,16 @@
+{
+  "id": "forest-survival:weapon/longblade",
+  "kind": "weapon",
+  "name": "林卫长刀",
+  "interval": 1.1,
+  "cost": 6.111,
+  "coefficient": 1.4667,
+  "range": 2,
+  "supportSlots": 1,
+  "delivery": "melee",
+  "effect": "slash",
+  "angle": 120,
+  "width": 0,
+  "knockback": 0,
+  "description": "扇形近战清群，基础120度；5级扩大至150度，10级扩大至180度。刀光随实际横扫范围展开。"
+}

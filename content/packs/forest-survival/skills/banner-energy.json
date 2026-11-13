@@ -1,0 +1,13 @@
+{
+  "id": "forest-survival:skill/banner-energy",
+  "kind": "skill",
+  "name": "归元战旗",
+  "effect": "banner-energy",
+  "interval": 3,
+  "cost": 12,
+  "coefficient": 0,
+  "range": 10,
+  "supportSlots": 1,
+  "delivery": "nova",
+  "description": "布旗后心法恢复量提高15%，仍支付魔法值。同类取最强，自身额外灵力预算不超过布旗成本80%。5级延长，10级入阵强化恢复，15级低灵力增强，20级归元脉冲。"
+}

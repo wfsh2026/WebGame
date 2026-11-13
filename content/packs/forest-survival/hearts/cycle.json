@@ -1,0 +1,14 @@
+{
+  "id": "forest-survival:heart/cycle",
+  "kind": "heart",
+  "name": "周天诀",
+  "effect": "cycle",
+  "slots": 1,
+  "capacity": 32,
+  "interval": 1,
+  "recovery": 8,
+  "manaCost": 3,
+  "capacityGrowth": 3,
+  "recoveryGrowth": 0.4,
+  "description": "4秒内近远交替命中，使下次恢复多转换2灵力，每级再加0.2，触发间隔1秒；额外转换仍按比例消耗魔法。5/10/15/20级解锁能力槽。"
+}

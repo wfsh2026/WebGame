@@ -1,0 +1,7 @@
+CREATE TABLE "Account" ("id" TEXT PRIMARY KEY, "name" TEXT NOT NULL UNIQUE, "passwordHash" TEXT NOT NULL, "role" TEXT, "coins" INTEGER NOT NULL DEFAULT 0, "materials" INTEGER NOT NULL DEFAULT 0, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE "Session" ("tokenHash" TEXT PRIMARY KEY, "accountId" TEXT NOT NULL REFERENCES "Account"("id"), "expiresAt" TIMESTAMP(3) NOT NULL);
+CREATE INDEX "Session_expiresAt_idx" ON "Session"("expiresAt");
+CREATE TABLE "Run" ("id" TEXT PRIMARY KEY, "roomId" TEXT NOT NULL, "contentVersion" TEXT NOT NULL, "ruleVersion" TEXT NOT NULL, "status" TEXT NOT NULL DEFAULT 'active', "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE "Participant" ("runId" TEXT NOT NULL REFERENCES "Run"("id"), "accountId" TEXT NOT NULL REFERENCES "Account"("id"), "settled" BOOLEAN NOT NULL DEFAULT false, "coins" INTEGER NOT NULL DEFAULT 0, "materials" INTEGER NOT NULL DEFAULT 0, PRIMARY KEY ("runId", "accountId"));
+CREATE TABLE "RoundRecord" ("runId" TEXT NOT NULL REFERENCES "Run"("id"), "round" INTEGER NOT NULL, "success" BOOLEAN NOT NULL, "results" JSONB NOT NULL, PRIMARY KEY ("runId", "round"));
+CREATE TABLE "AssetLedger" ("id" TEXT PRIMARY KEY, "runId" TEXT NOT NULL, "accountId" TEXT NOT NULL, "coins" INTEGER NOT NULL, "materials" INTEGER NOT NULL, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE ("runId", "accountId"));

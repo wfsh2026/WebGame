@@ -1,0 +1,31 @@
+{
+  "generator": "image_gen.imagegen",
+  "mode": "built-in",
+  "reference": "content/common/lobby/camp-background.webp",
+  "reason": "商店与右下角前景石墙和灌木重叠，需要平整店铺占地并衔接道路。",
+  "prompt": "Precise local environment edit of reference image 1, the existing 1672 by 941 pixel forest-camp background texture. Reference image 2 is the user's cropped gameplay screenshot illustrating the problem: the separate merchant tent sprite is currently overlaid on a tall ruined stone arch in the lower-right corner and appears to float. Edit the BACKGROUND texture from reference image 1 to create a flat grounded site for that shop. Target ONLY the LOWER-RIGHT area, approximately original pixel coordinates x=1110..1672 and y=590..941. Remove the foreground ruined stone arch, its vertical masonry, the large obstructing boulders immediately beside it, and thick bushes within this shop footprint. Replace them with a natural flat patch of worn warm earth with short sparse grass and gentle painterly ground texture, continuous with the existing camp clearing. Form a subtle dirt approach from the central fork of the stone path toward the shop entrance at roughly x=1330,y=825. The prepared shop site should extend to the bottom and right image edges so the merchant tent can sit on the ground without stone walls or bushes showing beneath it. Retain soft low grass and modest flowers around the left edge of the prepared site and preserve the forest ambience. Maintain the original ground perspective, sunlight, colors and brushwork. STRICT INVARIANTS: preserve the exact original full-camp camera, framing, aspect ratio, composition and coordinates of the left equipment tent, campfire, upper central glowing portal, right upper floating-book rune altar, left lower desk, central stone paths and all areas outside the lower-right edit. Keep the right upper rune altar and its stairs fully intact. Output the full 1672x941 background texture with this localized ground repair. No merchant tent or new buildings in the output because the shop is a separate sprite. No UI, captions, floating labels, characters, additional glowing effects, grid, watermark or new foreground objects. Use richly painted natural earth and grass artwork, never flat geometric replacement shapes. The result should make the existing merchant tent overlay in the screenshot look grounded on flat earth.",
+  "generatedMaster": "development/features/shop-art/content/assets/camp-background-shop-ground-generated.png",
+  "master": "development/features/shop-art/content/assets/camp-background-shop-ground-master.png",
+  "runtime": "content/common/lobby/camp-background-shop-ground.webp",
+  "generatedSize": [
+    1602,
+    981
+  ],
+  "runtimeSize": [
+    1672,
+    941
+  ],
+  "format": "opaque WebP, quality 90",
+  "runtimeBytes": 378874,
+  "compositeRegion": {
+    "left": 1080,
+    "top": 590,
+    "right": 1672,
+    "bottom": 941,
+    "leftFeather": 48,
+    "topFeather": 40
+  },
+  "layers": "营地背景与商店建筑分层，动态界面文字独立",
+  "animation": "静态",
+  "createdAt": "2026-11-12"
+}

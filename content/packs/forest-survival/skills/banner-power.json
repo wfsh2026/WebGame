@@ -1,0 +1,13 @@
+{
+  "id": "forest-survival:skill/banner-power",
+  "kind": "skill",
+  "name": "破军战旗",
+  "effect": "banner-power",
+  "interval": 3,
+  "cost": 10,
+  "coefficient": 0,
+  "range": 10,
+  "supportSlots": 1,
+  "delivery": "nova",
+  "description": "布旗后范围内直接伤害提高12%；同类取最强。5级扩大范围，10级入阵强化下一击，15级驻留蓄势，20级周期军威脉冲。"
+}

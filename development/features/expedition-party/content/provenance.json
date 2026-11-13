@@ -1,0 +1,13 @@
+{
+  "transparency": "opaque",
+  "reference": "用户确认的远征集结效果图",
+  "prompt": "Hand-painted walnut and aged brass border with ivy, blank green banner, uninterrupted dark forest green cloth; no text, portraits, slots, icons or buttons.",
+  "layers": "背景独立，文字、头像、按钮均由客户端渲染",
+  "dimensions": "1536x1024",
+  "file": "assembly-board.png",
+  "purpose": "远征集结界面的九宫格木框与布面背景",
+  "display": "桌面最大1500px，手机使用九宫格边框保持厚度",
+  "animation": "none",
+  "created": "2026-11-12",
+  "generator": "image_gen"
+}

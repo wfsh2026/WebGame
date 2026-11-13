@@ -1,0 +1,8 @@
+{
+  "id": "forest-survival:support/unleash",
+  "kind": "support",
+  "name": "释出",
+  "host": "skill",
+  "effect": "unleash",
+  "description": "每4次施放追加1枚延迟弹；3级改为每3次，5级追加2枚。追加弹45%伤害，不积累次数、不触发分裂与处决扩散；初始宿主伤害降低5%，每次耗能增加25%。升级减轻伤害折损。"
+}

@@ -1,0 +1,13 @@
+{
+  "id": "forest-survival:heart/ocean",
+  "kind": "heart",
+  "name": "藏海心法",
+  "slots": 1,
+  "capacity": 60,
+  "interval": 2,
+  "recovery": 18,
+  "manaCost": 7,
+  "capacityGrowth": 6,
+  "recoveryGrowth": 0.9,
+  "description": "5/10/15/20级解锁能力槽，升级提高容量和供能；恢复时藏海潮汐向内收束，5/10级强化动态层次。按实际转换量消耗魔法。"
+}

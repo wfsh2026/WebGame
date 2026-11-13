@@ -1,0 +1,56 @@
+name: web-game-online
+x-game-image: &game-image
+  image: web-game-online:${RELEASE_TAG:-latest}
+  build:
+    context: ..
+    dockerfile: deploy/Dockerfile
+services:
+  database:
+    image: postgres:16.11-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: web_game_online
+      POSTGRES_USER: web_game_online
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?required}
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U web_game_online -d web_game_online"]
+      interval: 5s
+      retries: 20
+    mem_limit: 256m
+  migrate:
+    <<: *game-image
+    command: ["pnpm", "--filter", "@web-game-world/api-server", "db:deploy"]
+    environment:
+      DATABASE_URL: postgresql://web_game_online:${DB_PASSWORD:?required}@database:5432/web_game_online
+    depends_on:
+      database:
+        condition: service_healthy
+    mem_limit: 256m
+  api:
+    <<: *game-image
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://web_game_online:${DB_PASSWORD:?required}@database:5432/web_game_online
+      INTERNAL_SECRET: ${INTERNAL_SECRET:?required}
+      ROOM_INTERNAL_URL: http://room:3102
+      PORT: 3101
+    ports: ["127.0.0.1:13101:3101"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    mem_limit: 256m
+  room:
+    <<: *game-image
+    restart: unless-stopped
+    command: ["pnpm", "--filter", "@web-game-world/room-server", "start"]
+    environment:
+      INTERNAL_SECRET: ${INTERNAL_SECRET:?required}
+      API_INTERNAL_URL: http://api:3101
+      PORT: 3102
+    ports: ["127.0.0.1:13102:3102"]
+    depends_on: [api]
+    mem_limit: 384m
+volumes:
+  database:

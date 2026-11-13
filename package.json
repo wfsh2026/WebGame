@@ -1,0 +1,25 @@
+{
+  "name": "web-game-world",
+  "private": true,
+  "type": "module",
+  "version": "0.3.1",
+  "description": "纯 Web 俯视角 2D 多人秘境游戏",
+  "packageManager": "pnpm@12.16.1",
+  "scripts": {
+    "dev": "pnpm --filter @web-game-world/web dev",
+    "build": "pnpm --filter @web-game-world/web build",
+    "preview": "pnpm --filter @web-game-world/web preview",
+    "dev:api": "pnpm --filter @web-game-world/api-server start",
+    "dev:room": "pnpm --filter @web-game-world/room-server start",
+    "test:simulation": "tsx tools/online-simulation-smoke.ts",
+    "test:online": "node tools/online-browser-smoke.mjs"
+  },
+  "devDependencies": {
+    "@web-game-world/content-schema": "workspace:*",
+    "@web-game-world/simulation": "workspace:*",
+    "@types/node": "24.10.1",
+    "playwright": "1.56.1",
+    "tsx": "4.23.15"
+  }
+}
+

@@ -1,0 +1,21 @@
+.heading { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); display: grid; min-width: 220px; padding: 8px 28px; text-align: center; border: 1px solid #c6aa68; border-radius: 16px 16px 30px 30px; color: #f8e5b5; background: #10271eeb; box-shadow: 0 3px 18px #0005; pointer-events: none; }
+.heading b { font: bold 24px/1.3 'Songti SC', SimSun, serif; letter-spacing: 4px; }.heading span { font-size: 11px; margin-top: 3px; }.heading strong { font: 32px/1.2 Georgia, serif; font-variant-numeric: tabular-nums; letter-spacing: 4px; }
+.reward { position: absolute; top: 18px; right: 18px; width: 225px; color: #f8e5b5; font-size: 13px; }
+.compact { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-left: auto; padding: 9px 17px; color: inherit; font: inherit; background: #10271eed; border: 1px solid #c6aa68; border-radius: 25px; cursor: pointer; }.compact:focus-visible { outline: 2px solid #fff1b9; outline-offset: 3px; }
+.details { margin-top: 8px; padding: 16px; background: #10271ef5; border: 1px solid #c6aa68; border-radius: 12px; box-shadow: 0 6px 24px #0005; }.details h3 { font: bold 20px 'Songti SC', SimSun, serif; margin: 0 0 14px; text-align: center; }.details p { display: flex; justify-content: space-between; margin: 9px 0; }.details small { display: block; text-align: center; margin-top: 15px; }.progress { height: 8px; border: 1px solid #bfa263; border-radius: 8px; overflow: hidden; margin-top: 15px; background: #13201a; }.progress span { display: block; height: 100%; background: #dfbc6a; }.milestones { display: flex; justify-content: space-between; font-size: 10px; margin-top: 5px; }
+@media (max-width: 600px) { .heading { top: 8px; min-width: 0; padding: 6px 12px; left: auto; right: 8px; transform: none; }.heading b { font-size: 15px; letter-spacing: 1px; }.heading strong { font-size: 24px; }.heading span { font-size: 10px; }.reward { top: 100px; right: 8px; width: 195px; font-size: 11px; }.compact { padding: 6px 10px; }.details { padding: 12px; } }
+
+.schedule { position: absolute; right: 18px; top: 210px; width: 245px; max-height: 45vh; overflow-y: auto; box-sizing: border-box; padding: 12px; color: #e6ead6; background: #10271ee8; border: 1px solid #8c9b73; border-radius: 12px; font-size: 12px; }
+.schedule p { margin: 7px 0; line-height: 1.5; }
+.schedule small { display: block; line-height: 1.5; }
+.schedule button { margin-top: 8px; border: 1px solid #b2b88d; border-radius: 5px; color: inherit; background: #284637; padding: 6px; cursor: pointer; }
+.imminent { color: #ffe0a0; font-weight: bold; }
+.cycle { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.cycle li { padding: 4px; border: 1px solid transparent; }
+.cycle li[aria-current] { border-color: #efd18b; color: #ffe0a0; }
+@media (max-width: 600px) { .schedule { right: 8px; top: 155px; width: min(205px, 58vw); max-height: 35vh; padding: 8px; font-size: 10px; } .cycle { grid-template-columns: 1fr; } }
+
+.rightPanel { position: absolute; top: 18px; right: 18px; bottom: 165px; width: 245px; overflow-y: auto; pointer-events: none; }
+.rightPanel > .reward, .rightPanel > .schedule { position: relative; top: auto; right: auto; width: 100%; max-height: none; pointer-events: auto; }
+.rightPanel > .schedule { margin-top: 10px; }
+@media (max-width: 600px) { .rightPanel { top: 135px; right: 8px; width: min(205px, 58vw); bottom: 165px; } }

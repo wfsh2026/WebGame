@@ -1,0 +1,8 @@
+{
+  "id": "forest-survival:support/spell-economy",
+  "kind": "support",
+  "name": "节能（法术）",
+  "host": "skill",
+  "costMultiplier": 0.65,
+  "damageMultiplier": 0.75
+}

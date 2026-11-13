@@ -1,0 +1,38 @@
+.launcher { position:absolute; z-index:12; bottom:18px; left:18px; display:flex; flex-direction:column; gap:6px; color:#e9eddf; font-size:12px; }
+.launcher button { padding:8px 12px; border:1px solid #8b9a72; border-radius:6px; color:inherit; background:#172d25ed; cursor:pointer; }
+.dialog { width:min(760px,94vw); max-height:84vh; overflow:auto; box-sizing:border-box; border:1px solid #a8ad7e; border-radius:12px; background:#172b24; color:#f0ecda; padding:20px; }
+.dialog::backdrop { background:#08120b88; }
+.dialog header { display:flex; align-items:start; gap:12px; justify-content:space-between; }
+.dialog h2 { margin:0 0 8px; }.dialog small { color:#b9c5b1; }.dialog nav { display:flex; flex-wrap:wrap; gap:8px; margin:18px 0; }
+.dialog button { padding:9px 12px; border:1px solid #7e956e; border-radius:6px; background:#294335; color:inherit; cursor:pointer; }
+.dialog label { display:flex; flex-direction:column; gap:6px; margin:10px 0; }
+.dialog select { width:100%; min-width:0; padding:10px; background:#122119; color:#ece9d7; border:1px solid #6a815d; }
+.choices { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }.choices button { display:flex; flex-direction:column; align-items:start; gap:10px; text-align:left; }.choices p { font-size:13px; line-height:1.6; }
+.branch { border-top:1px solid #5e7358; padding:8px 0; }.save { width:100%; margin-bottom:12px; }
+@media(max-width:600px) { .choices { grid-template-columns:1fr; }.dialog { padding:12px; }.launcher { left:8px; bottom:130px; font-size:11px; }.launcher button { padding:6px; } }
+
+.dialog { width:min(1080px,94vw); border:2px solid #b5a16a; background:linear-gradient(135deg,#102d23,#172b24 65%,#243a27); box-shadow:0 0 0 5px #14241bd9,0 20px 80px #0009; }
+.dialog h2 { font:700 28px/1.4 'Songti SC',SimSun,serif; color:#f4e4ae; }
+.waveLabel { padding:10px 14px; border-block:1px solid #8d835a; color:#e8d8a3; }
+.rewardCard { display:flex; flex-direction:column; align-items:stretch; gap:12px; padding:20px; border:1px solid #b5a16a; background:#10251dc7; border-radius:10px; }
+.rewardCard > b { font:700 23px/1.5 'Songti SC',SimSun,serif; color:#f4e4ae; }
+.rewardCard > strong { color:#e9c971; }
+.rewardCard p { margin:0; }
+.rewardCard > button { margin-top:auto; justify-content:center; text-align:center; border-color:#c6b47d; background:#465a38; }
+.rewardCard:hover { border-color:#f3d583; box-shadow:inset 0 0 18px #bfa35b1c; }
+@media(max-width:600px) { .rewardCard { padding:14px; }.dialog h2 { font-size:22px; } }
+
+.dialog[data-level=true] { width:min(1160px,96vw); max-height:94dvh; padding:0; border:2px solid #bea36b; border-radius:16px 4px; }
+.dialog[data-level=true]::backdrop { background:#06130d70; }
+.empty { padding:32px; text-align:center; }
+.launcher button:focus-visible,.dialog button:focus-visible { outline:2px solid #fff0b0; outline-offset:3px; }
+@media(min-width:1000px) { .launcher { bottom:18px; left:18px; }.launcher button:nth-of-type(1),.launcher button:nth-of-type(2) { font-size:14px; border-color:#b29d68; } }
+
+.skillLayout { display:grid; grid-template-columns:minmax(180px,1fr) minmax(0,3fr); gap:20px; }
+.skillSlots { display:flex; flex-direction:column; gap:12px; }.skillSlots .branch { display:flex; flex-direction:column; gap:8px; }.skillSlots button[aria-pressed=true] { border-color:#f3d583; background:#465a38; }
+.skillCandidates { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }.skillCandidates button:disabled { opacity:.5; cursor:default; }
+.newBuildItem { position:absolute; z-index:13; right:16px; bottom:24px; max-width:50vw; padding:12px; border:1px solid #b5a16a; border-radius:8px; background:#172b24; color:#f0ecda; cursor:pointer; }
+@media(max-width:600px) { .skillLayout,.skillCandidates { grid-template-columns:1fr; }.newBuildItem { bottom:80px; max-width:65vw; }.skillSlots button { text-align:left; } }
+
+/* Keep long names and decimal values within their cards. */
+.dialog { overflow-wrap:anywhere; } .rewardCard,.dialog header > div { min-width:0; } .rewardCard > * { max-width:100%; }

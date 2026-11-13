@@ -1,0 +1,61 @@
+{
+  "generator": "image_gen.imagegen",
+  "mode": "built-in",
+  "selectedPreview": "development/features/shop-art/previews/shop-a.png",
+  "styleReference": "content/common/lobby/camp-background.webp",
+  "userDirection": "方案 A，建筑放在场景右侧，店面朝向营地中央。",
+  "prompt": "Edit reference image 1, the user-approved Design A open-front canvas GENERAL STORE tent, into the final production building sprite. Reference image 2 supplies the existing forest camp's painterly style and elevated camera. Preserve A's architectural identity: cream fabric roof and tied-back curtains, thick weathered timber posts, restrained teal-and-gold fabric accents, warm lanterns, broad open interior, timber shelves, central wooden sales counter, visible leather armor and shield/sword, provisions, produce baskets, sacks, rolled cloth, a few potion bottles and modest books. Keep the balanced general-store merchandise and large visible interior. THE REQUIRED CHANGE IS THE BUILDING'S ORIENTATION. This shop will stand on the RIGHT EDGE of the camp; its open entrance MUST face diagonally toward the LOWER LEFT, into the center of the camp. Re-render the entire three-dimensional tent in a clear elevated front-right three-quarter view: viewer sees the OPEN SHOP FRONT on the LEFT-facing plane and the EXTERIOR RIGHT SIDE of the tent on the RIGHT. The near front counter and front eave must run diagonally DOWN toward screen-right; the right side wall then recedes UP toward screen-right. This geometry must unmistakably aim the broad open storefront southwest / lower-left. Show enough interior through the entrance to read the back shelves and floor. Use a consistent orthographic-like camera, with the viewer above and southwest of the entrance. Avoid a straight-on frontal facade. Avoid changing orientation only by rearranging goods. Keep the roof relatively shallow to reveal the interior. Match the camp's hand-painted 2D fantasy textures and lighting, with readable silhouette and attractive grouped details after downscaling to about 400 pixels wide. Final clean standalone sprite with the entire building, its closely attached props and subtle contact shadow inside the frame, 5 percent transparent padding, 1024x1024 master composition. Genuine transparent RGBA background, no checkerboard, no scenery background, no large ground tile or platform. Soft clean anti-aliased edges without colored fringe. Static artwork, building and goods in one coherent layer. No characters, written words, UI, price labels, or watermark. Do not copy the full camp composition. This is the selected A general store, rotated for the camp's right side.",
+  "specification": {
+    "usage": "公共营地综合商店建筑",
+    "orientation": "入口朝屏幕左下方，右侧外墙可见",
+    "expectedDisplayWidth": 400,
+    "maximumPlannedZoom": 1.25,
+    "campRenderResolution": [
+      1672,
+      941
+    ],
+    "layers": "静态建筑与陈设合为一层，界面文字独立",
+    "animation": "静态",
+    "transparency": "真实 RGBA 透明通道，保留边缘和接触阴影",
+    "categories": [
+      "装备",
+      "补给",
+      "杂货",
+      "少量书籍与卷轴"
+    ]
+  },
+  "master": {
+    "file": "development/features/shop-art/content/assets/shop-building-right-master.png",
+    "width": 1254,
+    "height": 1254,
+    "format": "PNG RGBA"
+  },
+  "runtime": {
+    "file": "content/common/lobby/shop-building-right.webp",
+    "width": 512,
+    "height": 512,
+    "format": "lossless WebP RGBA",
+    "bytes": 233980,
+    "trimmed": false,
+    "offset": [
+      0,
+      0
+    ],
+    "center": [
+      256,
+      256
+    ],
+    "alphaBounds": [
+      17,
+      46,
+      502,
+      472
+    ]
+  },
+  "comparison": {
+    "pngBytes": 428884,
+    "losslessWebpBytes": 233980,
+    "identicalRgba": true
+  },
+  "createdAt": "2026-11-12"
+}

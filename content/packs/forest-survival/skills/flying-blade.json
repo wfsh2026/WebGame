@@ -1,0 +1,14 @@
+{
+  "id": "forest-survival:skill/flying-blade",
+  "kind": "skill",
+  "name": "飞刃术",
+  "interval": 0.95,
+  "cost": 5.278,
+  "coefficient": 1.3722,
+  "range": 8,
+  "speed": 14,
+  "supportSlots": 1,
+  "delivery": "projectile",
+  "effect": "blade",
+  "description": "直线风刃命中2个目标；5级命中3个；10级命中4个并沿路径返回，返程伤害50%，去回程分别限制重复命中。"
+}
