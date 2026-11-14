@@ -1,0 +1,10 @@
+.experience { display: grid; grid-template-columns: auto minmax(20px, 1fr) auto; align-items: center; gap: 8px; min-width: 0; width: 100%; padding: 7px 0 0; color: #fff0cb; font: 13px/1.4 Georgia, SimSun, serif; text-shadow: 0 1px 3px #17120d; }
+.level, .value { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.caption { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 3px; font-variant-numeric: tabular-nums; }
+.caption b { color: #f8dfa0; font-size: 12px; }
+.track { height: 8px; overflow: hidden; border: 1px solid #a88a50; border-radius: 5px; background: #1d1b183d; }
+.track span { display: block; height: 100%; background: linear-gradient(#bce8a0, #6cae58); transition: width .18s ease-out; }
+.experience[data-upgraded=true] { animation: gained .65s ease-out; }
+@keyframes gained { from { filter: brightness(1.8); } to { filter: brightness(1); } }
+@media (max-width: 600px) { .experience { gap: 4px; font-size: 9px; padding-top: 5px; }.track { height: 6px; } }
+@media (prefers-reduced-motion: reduce) { .track span { transition: none; } .experience[data-upgraded=true] { animation: none; } }

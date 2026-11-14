@@ -49,15 +49,15 @@
 @media (max-width: 680px) { .header { align-items: flex-start; padding: 18px; } .account { justify-content: flex-end; gap: 8px; max-width: 55%; } .main { padding: 24px 14px; } .columns { grid-template-columns: 1fr; } .panel { padding: 20px; } .phase { align-items: flex-start; flex-direction: column; margin-bottom: 15px; } .main h2 { font-size: 22px; } .auth { margin: 15px auto; padding: 22px; } .roomRow { flex-wrap: wrap; } .arena { min-height: 300px; height: 55vh; } }
 
 .battleShell { position: fixed; inset: 0; overflow: hidden; background: #14261c; }
-.battleShell .arena { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; border: 0; }
+.battleShell .arena { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; border: 0; isolation: isolate; }
 .battleError, .battleConnection { position: absolute; left: 50%; top: 145px; transform: translateX(-50%); padding: 9px 15px; background: #37291de8; border: 1px solid #bc8055; border-radius: 8px; color: #ffe0be; font-size: 12px; }
 .battleConnection { top: 185px; }
 
-.soulPanel { position: absolute; z-index: 30; left: 50%; bottom: 180px; transform: translateX(-50%); width: min(380px, 90vw); padding: 16px; border: 1px solid #86bcb5; border-radius: 12px; background: #132b2cee; color: #e8f7f3; text-align: center; }
+.soulPanel { position: absolute; z-index: 30; left: 50%; bottom: 300px; transform: translateX(-50%); width: min(380px, 90vw); color: #e8f7f3; text-align: center; text-shadow: 0 1px 4px #000; }
 .soulPanel button { padding: 10px 16px; cursor: pointer; }
 .soulPanel button:disabled { cursor: default; opacity: .6; }
 
-.lootNotice { position:absolute; bottom:22px; right:18px; z-index:14; max-width:42vw; padding:8px 12px; color:#ffe7a5; background:#132b25df; border-radius:8px; pointer-events:none; font-size:12px; }
+.lootNotice { position:absolute; bottom:145px; right:18px; z-index:14; max-width:35vw; color:#ffe7a5; text-shadow:0 1px 4px #000; pointer-events:none; font-size:12px; }
 
 .loadingBattle { position: absolute; z-index: 100; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; background: #14261c; color: #ffe7a5; }
 .loadingBattle progress { width: min(320px, 85vw); }

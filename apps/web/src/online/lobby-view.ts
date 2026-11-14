@@ -1,4 +1,5 @@
-import type { TestAssetsData, TestAssetAdjustmentData } from '@web-game-world/contracts';
+import type { ExpeditionDifficultyData } from '@web-game-world/contracts';
+import type { TestAssetsData, TestAssetAdjustmentData, CharacterGrowthSaveData } from '@web-game-world/contracts';
 import type { InventoryItemData } from '@web-game-world/contracts';
 import type { FormEvent, ReactNode } from 'react';
 import type { Snapshot } from '@web-game-world/contracts';
@@ -11,6 +12,10 @@ export interface BackpackViewProps {
   onOpenChange?: (open: boolean) => void;
 }
 export interface LobbyViewProps {
+  unlockedDifficulties?: ExpeditionDifficultyData[];
+  saveCharacterGrowth?: (data: CharacterGrowthSaveData) => Promise<Profile>;
+  upgradeCharacter?: (data: { requestId: string; level: number }) => Promise<Profile>;
+  copyEquipment?: (data: { requestId: string; revision: number; coins: number }) => Promise<EquipmentStateData>;
   addTestInventory?: (requestId: string) => Promise<number>;
   loadTestAssets?: () => Promise<TestAssetsData>;
   adjustTestAssets?: (data: TestAssetAdjustmentData) => Promise<TestAssetsData>;
@@ -22,11 +27,11 @@ export interface LobbyViewProps {
   loadEquipment?: () => Promise<EquipmentStateData>;
   saveEquipment?: (data: { loadout: EquipmentLoadoutData; revision: number }) => Promise<EquipmentStateData>;
   profile: Profile;
-  rooms: { roomId: string; clients: number; maxClients: number; name: string }[];
-  history: { runId: string; settled: boolean; coins: number; materials: number; run: { status: string; createdAt: string } }[];
+  rooms: { roomId: string; clients: number; maxClients: number; name: string; difficulty?: ExpeditionDifficultyData }[];
+  history: { outcome?: string; baseCleared?: boolean; hellFloor?: number; runId: string; settled: boolean; coins: number; materials: number; run: { difficulty?: ExpeditionDifficultyData; status: string; createdAt: string } }[];
   busy: boolean;
   error: string;
-  enterRoom: (id?: string) => Promise<void>;
+  enterRoom: (id?: string, difficulty?: ExpeditionDifficultyData) => Promise<void>;
   logout: () => Promise<void>;
 }
 export interface AuthViewProps {
@@ -49,6 +54,8 @@ export interface OnlineAppProps {
 }
 
 export interface PartyViewProps {
+  changeDifficulty?: (difficulty: ExpeditionDifficultyData) => void;
+  unlockedDifficulties?: ExpeditionDifficultyData[];
   snapshot: Snapshot;
   playerId: string;
   busy: boolean;

@@ -6,8 +6,7 @@
   "capacity": 30,
   "interval": 1,
   "recovery": 8,
-  "manaCost": 3,
   "capacityGrowth": 3,
   "recoveryGrowth": 0.4,
-  "description": "5/10/15/20级解锁能力槽，升级提高容量和供能；恢复时归流灵光回旋汇入，5/10级强化动态层次。按实际转换量消耗魔法。"
+  "description": "5/10/15/20级解锁能力槽，升级提高容量和供能；恢复时归流灵光回旋汇入，5/10级强化动态层次。直接恢复角色灵力。"
 }

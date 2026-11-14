@@ -10,5 +10,6 @@
   "supportSlots": 1,
   "delivery": "projectile",
   "effect": "star",
-  "description": "追踪目标；5级弹射1次，10级弹射2次，每次伤害减半，优先未命中目标。"
+  "description": "追踪目标；5级弹射1次，10级弹射2次，每次伤害减半，优先未命中目标。",
+  "skillType": "ranged"
 }

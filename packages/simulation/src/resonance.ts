@@ -39,5 +39,5 @@ export function recordAbilityHit(player: Player, hit: { kind: string; sourceId: 
   state.supportLevel = source.supportLevels.resonance ?? 1;
   state.finisher = state.supportLevel >= 10 && (state.relayCount ?? 0) >= 3;
   if (state.finisher) state.relayCount = 0;
-  state.buffKind = hit.kind === 'weapon' ? 'skill' : 'weapon'; state.buffPower = power; state.buffLeft = state.supportLevel >= 3 ? 6 : 4; state.buffSource = hit.sourceId;
+  state.buffKind = hit.kind === 'melee' ? 'ranged' : 'melee'; state.buffPower = power; state.buffLeft = state.supportLevel >= 3 ? 6 : 4; state.buffSource = hit.sourceId;
 }

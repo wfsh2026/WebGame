@@ -4,11 +4,13 @@ import Phaser from 'phaser';
 import type { CombatFeedback } from './combat-feedback';
 import portraitsUrl from '../../../../content/packs/forest-survival/assets/runtime/portraits.webp';
 import portraitsData from '../../../../content/packs/forest-survival/assets/runtime/portraits.json';
+import { playerFrameGrade, prepareLootArt, preloadLootArt } from './loot-art';
 import { preloadTacticArt } from './tactic-effects';
 
 interface EntityAppearance { texture: string; radius: number; label: string; color: number; elite?: boolean; rank?: string; glow?: number; mine?: boolean }
-interface EntityState { banners?: BannerState; id: string; x: number; y: number; hp: number; maxHp: number; facingX: number; facingY: number; state?: string; originX?: number; originY?: number }
-interface Portrait { buffHalo?: Phaser.GameObjects.Image; buffIcons?: Phaser.GameObjects.Image[]; container: Phaser.GameObjects.Container; graphics: Phaser.GameObjects.Graphics; image: Phaser.GameObjects.Image; label: Phaser.GameObjects.Text; hp: number; trailHp?: number; damageAt?: number; deathAt?: number; deathScale?: number; deathFrameScale?: number; worldX?: number; worldY?: number; frame?: Phaser.GameObjects.Image; trails?: Phaser.GameObjects.Image[] }
+interface EntityState { level?: number; banners?: BannerState; id: string; x: number; y: number; hp: number; maxHp: number; facingX: number; facingY: number; state?: string; originX?: number; originY?: number }
+interface Portrait { levelBadge?: Phaser.GameObjects.Image; levelText?: Phaser.GameObjects.Text; clip?: Phaser.GameObjects.Graphics; buffLayers?: BuffLayers; buffHalo?: Phaser.GameObjects.Image; buffIcons?: Phaser.GameObjects.Image[]; container: Phaser.GameObjects.Container; graphics: Phaser.GameObjects.Graphics; image: Phaser.GameObjects.Image; label: Phaser.GameObjects.Text; hp: number; trailHp?: number; damageAt?: number; deathAt?: number; deathScale?: number; deathFrameScale?: number; worldX?: number; worldY?: number; frame?: Phaser.GameObjects.Image; trails?: Phaser.GameObjects.Image[] }
+export interface BuffLayers { back: Phaser.GameObjects.Container; front: Phaser.GameObjects.Container }
 export interface BattleViewport { unit: number; ox: number; oy: number }
 
 // 所有秘境共用的实体图像、生命、身份与朝向表现。
@@ -20,14 +22,28 @@ export class BattleEntities {
   private scene: Phaser.Scene;
   viewport: BattleViewport = { unit: 32, ox: 0, oy: 0 };
 
-  constructor(scene: Phaser.Scene) { this.scene = scene; }
+  constructor(scene: Phaser.Scene) { this.scene = scene; prepareLootArt(scene); }
 
   static preload(scene: Phaser.Scene): void {
     scene.load.atlas('battle-portraits', portraitsUrl, portraitsData);
-    preloadTacticArt(scene);
+    preloadTacticArt(scene); preloadLootArt(scene);
   }
 
   begin(viewport: BattleViewport): void { this.viewport = viewport; this.retained.clear(); }
+
+  buffLayers(id: string): BuffLayers | undefined {
+    const portrait = this.portraits.get(id);
+    if (!portrait?.container.visible) return;
+    if (!portrait.buffLayers) {
+      const back = this.scene.add.container(); const front = this.scene.add.container();
+      const imageIndex = portrait.container.getIndex(portrait.image); portrait.container.addAt(back, imageIndex);
+      const graphicsIndex = portrait.container.getIndex(portrait.graphics); portrait.container.addAt(front, graphicsIndex);
+      portrait.buffLayers = { back, front };
+    }
+    const layers = portrait.buffLayers;
+    layers.back.setPosition(portrait.image.x, portrait.image.y); layers.front.setPosition(portrait.image.x, portrait.image.y);
+    return layers;
+  }
 
   render(entity: EntityState, appearance: EntityAppearance): void {
     this.retained.add(entity.id);
@@ -73,6 +89,8 @@ export class BattleEntities {
     const pulse = appearance.glow ? 1 + Math.sin(this.scene.time.now / 65) * .025 : 1;
     const display = radius * 2 * (reaction?.scale ?? 1) * pulse;
     portrait.image.setPosition(x, y); portrait.image.setDisplaySize(display, display);
+    if (!portrait.clip) { portrait.clip = this.scene.make.graphics({ x: 0, y: 0 }, false); const mask = portrait.clip.createGeometryMask(); portrait.image.setMask(mask); }
+    portrait.clip.clear(); portrait.clip.fillStyle(0xffffff); portrait.clip.fillCircle(x, y, display / 2);
     if (entity.state === 'charge' || entity.state === 'flee') {
       if (!portrait.trails) {
         portrait.trails = [];
@@ -92,9 +110,10 @@ export class BattleEntities {
     if (buffs.length && this.scene.textures.exists('battle-banners')) {
       portrait.buffIcons ??= [];
       if (!portrait.buffHalo) { portrait.buffHalo = this.scene.add.image(0, 0, 'battle-banners', 3); portrait.container.addAt(portrait.buffHalo, 0); }
-      const beat = Math.floor(this.scene.time.now / 1800); const dominant = buffs[beat % buffs.length]; const row = bannerKinds.indexOf(dominant.kind);
-      const haloSize = radius * 3.1; const empowered = dominant.charge > 0 || dominant.resist > 0 || dominant.shield > 0; const pulse = (empowered ? .85 : .6) + Math.sin(this.scene.time.now / (empowered ? 100 : 180)) * .12;
-      portrait.buffHalo.setTexture('battle-banners', row * 4 + 3); portrait.buffHalo.setPosition(x, y); portrait.buffHalo.setDisplaySize(haloSize, haloSize); portrait.buffHalo.setAlpha(pulse); portrait.buffHalo.setVisible(true);
+      const beat = Math.floor(this.scene.time.now / 1800); const dominant = buffs[beat % buffs.length];
+      const haloSize = radius * 2.85; const empowered = dominant.charge > 0 || dominant.resist > 0 || dominant.shield > 0; const pulse = (empowered ? .65 : .4) + Math.sin(this.scene.time.now / (empowered ? 100 : 180)) * .1;
+      const haloFrame = `${dominant.kind.slice(7)}-edge`;
+      portrait.buffHalo.setTexture('banner-vfx-v2', haloFrame); portrait.buffHalo.setPosition(x, y); portrait.buffHalo.setDisplaySize(haloSize, haloSize); portrait.buffHalo.setAlpha(pulse); portrait.buffHalo.setVisible(true);
       for (let index = 0; index < buffs.length; index += 1) {
         const buff = buffs[index]; const frame = bannerKinds.indexOf(buff.kind) * 4 + 3; let icon = portrait.buffIcons[index];
         if (!icon) { icon = this.scene.add.image(0, 0, 'battle-banners', frame); portrait.container.add(icon); portrait.buffIcons.push(icon); }
@@ -109,10 +128,11 @@ export class BattleEntities {
     portrait.hp = entity.hp;
     if (portrait.label.text !== appearance.label) portrait.label.setText(appearance.label);
     const ranked = appearance.rank === 'elite' || appearance.rank === 'boss';
-    const overhead = ranked ? 22 : 8;
+    const overhead = ranked ? 22 : entity.level !== undefined ? 15 : 8;
     const labelY = y - radius - overhead - 4; portrait.label.setPosition(x, labelY);
     const g = portrait.graphics;
-    portrait.frame?.setVisible(Boolean(appearance.rank));
+    portrait.frame?.setVisible(Boolean(appearance.rank) || entity.level !== undefined);
+    portrait.levelBadge?.setVisible(entity.level !== undefined); portrait.levelText?.setVisible(entity.level !== undefined);
     if (appearance.rank) {
       const texture = `tactic-frame-${appearance.rank}`;
       if (!portrait.frame) {
@@ -121,8 +141,21 @@ export class BattleEntities {
       }
       portrait.frame.setTexture('battle-tactics', texture); portrait.frame.setPosition(x, y); portrait.frame.setDisplaySize(radius * 2 / .75, radius * 2 / .75);
     }
-    else { g.lineStyle(2, appearance.color, alpha); g.strokeCircle(x, y, radius); }
-    if (appearance.mine) { g.lineStyle(1, 0xf8e3a0, .7); g.strokeCircle(x, y, radius + 3); }
+    else if (entity.level !== undefined) {
+      const grade = playerFrameGrade(entity.level);
+      if (!portrait.frame) { portrait.frame = this.scene.add.image(x, y, 'loot-growth', grade); portrait.container.add(portrait.frame); }
+      portrait.frame.setTexture('loot-growth', grade); portrait.frame.setPosition(x, y); portrait.frame.setDisplaySize(radius * 2 / .62, radius * 2 / .62); portrait.frame.setAlpha(alpha);
+      if (!portrait.levelBadge) {
+        portrait.levelBadge = this.scene.add.image(0, 0, 'loot-growth', 7); portrait.container.add(portrait.levelBadge);
+        const style = { fontFamily: 'Georgia, Microsoft YaHei, serif', fontSize: '12px', color: '#fff0d0', stroke: '#19251b', strokeThickness: 2, fontStyle: 'bold' };
+        portrait.levelText = this.scene.add.text(0, 0, '', style); portrait.levelText.setOrigin(.5); portrait.container.add(portrait.levelText);
+      }
+      const badgeWidth = Math.max(35, radius * 1.9); const badgeY = y + radius + 8;
+      portrait.levelBadge.setPosition(x, badgeY); portrait.levelBadge.setDisplaySize(badgeWidth, 22); portrait.levelBadge.setAlpha(alpha);
+      const text = `Lv.${entity.level}`;
+      if (portrait.levelText?.text !== text) portrait.levelText?.setText(text);
+      portrait.levelText?.setPosition(x, badgeY); portrait.levelText?.setAlpha(alpha);
+    } else { g.lineStyle(2, appearance.color, alpha); g.strokeCircle(x, y, radius); }
     const tipX = x + entity.facingX * (radius + 6); const tipY = y + entity.facingY * (radius + 6);
     g.fillStyle(appearance.color, alpha);
     g.fillTriangle(tipX + entity.facingX * 4, tipY + entity.facingY * 4, tipX - entity.facingY * 3, tipY + entity.facingX * 3, tipX + entity.facingY * 3, tipY - entity.facingX * 3);
@@ -153,6 +186,7 @@ export class BattleEntities {
           const x = this.viewport.ox + (portrait.worldX ?? 0) * this.viewport.unit; const y = this.viewport.oy + (portrait.worldY ?? 0) * this.viewport.unit;
           portrait.container.setVisible(true);
           portrait.image.setPosition(x, y); portrait.image.setAlpha(alpha); portrait.image.setScale(scale); portrait.image.setVisible(true);
+          portrait.clip?.clear(); portrait.clip?.fillStyle(0xffffff); portrait.clip?.fillCircle(x, y, portrait.image.displayWidth / 2);
           portrait.label.setVisible(false);
           if (portrait.frame) {
             const frameScale = (portrait.deathFrameScale ?? 1) * (1 - age / 1100);
@@ -163,8 +197,13 @@ export class BattleEntities {
         }
       }
       portrait.container.setVisible(false);
-      if (this.spare.length < 96) this.spare.push(portrait); else portrait.container.destroy();
+      if (this.spare.length < 96) this.spare.push(portrait); else { portrait.clip?.destroy(); portrait.container.destroy(); }
       this.portraits.delete(id);
     }
+  }
+  dispose(): void {
+    for (const portrait of this.portraits.values()) { portrait.clip?.destroy(); portrait.container.destroy(); }
+    for (const portrait of this.spare) { portrait.clip?.destroy(); portrait.container.destroy(); }
+    this.portraits.clear(); this.spare = [];
   }
 }

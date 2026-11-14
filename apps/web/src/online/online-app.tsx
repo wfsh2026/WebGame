@@ -1,3 +1,6 @@
+import { expeditionAccessSchema } from '@web-game-world/contracts';
+import type { ExpeditionActionData, ExpeditionDifficultyData } from '@web-game-world/contracts';
+import type { RefreshGrowthData } from '@web-game-world/contracts';
 import { ClientBattle } from '../network/client-battle';
 import { PauseMenu } from './pause-menu';
 import { predictGrowth } from './instant-growth';
@@ -28,11 +31,14 @@ import s from './online.module.css';
 import { CharacterCreator } from '../character-creator/creator';
 import { appVersion } from '../app-version';
 import { CombatHud } from '../hud/combat-hud';
+import { PickupNotices } from '../hud/pickup-notices';
+import { PickupNoticeFeed } from '../hud/pickup-notice-feed';
 import { SurvivalOverlay } from './survival-overlay';
 import { ExpeditionResult } from './expedition-result';
 import { profileSchema } from '@web-game-world/contracts';
-import type { CharacterBuildData } from '@web-game-world/contracts';
+import type { CharacterBuildData, CharacterGrowthSaveData, CharacterUpgradeData } from '@web-game-world/contracts';
 import { calculateCharacterStats, characterTalents, defaultCharacterPoints } from '@web-game-world/simulation';
+import { useTutorial } from './tutorial/tutorial-context';
 
 export const freshTestAccount = import.meta.env.BASE_URL === '/online-test/';
 const storageKey = 'web-game-world.online-token.v1';
@@ -70,12 +76,16 @@ function ArenaView({ runtime }: { runtime: BattleRuntime }) {
 }
 export function OnlineApp({ renderLobby, renderAuth, renderBackpack, renderParty }: OnlineAppProps) {
   const [token, setToken] = useState(readToken); const [profile, setProfile] = useState<Profile | null>(null); const [name, setName] = useState(''); const [password, setPassword] = useState(''); const [login, setLogin] = useState(true);
+  const guide = useTutorial();
+  const guideAccountId = profile?.role ? profile.id : '';
+  useEffect(() => { const session = { token, accountId: guideAccountId }; guide.connect(session); }, [token, guideAccountId, guide.connect]);
   const serverBuild = useRef<BuildStateData | null>(null);
   const pendingGrowth = useRef<PendingGrowth[]>([]);
   const visibleBuild = useRef<BuildStateData | null>(null);
   const [build, setBuild] = useState<BuildStateData | null>(null);
   const [buildError, setBuildError] = useState('');
-  const [error, setError] = useState(''); const [busy, setBusy] = useState(false); const [rooms, setRooms] = useState<{ roomId: string; clients: number; maxClients: number; name: string }[]>([]); const [roomCode, setRoomCode] = useState(''); const [snapshot, setSnapshot] = useState<Snapshot | null>(null); const [connection, setConnection] = useState(''); const [history, setHistory] = useState<ReturnType<typeof historySchema.parse>>([]);
+  const [unlockedDifficulties, setUnlockedDifficulties] = useState<ExpeditionDifficultyData[]>(['normal']);
+  const [error, setError] = useState(''); const [busy, setBusy] = useState(false); const [rooms, setRooms] = useState<{ roomId: string; clients: number; maxClients: number; name: string; difficulty?: ExpeditionDifficultyData }[]>([]); const [roomCode, setRoomCode] = useState(''); const [snapshot, setSnapshot] = useState<Snapshot | null>(null); const [connection, setConnection] = useState(''); const [history, setHistory] = useState<ReturnType<typeof historySchema.parse>>([]);
   const initiallyRestoring = token.length > 0;
   const [restoring, setRestoring] = useState(initiallyRestoring);
   const [entryStep, setEntryStep] = useState(0);
@@ -84,6 +94,11 @@ export function OnlineApp({ renderLobby, renderAuth, renderBackpack, renderParty
   const hudClock = useRef(0);
   const [loot, setLoot] = useState<LootStateData>({ revision: 0, safe: [], consumables: [] });
   const [lootNotice, setLootNotice] = useState('');
+  const [pickupFeed] = useState(() => new PickupNoticeFeed());
+  useEffect(() => {
+    if (snapshot?.stage !== 'combat') pickupFeed.clear();
+  }, [snapshot?.stage, pickupFeed]);
+  useEffect(() => pickupFeed.clear, [pickupFeed]);
   useEffect(() => {
     if (!lootNotice) return;
     const timer = window.setTimeout(() => setLootNotice(''), 2500);
@@ -109,21 +124,35 @@ export function OnlineApp({ renderLobby, renderAuth, renderBackpack, renderParty
   }, [profile?.role, runtime]);
   useEffect(() => () => { bridge.current.battle?.dispose(); runtime.dispose(); }, [runtime]);
   function reportError(cause: unknown): void { const detail = message(cause); setError(detail); }
-  async function refreshLobby(): Promise<void> { const data = await request('rooms', { token }); const available = roomListSchema.parse(data); setRooms(available); const records = await request('history', { token }); const items = historySchema.parse(records); setHistory(items); }
+  async function refreshLobby(): Promise<void> {
+    const roomRequest = request('rooms', { token }); const historyRequest = request('history', { token }); const accessRequest = request('expedition-access', { token });
+    const responses = await Promise.all([roomRequest, historyRequest, accessRequest]);
+    const available = roomListSchema.parse(responses[0]); const items = historySchema.parse(responses[1]); const access = expeditionAccessSchema.parse(responses[2]);
+    setRooms(available); setHistory(items); setUnlockedDifficulties(access.unlocked);
+  }
   async function loadProfile(): Promise<void> { const current = await fetchProfile(token); setProfile(current); }
   function attach(next: Room): void {
     room.current = next; sequence.current = Date.now() % 1000000000; setConnection('已连接权威房间');
     try { sessionStorage.setItem(roomKey, next.reconnectionToken); } catch { /* 页面内连接仍可继续。 */ }
     serverBuild.current = null; visibleBuild.current = null; pendingGrowth.current = [];
     setBuild(null); setBuildError(''); setLoot({ revision: 0, safe: [], consumables: [] }); bridge.current.pickups = [];
+    pickupFeed.reset(next.roomId);
     next.onMessage('build-fusion', (raw: unknown) => { if (typeof raw === 'string') setLootNotice(raw); });
     next.onMessage('preparation-notice', (raw: unknown) => { if (typeof raw === 'string') setLootNotice(raw); });
     next.onMessage('loot-state', (raw: unknown) => { const parsed = lootStateSchema.safeParse(raw); if (parsed.success) setLoot(parsed.data); });
-    next.onMessage('loot-pickup', (raw: unknown) => { const parsed = lootPickupSchema.safeParse(raw); if (!parsed.success) return; bridge.current.pickups.push(parsed.data); if (parsed.data.playerId === bridge.current.playerId) { const target = parsed.data.item.category === 'consumable' ? '已立即使用' : parsed.data.item.category === 'insured' ? '保险箱' : '背包'; setLootNotice(`${parsed.data.item.name} → ${target}`); } });
+    next.onMessage('loot-pickup', (raw: unknown) => {
+      if (room.current !== next) return;
+      const parsed = lootPickupSchema.safeParse(raw);
+      if (!parsed.success) return;
+      const event = parsed.data; bridge.current.pickups.push(event);
+      if (event.playerId === bridge.current.playerId) pickupFeed.receive(event);
+    });
+    next.onMessage('growth-refresh-receipt', () => { setBuildError(''); });
     next.onMessage('growth-receipt', (raw: unknown) => {
       if (!raw || typeof raw !== 'object' || !('choiceId' in raw) || typeof raw.choiceId !== 'number') return;
       const entry = pendingGrowth.current.find(item => item.choiceId === raw.choiceId);
       if (entry) entry.confirmed = true;
+      guide.mark('reward-picked');
     });
     next.onMessage('build-state', (raw: unknown) => {
       const parsed = buildStateSchema.safeParse(raw); if (!parsed.success) return;
@@ -145,7 +174,9 @@ export function OnlineApp({ renderLobby, renderAuth, renderBackpack, renderParty
         current = { ...current, players };
       }
       const previous = bridge.current.current; bridge.current.current = current;
-      const now = performance.now(); const phaseChanged = previous?.stage !== current.stage || previous?.round !== current.round || previous?.paused !== current.paused;
+      const now = performance.now();
+      const preparationChanged = Boolean(previous?.preparation) !== Boolean(current.preparation) || Boolean(previous?.resting) !== Boolean(current.resting);
+      const phaseChanged = previous?.stage !== current.stage || previous?.round !== current.round || previous?.paused !== current.paused || preparationChanged;
       if (phaseChanged || current.stage !== 'combat' || now - hudClock.current >= 250) { hudClock.current = now; setSnapshot(current); }
     };
     next.onMessage('snapshot', (raw: unknown) => {
@@ -164,7 +195,7 @@ export function OnlineApp({ renderLobby, renderAuth, renderBackpack, renderParty
         const old = oldPlayers.get(player.id);
         return { ...player, buildItems: player.buildItems ?? old?.buildItems, loadout: player.loadout ?? old?.loadout };
       });
-      const snapshot = { ...packet, players, results: packet.results ?? previous.results, rewards: packet.rewards ?? previous.rewards };
+      const snapshot = { ...packet, wavePlans: packet.wavePlans ?? previous.wavePlans, players, results: packet.results ?? previous.results, rewards: packet.rewards ?? previous.rewards };
       applySnapshot(snapshot);
     });
     bridge.current.battle?.dispose(); bridge.current.battle = new ClientBattle(next, setError);
@@ -245,24 +276,52 @@ export function OnlineApp({ renderLobby, renderAuth, renderBackpack, renderParty
     const current = equipmentStateSchema.parse(result);
     setProfile(previous => previous ? { ...previous, loadout: current.loadout } : previous);
     profilePromiseCache.delete(token);
+    void guide.refresh();
     return current;
-  }, [token]);
+  }, [token, guide.refresh]);
+  const mutateCharacter = useCallback(async (path: string, data: CharacterUpgradeData | CharacterGrowthSaveData) => {
+    const options = { token, body: data };
+    try {
+      const response = await request(path, options);
+      const current = profileSchema.parse(response);
+      setProfile(current); profilePromiseCache.delete(token);
+      void guide.refresh();
+      return current;
+    } catch (cause) {
+      profilePromiseCache.delete(token);
+      try { const current = await fetchProfile(token); setProfile(current); void guide.refresh(); } catch { /* 保留原始操作错误供重试。 */ }
+      throw cause;
+    }
+  }, [token, guide.refresh]);
+  const upgradeCharacter = useCallback((data: CharacterUpgradeData) => mutateCharacter('character/upgrade', data), [mutateCharacter]);
+  const saveCharacterGrowth = useCallback((data: CharacterGrowthSaveData) => mutateCharacter('character/growth', data), [mutateCharacter]);
+  const copyEquipment = useCallback(async (data: { requestId: string; revision: number; coins: number }) => {
+    const options = { token, body: data };
+    const response = await request('equipment/copy', options);
+    const current = equipmentStateSchema.parse(response);
+    setProfile(previous => previous ? { ...previous, coins: current.coins, loadout: current.loadout } : previous);
+    profilePromiseCache.delete(token);
+    void guide.refresh();
+    return current;
+  }, [token, guide.refresh]);
   const loadShop = useCallback(async () => {
     const options = { token };
     const response = await request('shop', options);
     const current = shopStateSchema.parse(response);
     setProfile(previous => previous ? { ...previous, coins: current.coins, materials: current.materials } : previous);
     profilePromiseCache.delete(token);
+    void guide.refresh();
     return current;
-  }, [token]);
+  }, [token, guide.refresh]);
   const purchaseProduct = useCallback(async (data: ShopPurchaseData) => {
     const options = { token, body: data };
     const response = await request('shop/purchase', options);
     const current = shopStateSchema.parse(response);
     setProfile(previous => previous ? { ...previous, coins: current.coins, materials: current.materials } : previous);
     profilePromiseCache.delete(token);
+    void guide.refresh();
     return current;
-  }, [token]);
+  }, [token, guide.refresh]);
   const refreshShop = useCallback(async (data: ShopRefreshData) => {
     const options = { token, body: data };
     const response = await request('shop/refresh', options);
@@ -293,15 +352,17 @@ export function OnlineApp({ renderLobby, renderAuth, renderBackpack, renderParty
     profilePromiseCache.delete(token);
     return assets;
   }, [token]);
-  async function enterRoom(id?: string): Promise<void> { runtime.prepare(); setBusy(true); setError(''); try { const client = roomClient(); const options = { token, protocol: protocolVersion }; const next = id ? await client.joinById(id, options) : await client.create('expedition', options); attach(next); } catch (cause) { reportError(cause); } finally { setBusy(false); } }
-  async function returnLobby(): Promise<void> { bridge.current.battle?.dispose(); bridge.current.battle = undefined; setBusy(true); try { const current = room.current; room.current = null; if (current) await current.leave(); sessionStorage.removeItem(roomKey); bridge.current.current = null; setSnapshot(null); setConnection(''); setError(''); await loadProfile(); await refreshLobby(); } catch (cause) { reportError(cause); } finally { setBusy(false); } }
+  async function enterRoom(id?: string, difficulty: ExpeditionDifficultyData = 'normal'): Promise<void> { runtime.prepare(); setBusy(true); setError(''); try { const client = roomClient(); const options = { token, protocol: protocolVersion, difficulty }; const next = id ? await client.joinById(id, options) : await client.create('expedition', options); attach(next); } catch (cause) { reportError(cause); } finally { setBusy(false); } }
+  async function returnLobby(): Promise<void> { bridge.current.battle?.dispose(); bridge.current.battle = undefined; setBusy(true); try { const current = room.current; room.current = null; if (current) await current.leave(); sessionStorage.removeItem(roomKey); bridge.current.current = null; setSnapshot(null); setConnection(''); setError(''); await loadProfile(); await refreshLobby(); void guide.refresh(); } catch (cause) { reportError(cause); } finally { setBusy(false); } }
   async function logout(): Promise<void> { if (freshTestAccount) { window.location.reload(); return; } try { await request('logout', { token, method: 'POST' }); } catch { /* 清除本地会话。 */ } profilePromiseCache.delete(token); rememberToken(''); sessionStorage.removeItem(roomKey); setToken(''); setProfile(null); setPassword(''); setError(''); }
   function ready(): void { const mine = snapshot?.players.find(player => player.id === profile?.id); room.current?.send('ready', !mine?.ready); }
+  function changeDifficulty(difficulty: ExpeditionDifficultyData): void { setError(''); room.current?.send('change-difficulty', difficulty); }
   function start(): void { room.current?.send('start'); }
   function chooseUpgrade(choiceId: number, index: number, targetId?: string): void {
     const state = visibleBuild.current; const current = bridge.current.current;
     const choice = state?.choices.find(item => item.id === choiceId);
     if (!room.current || !choice) return;
+    setBuildError('');
     if (choice.source === 'level' && state) {
       const request: PendingGrowth = { choiceId, index, confirmed: false };
       const mine = current?.players.find(player => player.id === bridge.current.playerId);
@@ -315,22 +376,36 @@ export function OnlineApp({ renderLobby, renderAuth, renderBackpack, renderParty
     }
     const request = { choiceId, index, targetId }; room.current.send('choose-growth', request);
   }
-  function discardBattle(id: string): void { room.current?.send('discard-build-item', id); }
-  function equipBattle(loadout: EquipmentLoadoutData, revision: number): void { const request = { loadout, revision }; room.current?.send('battle-equipment', request); }
-  function waveReady(ready: boolean): void { const round = bridge.current.current?.round; if (!round) return; const data = { round, ready }; room.current?.send('wave-ready', data); }
+  function refreshGrowth(data: RefreshGrowthData): void { setBuildError(''); room.current?.send('refresh-growth', data); }
+  function discardBattle(id: string): void { setBuildError(''); room.current?.send('discard-build-item', id); }
+  function equipBattle(loadout: EquipmentLoadoutData, revision: number): void { setBuildError(''); const request = { loadout, revision }; room.current?.send('battle-equipment', request); }
+  function waveReady(ready: boolean, solo: boolean): void {
+    const current = bridge.current.current; const round = current?.round;
+    if (!round || !current?.resting) return;
+    const singleParticipant = current.preparation?.participantIds.length === 1;
+    if (solo !== singleParticipant) return;
+    if (ready && solo) { room.current?.send('start-wave', round); return; }
+    const data = { round, ready }; room.current?.send('wave-ready', data);
+  }
+  function chooseExpedition(data: ExpeditionActionData): void { setBuildError(''); room.current?.send('expedition-action', data); }
   function remindReady(): void { const round = bridge.current.current?.round; if (round) room.current?.send('remind-ready', round); }
   function pauseBattle(paused: boolean): void { room.current?.send('pause', paused); }
   function revive(): void { room.current?.send('revive'); }
   const mine = snapshot?.players.find(player => player.id === profile?.id);
   const personalReward = snapshot?.rewards?.find(reward => reward.id === profile?.id);
-  const phase = snapshot ? stageNames[snapshot.stage] : '游戏大厅';
+  const hasPersonalReward = Boolean(personalReward);
+  useEffect(() => {
+    if (snapshot?.stage === 'combat') guide.mark('combat-entered');
+    if (hasPersonalReward) void guide.refresh();
+  }, [snapshot?.stage, hasPersonalReward, guide.data?.enabled, guide.mark, guide.refresh]);
+  const phase = snapshot ? snapshot.stage === 'waiting' && snapshot.players.length === 1 ? '单人冒险' : stageNames[snapshot.stage] : '游戏大厅';
   function changeMode(): void { setLogin(!login); setError(''); setPassword(''); }
   if (profile && snapshot && renderParty && (snapshot.stage === 'waiting' || snapshot.stage === 'rest')) {
-    const partyProps = { snapshot, playerId: profile.id, busy, connection, error: error || snapshot.error, ready, start, leave: returnLobby };
+    const partyProps = { changeDifficulty, unlockedDifficulties, snapshot, playerId: profile.id, busy, connection, error: error || snapshot.error, ready, start, leave: returnLobby };
     return renderParty(partyProps);
   }
-  if (snapshot?.stage === 'final-result' && profile) {
-    const resultProps = { playerId: profile.id, name: mine?.name ?? profile.name, results: snapshot.results, reward: personalReward, busy, error: error || snapshot.error, onClose: returnLobby };
+  if (snapshot && profile && (snapshot.stage === 'final-result' || hasPersonalReward)) {
+    const resultProps = { expedition: snapshot.expedition, playerId: profile.id, name: mine?.name ?? profile.name, results: snapshot.results, reward: personalReward, busy, error: error || snapshot.error, onClose: returnLobby };
     return <ExpeditionResult {...resultProps} />;
   }
   if (!profile && freshTestAccount) return <main className={s.shell}><section className={s.panel}><h2>进入测试大厅</h2><p>每次打开或刷新页面都会创建全新账号，使用默认角色。</p>{error ? <><p role="alert">{error}</p><button disabled={busy} onClick={retryTestAccount}>重新进入</button></> : <div role="status"><progress max={2} value={entryStep} aria-label="账号准备进度" style={{ width: '100%' }} /><p>{entryStep === 0 ? '正在创建全新账号…（1/2）' : '正在初始化默认角色…（2/2）'}</p><small>完成后加载大厅场景</small></div>}</section></main>;
@@ -344,10 +419,11 @@ export function OnlineApp({ renderLobby, renderAuth, renderBackpack, renderParty
     return <main className={s.battleShell}>
       <PauseMenu snapshot={snapshot} runtime={runtime} change={pauseBattle} connection={connection} />
       <ArenaView runtime={runtime} />
+      <PickupNotices feed={pickupFeed} />
       {lootNotice && <div className={s.lootNotice} role="status">{lootNotice}</div>}
-      {build && <BuildPanel snapshot={snapshot} waveReady={waveReady} remind={remindReady} resting={snapshot.resting ?? false} loot={loot} player={mine} discard={discardBattle} state={build} error={buildError} choose={chooseUpgrade} equip={equipBattle} />}
-      {mine && <CombatHud player={mine} players={snapshot.players} abilities={abilities} />}
-      <SurvivalOverlay preparation={snapshot.preparation} enemies={snapshot.enemies.filter(enemy => enemy.hp > 0).length} warnings={snapshot.spawnWarnings ?? []} pending={snapshot.pendingSpawns ?? 0} round={snapshot.round} seconds={snapshot.seconds} survived={mine?.survivalSeconds ?? 0} resting={snapshot.resting ?? false} living={snapshot.players.filter(player => player.hp > 0).length} total={snapshot.players.length} />
+      {build && <BuildPanel connected={connection === '已连接权威房间'} snapshot={snapshot} waveReady={waveReady} remind={remindReady} resting={snapshot.resting ?? false} loot={loot} player={mine} discard={discardBattle} state={build} error={buildError} refresh={refreshGrowth} choose={chooseUpgrade} equip={equipBattle} decide={chooseExpedition} />}
+      {mine && <CombatHud player={mine} players={snapshot.players} abilities={abilities} runtime={runtime} />}
+      <SurvivalOverlay expedition={snapshot.expedition} coins={Math.max(0, (build?.coinsEarned ?? 0) - (build?.coinsSpent ?? 0))} plans={snapshot.wavePlans} preparation={snapshot.preparation} enemies={snapshot.enemies.filter(enemy => enemy.hp > 0).length} warnings={snapshot.spawnWarnings ?? []} pending={snapshot.pendingSpawns ?? 0} round={snapshot.round} seconds={snapshot.seconds} survived={mine?.survivalSeconds ?? 0} resting={snapshot.resting ?? false} living={snapshot.players.filter(player => player.hp > 0).length} total={snapshot.players.length} />
       {mine && mine.hp <= 0 && <section className={s.soulPanel} role="status"><b>灵魂状态 · 可使用 WASD 移动</b><p>无法攻击，继续累计生存与波次收益。</p><button onClick={revive} disabled={mine.reviveRemaining > 0}>{mine.reviveRemaining > 0 ? `${Math.ceil(mine.reviveRemaining)} 秒后可以复活` : '在灵魂当前位置复活'}</button></section>}
       {(error || snapshot.error) && <div className={s.battleError} role="alert">{error || snapshot.error}</div>}
       {connection !== '已连接权威房间' && <div className={s.battleConnection} role="status">{connection}</div>}
@@ -355,20 +431,20 @@ export function OnlineApp({ renderLobby, renderAuth, renderBackpack, renderParty
   }
   if (profile && !profile.role) return <CharacterCreator onCreate={selectCharacter} onExit={logout} />;
   const character = profile?.character;
-  const characterStats = character ? calculateCharacterStats(character) : null;
+  const characterStats = character ? calculateCharacterStats(character, profile?.characterGrowth) : null;
   const talentNames = character ? characterTalents.filter(talent => character.talents.includes(talent.id)).map(talent => talent.name).join(' · ') : '';
-  if (profile?.role && !snapshot && renderLobby) { const lobbyProps = { profile, rooms, history, busy: busy || reconnecting.current, error, enterRoom, logout, loadEquipment, saveEquipment, loadShop, purchaseProduct, refreshShop, loadInventory, renderBackpack, addTestInventory: import.meta.env.VITE_TEST_TOOLS === 'true' ? addTestInventory : undefined, loadTestAssets: import.meta.env.VITE_TEST_TOOLS === 'true' ? loadTestAssets : undefined, adjustTestAssets: import.meta.env.VITE_TEST_TOOLS === 'true' ? adjustTestAssets : undefined }; return renderLobby(lobbyProps); }
+  if (profile?.role && !snapshot && renderLobby) { const lobbyProps = { unlockedDifficulties, upgradeCharacter, saveCharacterGrowth, copyEquipment, profile, rooms, history, busy: busy || reconnecting.current, error, enterRoom, logout, loadEquipment, saveEquipment, loadShop, purchaseProduct, refreshShop, loadInventory, renderBackpack, addTestInventory: import.meta.env.VITE_TEST_TOOLS === 'true' ? addTestInventory : undefined, loadTestAssets: import.meta.env.VITE_TEST_TOOLS === 'true' ? loadTestAssets : undefined, adjustTestAssets: import.meta.env.VITE_TEST_TOOLS === 'true' ? adjustTestAssets : undefined }; return renderLobby(lobbyProps); }
   return <div className={s.shell}><header className={s.header}><div><span className={s.eyebrow}>INTO THE RIFT · ONLINE</span><h1>林地围猎</h1></div><div className={s.account}>{profile && <><b>{profile.name}</b><span>金币 {profile.coins} · 经营素材 {profile.materials}</span>{!snapshot && <button className={s.ghost} onClick={logout}>退出账号</button>}</>}</div></header>
     <main className={s.main}>{error && <div className={s.error} role="alert">{error}</div>}{snapshot?.error && <div className={s.error} role="alert">{snapshot.error}</div>}
     {!profile ? <section className={s.auth}><span className={s.eyebrow}>第一段旅程，从这里开始</span><h2>{login ? '欢迎回来' : '创建冒险者账号'}</h2><p>真实联机 · 自动战斗 · 持续波次</p><form onSubmit={authenticate}><label>账号<input autoComplete="username" value={name} minLength={2} maxLength={20} onChange={event => setName(event.target.value)} required /></label><label>密码<input type="password" autoComplete={login ? 'current-password' : 'new-password'} value={password} minLength={8} maxLength={72} onChange={event => setPassword(event.target.value)} required /></label><button disabled={busy}>{busy ? '正在连接…' : login ? '登录' : '创建账号'}</button></form><button className={s.ghost} onClick={() => setLogin(!login)}>{login ? '创建新账号' : '已有账号，去登录'}</button></section>
-    : !snapshot ? <>{character && characterStats && <section className={s.characterCard}><div><span className={s.eyebrow}>你的冒险者</span><h3>{character.name}</h3><p>{character.description || '每一种取舍，都成为你的天赋。'}</p><div className={s.tags}><span>{talentNames || '纯粹属性 · 无天赋'}</span></div></div><div className={s.characterNumbers}><span>生命 <b>{characterStats.maxHp}</b></span><span>魔法 <b>{characterStats.maxMp}</b></span><span>物攻 <b>{characterStats.physicalAttack}</b></span><span>魔攻 <b>{characterStats.magicalAttack}</b></span></div></section>}<div className={s.intro}><span className={s.eyebrow}>冒险者营地</span><h2>与同行者一起，穿过林地。</h2><p>最多二十人协作。持续迎战怪潮，全员灵魂后结算。</p></div><div className={s.columns}><section className={s.panel}><span className={s.eyebrow}>01 · 完整秘境</span><h2>森语遗迹 · 林地围猎</h2><p>怪物随波次和入场人数增强。清空本波后休息，全员准备后进入下一波。灵魂可移动并等待复活，全员灵魂即失败。</p><div className={s.tags}><span>自动攻击</span><span>共享战场</span><span>持续生存</span></div><button disabled={busy || reconnecting.current} onClick={() => { void enterRoom(); }}>创建房间</button><div className={s.join}><input aria-label="房间编号" placeholder="输入好友的房间编号" value={roomCode} onChange={event => setRoomCode(event.target.value)} /><button disabled={busy || !roomCode.trim()} onClick={() => { const id = roomCode.trim(); void enterRoom(id); }}>加入</button></div>{connection && <p role="status">{connection}</p>}</section><section className={s.panel}><h3>等待中的房间</h3>{rooms.length ? rooms.map(item => <div className={s.roomRow} key={item.roomId}><div><b>{item.name}</b><small>{item.roomId} · {item.clients}/{item.maxClients} 人</small></div><button disabled={busy} onClick={() => { void enterRoom(item.roomId); }}>加入</button></div>) : <p>暂无等待房间，创建一个邀请好友吧。</p>}</section></div><section className={s.panel}><h3>最近的秘境记录</h3>{history.length ? history.map(item => <div className={s.roomRow} key={item.runId}><span>{item.run.createdAt.slice(0, 16).replace('T', ' ')} · {item.run.status === 'completed' ? '已完成' : item.run.status === 'failed' ? '挑战结束' : '进行中 / 中断'}</span><span>{item.settled ? `金币 +${item.coins} · 素材 +${item.materials}` : '尚未结算'}</span></div>) : <p>完成第一次秘境后，在这里查看收获。</p>}</section></>
+    : !snapshot ? <>{character && characterStats && <section className={s.characterCard}><div><span className={s.eyebrow}>你的冒险者</span><h3>{character.name}</h3><p>{character.description || '每一种取舍，都成为你的天赋。'}</p><div className={s.tags}><span>{talentNames || '纯粹属性 · 无天赋'}</span></div></div><div className={s.characterNumbers}><span>生命 <b>{characterStats.maxHp}</b></span><span>灵力容量加成 <b>{characterStats.energyCapacityBonus}</b></span><span>物攻 <b>{characterStats.physicalAttack}</b></span><span>魔攻 <b>{characterStats.magicalAttack}</b></span></div></section>}<div className={s.intro}><span className={s.eyebrow}>冒险者营地</span><h2>与同行者一起，穿过林地。</h2><p>最多二十人协作。持续迎战怪潮，全员灵魂后结算。</p></div><div className={s.columns}><section className={s.panel}><span className={s.eyebrow}>01 · 完整秘境</span><h2>森语遗迹 · 林地围猎</h2><p>怪物随波次和入场人数增强。清空本波后休息，单人点击开始下一波，组队全员准备后继续。灵魂可移动并等待复活，全员灵魂即失败。</p><div className={s.tags}><span>自动攻击</span><span>共享战场</span><span>持续生存</span></div><button disabled={busy || reconnecting.current} onClick={() => { void enterRoom(); }}>创建房间</button><div className={s.join}><input aria-label="房间编号" placeholder="输入好友的房间编号" value={roomCode} onChange={event => setRoomCode(event.target.value)} /><button disabled={busy || !roomCode.trim()} onClick={() => { const id = roomCode.trim(); void enterRoom(id); }}>加入</button></div>{connection && <p role="status">{connection}</p>}</section><section className={s.panel}><h3>等待中的房间</h3>{rooms.length ? rooms.map(item => <div className={s.roomRow} key={item.roomId}><div><b>{item.name}</b><small>{item.roomId} · {item.clients}/{item.maxClients} 人</small></div><button disabled={busy} onClick={() => { void enterRoom(item.roomId); }}>加入</button></div>) : <p>暂无等待房间，创建一个邀请好友吧。</p>}</section></div><section className={s.panel}><h3>最近的秘境记录</h3>{history.length ? history.map(item => <div className={s.roomRow} key={item.runId}><span>{item.run.createdAt.slice(0, 16).replace('T', ' ')} · {item.run.status === 'completed' ? '已完成' : item.run.status === 'failed' ? '挑战结束' : '进行中 / 中断'}</span><span>{item.settled ? `金币 +${item.coins} · 素材 +${item.materials}` : '尚未结算'}</span></div>) : <p>完成第一次秘境后，在这里查看收获。</p>}</section></>
     : <><div className={s.phase}><div><span className={s.eyebrow}>{connection} · 房间 {snapshot.roomId}</span><h2>{phase}{snapshot.round > 0 && ` · 第 ${snapshot.round} 轮`}</h2></div><div className={s.timer}>{snapshot.stage === 'rest' ? `${Math.ceil(snapshot.seconds)} 秒后统一出发` : ''}</div></div>
-      <section className={s.panel}>{snapshot.stage === 'waiting' && <><h3>等待同行者</h3><p>复制房间编号给好友：<strong>{snapshot.roomId}</strong>。所有成员准备后，房主开启。开局后不接受新玩家。</p><button onClick={ready}>{mine?.ready ? '取消准备' : '准备'}</button>{snapshot.hostId === profile.id && <button onClick={start} disabled={snapshot.players.some(player => !player.ready || !player.connected)}>开启秘境</button>}</>}
-      {snapshot.stage === 'rest' && <><h3>准备进入林地</h3><p>倒计时结束后全员进入。此后原地连续刷新波次，只有全员进入灵魂才结束任务。</p></>}
-      {(snapshot.stage === 'round-result' || snapshot.stage === 'settling') && <><h3>全员进入灵魂 · 任务失败</h3><p>服务器正在保存各波次成果并结算个人收益，请稍候。</p></>}
+      <section className={s.panel}>{snapshot.stage === 'waiting' && <><h3>{snapshot.players.length === 1 ? '单人冒险' : '等待同行者'}</h3><p>复制房间编号给好友：<strong>{snapshot.roomId}</strong>。{snapshot.players.length === 1 ? '可直接开启秘境。' : '所有成员准备后，房主开启。'}开局后不接受新玩家。</p>{snapshot.players.length > 1 && <button onClick={ready}>{mine?.ready ? '取消准备' : '准备'}</button>}{snapshot.hostId === profile.id && <button onClick={start} disabled={busy || connection !== '已连接权威房间' || snapshot.players.some(player => !player.connected || snapshot.players.length > 1 && !player.ready)}>开启秘境</button>}</>}
+      {snapshot.stage === 'rest' && <><h3>准备进入林地</h3><p>倒计时结束后全员进入。此后原地连续刷新波次，完成20关后可提取收益，或选择地狱20层高风险挑战。</p></>}
+      {(snapshot.stage === 'round-result' || snapshot.stage === 'settling') && <><h3>{snapshot.results.at(-1)?.success ? '地狱20层通关 · 正在结算' : snapshot.expedition?.hellFloor ? '地狱挑战失败 · 正在结算' : '本次挑战失败 · 正在结算'}</h3><p>服务器正在保存关卡成果并结算个人收益，请稍候。</p></>}
       </section>
-      <div className={s.players}>{snapshot.players.map(player => <div className={s.player} key={player.id}><b>{player.id === snapshot.hostId ? '♜ ' : ''}{player.name}{player.id === profile.id ? '（你）' : ''}</b><span>{!player.connected ? '离线 · 30 秒重连宽限' : snapshot.stage === 'waiting' ? player.ready ? '已准备' : '未准备' : player.hp <= 0 ? '灵魂状态' : `生命 ${Math.ceil(player.hp)}/${player.maxHp}`}</span></div>)}</div>{(snapshot.stage === 'waiting' || snapshot.stage === 'final-result' || connection === '重连失败') && <button className={s.ghost} onClick={returnLobby} disabled={busy}>返回游戏大厅</button>}
+      <div className={s.players}>{snapshot.players.map(player => <div className={s.player} key={player.id}><b>{player.id === snapshot.hostId ? '♜ ' : ''}{player.name}{player.id === profile.id ? '（你）' : ''}</b><span>{!player.connected ? '离线 · 30 秒重连宽限' : snapshot.stage === 'waiting' ? snapshot.players.length === 1 ? '可开启秘境' : player.ready ? '已准备' : '未准备' : player.hp <= 0 ? '灵魂状态' : `生命 ${Math.ceil(player.hp)}/${player.maxHp}`}</span></div>)}</div>{(snapshot.stage === 'waiting' || snapshot.stage === 'final-result' || connection === '重连失败') && <button className={s.ghost} onClick={returnLobby} disabled={busy}>返回游戏大厅</button>}
     </>}
-    </main><footer className={s.footer}>v{appVersion} · 服务器权威战斗 · 规则版本 1</footer></div>;
+    </main><footer className={s.footer}>v{appVersion} · 客户端战斗 · 规则版本 2</footer></div>;
 }
 

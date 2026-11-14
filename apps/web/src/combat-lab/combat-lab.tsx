@@ -34,19 +34,19 @@ function Arena({ state }: { state: LabState }) {
     const events = state.events.filter((event) => event.id > processed.current);
     events.reverse();
     for (const event of events) {
-      if (event.kind === 'weapon' || event.kind === 'spell') handle.current?.fire(event);
+      if (event.kind === 'melee' || event.kind === 'ranged') handle.current?.fire(event);
     }
     processed.current = state.sequence;
   }, [state.events, state.sequence]);
   function retry() { setAttempt(attempt + 1); }
-  return <div><div className={s.arena} ref={parent} role="img" aria-label="武器与法术独立向训练木桩发动攻击的实时画面" />{!ready && !error && <p>正在加载训练场…</p>}{error && <p role="alert">训练场加载失败，数值模拟仍可使用。<button onClick={retry}>重新加载画面</button></p>}</div>;
+  return <div><div className={s.arena} ref={parent} role="img" aria-label="近战技能与远程技能独立向训练木桩发动攻击的实时画面" />{!ready && !error && <p>正在加载训练场…</p>}{error && <p role="alert">训练场加载失败，数值模拟仍可使用。<button onClick={retry}>重新加载画面</button></p>}</div>;
 }
 
-const socketNames: Record<Socket, string> = { heart: '心法', weapon: '武器', spell: '技能', 'weapon-support': '武器辅助', 'spell-support': '技能辅助' };
+const socketNames: Record<Socket, string> = { heart: '心法', melee: '近战技能', ranged: '技能', 'melee-support': '近战技能辅助', 'ranged-support': '技能辅助' };
 
 function getSocketItem(loadout: Loadout, socket: Socket) {
   const inventory = getInventory(socket);
-  const id = socket === 'weapon-support' ? loadout.weaponSupport : socket === 'spell-support' ? loadout.spellSupport : loadout[socket];
+  const id = socket === 'melee-support' ? loadout.meleeSupport : socket === 'ranged-support' ? loadout.rangedSupport : loadout[socket];
   return inventory.find((item) => item.id === id);
 }
 
@@ -56,8 +56,8 @@ function ConnectionBoard({ loadout, focus, onSelect, state }: { loadout: Loadout
   const heart = hearts.find((item) => item.id === loadout.heart);
   function socketButton(socket: Socket) {
     const item = getSocketItem(loadout, socket);
-    const auxiliary = socket === 'weapon-support' || socket === 'spell-support';
-    const parentMissing = socket === 'heart' ? false : !heart || (socket === 'weapon-support' && !loadout.weapon) || (socket === 'spell-support' && !loadout.spell);
+    const auxiliary = socket === 'melee-support' || socket === 'ranged-support';
+    const parentMissing = socket === 'heart' ? false : !heart || (socket === 'melee-support' && !loadout.melee) || (socket === 'ranged-support' && !loadout.ranged);
     const className = `${s.socket} ${socket === 'heart' ? s.heartSocket : auxiliary ? s.supportSocket : s.abilitySocket} ${focus === socket ? s.selected : ''}`;
     function select() { onSelect?.(socket); }
     return <button type="button" className={className} onClick={select} disabled={!onSelect || parentMissing} aria-pressed={onSelect ? focus === socket : undefined} aria-label={`${socketNames[socket]}：${item?.name ?? '未装备'}`}>
@@ -67,7 +67,7 @@ function ConnectionBoard({ loadout, focus, onSelect, state }: { loadout: Loadout
   const heartButton = socketButton('heart');
   const rows = abilities.map((ability) => {
     const abilityButton = socketButton(ability.id);
-    const supportSocket: Socket = ability.id === 'weapon' ? 'weapon-support' : 'spell-support';
+    const supportSocket: Socket = ability.id === 'melee' ? 'melee-support' : 'ranged-support';
     const supportButton = socketButton(supportSocket);
     const branch = state?.[ability.id];
     const missing = state ? Math.max(0, ability.cost - state.pool) : 0;
@@ -106,18 +106,18 @@ export function CombatLab() {
 
   function equip(id: string) {
     const next = { ...draft };
-    if (focus === 'heart' || focus === 'weapon' || focus === 'spell') next[focus] = id;
-    else if (focus === 'weapon-support' && (id === 'power' || id === 'economy')) next.weaponSupport = id;
-    else if (focus === 'spell-support' && (id === 'multi' || id === 'economy')) next.spellSupport = id;
+    if (focus === 'heart' || focus === 'melee' || focus === 'ranged') next[focus] = id;
+    else if (focus === 'melee-support' && (id === 'power' || id === 'economy')) next.meleeSupport = id;
+    else if (focus === 'ranged-support' && (id === 'multi' || id === 'economy')) next.rangedSupport = id;
     setDraft(next);
   }
   function unequip() {
     const next = { ...draft };
-    if (focus === 'heart') { next.heart = null; next.weapon = null; next.spell = null; next.weaponSupport = 'none'; next.spellSupport = 'none'; }
-    if (focus === 'weapon') { next.weapon = null; next.weaponSupport = 'none'; }
-    if (focus === 'spell') { next.spell = null; next.spellSupport = 'none'; }
-    if (focus === 'weapon-support') next.weaponSupport = 'none';
-    if (focus === 'spell-support') next.spellSupport = 'none';
+    if (focus === 'heart') { next.heart = null; next.melee = null; next.ranged = null; next.meleeSupport = 'none'; next.rangedSupport = 'none'; }
+    if (focus === 'melee') { next.melee = null; next.meleeSupport = 'none'; }
+    if (focus === 'ranged') { next.ranged = null; next.rangedSupport = 'none'; }
+    if (focus === 'melee-support') next.meleeSupport = 'none';
+    if (focus === 'ranged-support') next.rangedSupport = 'none';
     setDraft(next);
   }
   function enterArena() {
@@ -140,8 +140,8 @@ export function CombatLab() {
   const deficit = demand > supply;
   const selectedItem = getSocketItem(draft, focus);
   const inventory = getInventory(focus);
-  const hasParent = focus === 'heart' || Boolean(draft.heart && (focus === 'weapon-support' ? draft.weapon : focus === 'spell-support' ? draft.spell : true));
-  const canEnter = Boolean(draft.heart && (draft.weapon || draft.spell));
+  const hasParent = focus === 'heart' || Boolean(draft.heart && (focus === 'melee-support' ? draft.melee : focus === 'ranged-support' ? draft.ranged : true));
+  const canEnter = Boolean(draft.heart && (draft.melee || draft.ranged));
   const equipmentCards = inventory.map((item) => {
     const equipped = selectedItem?.id === item.id;
     return <button className={`${s.equipmentCard} ${equipped ? s.equipped : ''}`} key={item.id} onClick={() => { equip(item.id); }} disabled={!hasParent} aria-pressed={equipped}>
@@ -158,19 +158,19 @@ export function CombatLab() {
   const recoveryCountdown = ((state.nextRecovery - state.time) / 1000).toFixed(2);
 
   return <main className={s.page}>
-    <header className={s.heading}><div><span className={s.eyebrow}>秘境之间 / 心法构筑体验</span><h1>{view === 'workshop' ? '心法装配' : '试炼场'}</h1><p>{view === 'workshop' ? '以心法为源，连接你的武器、技能与辅助。' : '构筑已生效。自动攻击训练木桩，观察每条连接是否获得供能。'}</p></div><a href="#">返回游戏大厅 ↗</a></header>
+    <header className={s.heading}><div><span className={s.eyebrow}>秘境之间 / 心法构筑体验</span><h1>{view === 'workshop' ? '心法装配' : '试炼场'}</h1><p>{view === 'workshop' ? '以心法为源，连接你的近战技能、技能与辅助。' : '构筑已生效。自动攻击训练木桩，观察每条连接是否获得供能。'}</p></div><a href="#">返回游戏大厅 ↗</a></header>
     <div className={s.steps}><span className={view === 'workshop' ? s.currentStep : ''}>01 装备心法</span><i>→</i><span className={view === 'workshop' ? s.currentStep : ''}>02 连接能力与辅助</span><i>→</i><span className={view === 'arena' ? s.currentStep : ''}>03 返回试炼场观察</span></div>
     {view === 'workshop' ? <>
-      <div className={s.workshopLayout}><section className={s.buildPanel}><div className={s.panelHeading}><div><span className={s.eyebrow}>YOUR BUILD</span><h2>心法连接图</h2></div><span className={s.badge}>{heart ? '2 个能力槽 · 每个能力 1 个辅助格' : '尚未装备心法'}</span></div><p className={s.instruction}>点击槽位，再从右侧选择物品。卸下能力会同时取下它的辅助。</p><ConnectionBoard loadout={draft} focus={focus} onSelect={setFocus} /><div className={s.legend}><span><i className={s.heartKey} />心法 / 供能</span><span><i className={s.abilityKey} />武器与技能 / 取能</span><span><i className={s.supportKey} />辅助 / 修饰所属能力</span></div></section>
-      <aside className={s.inventory}><div className={s.panelHeading}><div><span className={s.eyebrow}>EQUIPMENT</span><h2>装备{socketNames[focus]}</h2></div>{selectedItem && <button className={s.textButton} onClick={unequip}>卸下{focus === 'heart' ? '整套连接' : ''}</button>}</div><p className={s.instruction}>{!hasParent ? '请先装备心法及所属能力。' : '点击物品，即可放入当前选中的槽位。'}</p><div className={s.equipmentList}>{equipmentCards}</div><div className={s.itemNote}>辅助只作用于连接它的武器或技能，不会影响另一条分支。当前物品为体验用配置。</div></aside></div>
+      <div className={s.workshopLayout}><section className={s.buildPanel}><div className={s.panelHeading}><div><span className={s.eyebrow}>YOUR BUILD</span><h2>心法连接图</h2></div><span className={s.badge}>{heart ? '2 个能力槽 · 每个能力 1 个辅助格' : '尚未装备心法'}</span></div><p className={s.instruction}>点击槽位，再从右侧选择物品。卸下能力会同时取下它的辅助。</p><ConnectionBoard loadout={draft} focus={focus} onSelect={setFocus} /><div className={s.legend}><span><i className={s.heartKey} />心法 / 供能</span><span><i className={s.abilityKey} />近战技能与技能 / 取能</span><span><i className={s.supportKey} />辅助 / 修饰所属能力</span></div></section>
+      <aside className={s.inventory}><div className={s.panelHeading}><div><span className={s.eyebrow}>EQUIPMENT</span><h2>装备{socketNames[focus]}</h2></div>{selectedItem && <button className={s.textButton} onClick={unequip}>卸下{focus === 'heart' ? '整套连接' : ''}</button>}</div><p className={s.instruction}>{!hasParent ? '请先装备心法及所属能力。' : '点击物品，即可放入当前选中的槽位。'}</p><div className={s.equipmentList}>{equipmentCards}</div><div className={s.itemNote}>辅助只作用于连接它的近战技能或技能，不会影响另一条分支。当前物品为体验用配置。</div></aside></div>
       <section className={s.budget} data-deficit={deficit}><div><span className={s.eyebrow}>共享供能预览</span><h2>{!heart ? '从一部心法开始' : deficit ? '供能不足，能力会竞争灵力' : '平均供能足够，仍需留意瞬间消耗'}</h2><p>两条分支独立计时，却从同一个池子取能。某次攻击花掉的灵力，另一条分支就无法使用。</p></div><div className={s.budgetNumbers}><span>心法供给<strong>{supply.toFixed(1)}<small>灵力/秒</small></strong></span><b>↔</b><span>总满速需求<strong>{demand.toFixed(1)}<small>灵力/秒</small></strong></span></div></section>
-      <footer className={s.actions}><div><strong>装配完成后进入试炼场，所有能力自动运行。</strong><small>每次确认装配开启新一轮试炼：魔法值 300、心法池满、攻速 1 倍。</small></div><div>{session > 0 && <button className={s.secondaryButton} onClick={discard}>放弃修改，继续观察</button>}<button className={s.primaryButton} onClick={enterArena} disabled={!canEnter}>确认装配 · 返回试炼场 →</button></div></footer>
+      <footer className={s.actions}><div><strong>装配完成后进入试炼场，所有能力自动运行。</strong><small>每次确认装配开启新一轮试炼：灵力池满、攻速 1 倍。</small></div><div>{session > 0 && <button className={s.secondaryButton} onClick={discard}>放弃修改，继续观察</button>}<button className={s.primaryButton} onClick={enterArena} disabled={!canEnter}>确认装配 · 返回试炼场 →</button></div></footer>
     </> : <>
       <div className={s.testTop}><span className={s.liveBadge}><i />自动运行中 · {elapsed}s</span><button className={s.primaryButton} onClick={openWorkshop}>进入心法装配 ↗</button></div>
-      <div className={s.testLayout}><section className={s.stagePanel}><Arena key={session} state={state} /><div className={s.stageFooter}><span>训练木桩 · 零防御 · 无需操作</span><strong>累计伤害 {state.damage.toFixed(0)} <small> / 平均 {dps}/秒</small></strong></div><div className={s.testResources}><article><span>角色魔法值</span><strong>{state.mana.toFixed(1)}<small> / {config.mana}</small></strong><progress max={config.mana} value={state.mana} aria-label="角色当前魔法值" /><small>为心法恢复提供消耗，不自动回复</small></article><div className={s.resourceArrow}>转换 →</div><article className={s.pool}><span>{heart?.name} · 灵力池</span><strong>{state.pool.toFixed(1)}<small> / {config.capacity}</small></strong><progress max={config.capacity} value={state.pool} aria-label="心法当前灵力" /><small>下次恢复 {recoveryCountdown}s · 每次 +{config.recoveryAmount}</small></article></div></section>
-      <aside className={s.observation}><div className={s.panelHeading}><h2>触发观察</h2><span className={s.badge}>同一灵力池</span></div><p className={s.instruction}>进度条是各能力自己的计时；“等待供能”表示计时已到，但灵力不足。</p><ConnectionBoard loadout={loadout} state={state} /><div className={s.competitionNote} data-deficit={deficit}><strong>{deficit ? '总需求超过恢复速度' : '平均供给可覆盖需求'}</strong><p>供给 {supply.toFixed(1)}/秒 · 需求 {demand.toFixed(1)}/秒。池容量只能缓冲消耗，不能提高持续供给。{state.mana <= 0 ? '角色魔法值已耗尽，心法无法继续恢复。' : ''}</p></div></aside></div>
+      <div className={s.testLayout}><section className={s.stagePanel}><Arena key={session} state={state} /><div className={s.stageFooter}><span>训练木桩 · 零防御 · 无需操作</span><strong>累计伤害 {state.damage.toFixed(0)} <small> / 平均 {dps}/秒</small></strong></div><div className={s.testResources}><article className={s.pool}><span>{heart?.name} · 灵力池</span><strong>{state.pool.toFixed(1)}<small> / {config.capacity}</small></strong><progress max={config.capacity} value={state.pool} aria-label="心法当前灵力" /><small>下次恢复 {recoveryCountdown}s · 每次 +{config.recoveryAmount}</small></article></div></section>
+      <aside className={s.observation}><div className={s.panelHeading}><h2>触发观察</h2><span className={s.badge}>同一灵力池</span></div><p className={s.instruction}>进度条是各能力自己的计时；“等待供能”表示计时已到，但灵力不足。</p><ConnectionBoard loadout={loadout} state={state} /><div className={s.competitionNote} data-deficit={deficit}><strong>{deficit ? '总需求超过恢复速度' : '平均供给可覆盖需求'}</strong><p>供给 {supply.toFixed(1)}/秒 · 需求 {demand.toFixed(1)}/秒。池容量只能缓冲消耗，不能提高持续供给。</p></div></aside></div>
       <section className={s.log}><div className={s.panelHeading}><h2>最近发生了什么</h2><span className={s.badge}>恢复 → 取能 → 触发</span></div><ol>{events.length ? events : <li>能力正在独立计时，等待首次触发…</li>}</ol></section>
-      <p className={s.bottomNote}>调整装备请进入心法装配。观察区只展示触发结果，不提供手动攻击、补能或参数修改。体验暂用：缺能时等待；同刻先恢复、再检查武器与技能。</p>
+      <p className={s.bottomNote}>调整装备请进入心法装配。观察区只展示触发结果，不提供手动攻击、补能或参数修改。体验暂用：缺能时等待；同刻先恢复、再检查近战技能与技能。</p>
     </>}
     <p className={s.bottomNote}>本地构筑体验 · 不写入角色资产 · 心法与物品数值为示例，尚未接入正式多人战斗。</p>
   </main>;

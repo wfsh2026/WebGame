@@ -34,14 +34,43 @@
 .error { position: absolute; bottom: 8%; left: 50%; transform: translateX(-50%); background: #502e23ed; padding: 12px 24px; border: 1px solid #b59166; border-radius: 5px; }
 .dialog { padding: 0; background: transparent; border: 0; color: #eee9d9; max-width: min(820px, 94vw); width: 820px; max-height: 88dvh; overflow: visible; }
 .dialog::backdrop { background: #0b17159e; backdrop-filter: blur(3px); }
-.skillDialog { width: 1200px; max-width: 96vw; max-height: 94dvh; }
-.skillPanel { max-height: 94dvh; border-color: #b69961; background: #0b101a; }
+.characterDialog { width: 960px; max-width: calc(100vw - 20px); max-height: calc(100dvh - 64px); }
+.panel.characterPanel { box-sizing: border-box; max-height: calc(100dvh - 64px); padding: 19px 25px 15px; border: 0; border-radius: 0; background: url('../../../../../content/common/lobby/shop-ui-panel.webp') center / 100% 100% no-repeat; overflow: visible; }
+.characterPanel .characterBody { min-height: 0; padding: 0; overflow: visible; }
+@media (max-width: 699px) {
+  .characterDialog { max-width: calc(100vw - 14px); max-height: calc(100dvh - 40px); }
+  .panel.characterPanel { max-height: calc(100dvh - 40px); padding: 10px 13px 14px; }
+}
+.skillDialog { width: 1120px; max-width: calc(100vw - 20px); max-height: calc(100dvh - 28px); }
+.shopDialog { width: 920px; max-width: calc(100vw - 20px); max-height: calc(100dvh - 24px); }
+.shopDialog:has([aria-controls='shop-panel-hearts'][aria-selected='true']) { width: 760px; }
+.panel.shopPanel { max-height: calc(100dvh - 24px); border: 22px solid transparent; border-radius: 0; background: url('../../../../../content/common/lobby/shop-ui-panel.webp') center / 100% 100% no-repeat; background-origin: border-box; overflow: visible; }
+.shopPanel .panelBody { padding: 0 8px 6px; overflow: visible; }
+.shopPanel .panelFooter { display: none; }
+.expeditionDialog { width: 980px; max-width: calc(100vw - 20px); max-height: calc(100dvh - 52px); }
+.panel.expeditionPanel { max-height: calc(100dvh - 52px); border: 22px solid transparent; border-radius: 0; background: url('../../../../../content/common/lobby/shop-ui-panel.webp') center / 100% 100% no-repeat; background-origin: border-box; overflow: visible; }
+.expeditionPanel .panelBody { padding: 0 8px 6px; overflow: visible; }
+@media (max-height: 599px) and (min-width: 600px) {
+  .panel.expeditionPanel { border-width: 16px; }
+  .expeditionPanel .panelBody { padding-inline: 4px; }
+}
+@media (max-width: 599px) {
+  .panel.expeditionPanel { border-width: 14px; }
+  .expeditionPanel .panelBody { padding: 0 5px 6px; }
+}
+@media (max-width: 600px) {
+  .panel.shopPanel { border-width: 14px; }
+  .shopPanel .panelBody { padding: 0 1px 2px; }
+}
+.panel.skillPanel { max-height: calc(100dvh - 28px); border: 22px solid transparent; border-radius: 0; background: url('../../../../../content/common/lobby/shop-ui-panel.webp') center / 100% 100% no-repeat; background-origin: border-box; overflow: visible; }
 .skillPanel .panelHeader { padding: 14px 24px; background: linear-gradient(110deg, #1b1d27, #10151f); border-bottom-color: #a58a533d; }
 .skillPanel .panelHeader h1 { font-family: 'Songti SC', SimSun, serif; color: #ecd2a1; font-size: 22px; }
 .skillPanel .panelHeader small { color: #a49a87; }
 .skillPanel .panelHeader button { background: #151b26; border-color: #998057; }
-.skillPanel .skillBody { padding: 0; background: #070b13; }
+.skillPanel .skillBody { padding: 0 5px; background: none; overflow: visible; }
 .skillPanel .panelFooter { background: #0d121c; color: #9e917b; border-top-color: #a58a5326; padding: 12px 24px; }
+@media (max-width: 700px) { .panel.skillPanel { border-width: 14px; overflow-y: auto; overflow-x: hidden; }.skillPanel .skillBody { padding: 0; overflow: visible; }.skillDialog { max-height: calc(100dvh - 24px); } }
+@media (min-width: 701px) and (max-height: 550px) { .panel.skillPanel { overflow-y: auto; overflow-x: hidden; } }
 .panel { display: flex; flex-direction: column; max-height: 88dvh; background: linear-gradient(135deg, #29362cfa, #17251ffd); border: 1px solid #b49b67; border-radius: 10px; box-shadow: 0 30px 100px #0009, inset 0 0 0 5px #a6915e0b; overflow: hidden; }
 .panelHeader { display: flex; justify-content: space-between; align-items: center; padding: 24px 30px 20px; border-bottom: 1px solid #ae996340; }
 .panelHeader small { font-size: 10px; color: #b6a576; letter-spacing: 4px; }

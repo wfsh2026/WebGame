@@ -21,7 +21,7 @@ export function EquipmentIcon({ kind, effect, size = 48 }: { kind: string; effec
   const cells: Record<string, number> = { slash: 0, dual: 1, spear: 2, hammer: 3, blade: 4, star: 5, fireball: 6, frost: 7 };
   const resonanceCells: Record<string, number> = { 'thunder-seal': 0, 'thunder-staff': 2, cycle: 6, resonance: 7 };
   const special = resonanceCells[effect ?? ''];
-  const index = special ?? cells[effect ?? ''] ?? (kind === 'heart' ? 12 : kind === 'weapon' ? 13 : kind === 'skill' ? 14 : 15);
+  const index = special ?? cells[effect ?? ''] ?? (kind === 'heart' ? 12 : kind === 'skill' ? 14 : 15);
   const x = index % 4 * 100 / 3; const y = Math.floor(index / 4) * 100 / (special === undefined ? 3 : 1);
   const style: CSSProperties = { display: 'inline-block', width: size, height: size, flexShrink: 0, backgroundImage: `url(${special === undefined ? atlas : resonanceAtlas})`, backgroundSize: special === undefined ? '400% 400%' : '400% 200%', backgroundPosition: `${x}% ${y}%` };
   return <span style={style} aria-hidden="true" />;

@@ -1,0 +1,10 @@
+.page { box-sizing: border-box; min-height: 100dvh; padding: 24px; background: #10221c; color: #e9ecd9; font-family: system-ui, sans-serif; }
+.page h1 { font-size: 24px; }
+.page header p { font-size: 14px; color: #c4cbbb; line-height: 1.7; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+.page button, .page select { padding: 9px 12px; border: 1px solid #a5915b; border-radius: 6px; background: #294736; color: #f5edce; cursor: pointer; }
+.page select { margin-left: 8px; }
+.stage { max-width: 780px; margin: 100px auto 20px; padding: 20px; }
+.stage > button { margin-bottom: 18px; }
+.selector { max-width: 1000px; margin: 80px auto 0; padding: 30px; background: #e7d2a1; border: 12px solid #9b743f; }
+@media (max-width: 520px) { .page { padding: 12px; } .stage { padding: 8px; margin-top: 110px; } .selector { padding: 15px; border-width: 6px; } }

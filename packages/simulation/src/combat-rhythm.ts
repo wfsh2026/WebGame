@@ -9,7 +9,7 @@ export function abilityProgress(state: AbilityState): AbilityProgress {
 }
 export function attackInterval(player: Player, branch: Player['equipment']['branches'][number], state?: AbilityState): number {
   const haste = branch.supportLevels.haste ?? 0; const stacks = state?.progress?.stacks ?? 0;
-  const speed = branch.item.kind === 'weapon' ? player.stats.attackSpeed : player.stats.castingSpeed;
+  const speed = branch.item.skillType === 'melee' ? player.stats.attackSpeed : player.stats.castingSpeed;
   const rapid = haste >= 20 && stacks >= 5 && ((state?.count ?? 0) - (state?.progress?.origin ?? 0) + 1) % 5 === 0 ? .5 : 1;
   const tempo = isBanner(branch.item.effect) ? 1 : bannerTempo(player);
   const interval = branch.item.interval * branch.intervalMultiplier / speed / (1 + stacks * .04) * rapid * tempo;
@@ -20,8 +20,9 @@ export function castModifiers(player: Player, branch: Player['equipment']['branc
   const discount = economy >= 3 && progress.starved >= .5 || economy >= 5 && progress.charges > 0 && player.energy < player.capacity * .5;
   const factor = discount ? economy >= 20 ? .8 : .9 : 1;
   const resonance = player.resonance;
-  const relay = resonance && resonance.buffLeft > 0 && resonance.buffKind === branch.item.kind && resonance.finisher && (resonance.supportLevel ?? 0) >= 20 ? .8 : 1;
-  const cost = branch.item.cost * branch.costMultiplier * factor * relay;
+  const relay = resonance && resonance.buffLeft > 0 && resonance.buffKind === branch.item.skillType && resonance.finisher && (resonance.supportLevel ?? 0) >= 20 ? .8 : 1;
+  const focus = player.focusLeft > 0 ? .8 : 1;
+  const cost = branch.item.cost * branch.costMultiplier * factor * relay * focus;
   const overloaded = progress.overload > 0 && progress.overloadCast === 0;
   return { cost, saved: Boolean(discount && progress.charges > 0), damage: overloaded ? 1.2 : 1, overloaded };
 }
@@ -33,7 +34,7 @@ export function prepareRhythm(sim: Simulation, player: Player, dt: number): void
     if (enemy.hp <= 0 || enemy.state === 'detonating' || enemy.state === 'escaped') return false;
     const dx = enemy.x - player.x; const dy = enemy.y - player.y; const distance = Math.hypot(dx, dy);
     const reach = branch.item.effect === 'spear' ? 3.6 : branch.item.range ?? 0;
-    return distance <= reach * (branch.item.kind === 'weapon' ? branch.areaMultiplier : 1);
+    return distance <= reach * (branch.item.skillType === 'melee' ? branch.areaMultiplier : 1);
   }));
   eligible.sort((a, b) => {
     const priorityA = a.item.effect === 'thunder-seal' ? -.1 : a.item.interval;
@@ -76,7 +77,7 @@ export function commitCast(player: Player, branch: Player['equipment']['branches
   if (overload >= 3 && progress.overload <= 0 && (state.count - progress.origin) % cadence === 0) progress.overload = overload >= 15 ? 6 : 3;
   progress.quiet = 0; progress.starved = 0; progress.released = false;
 }
-export function heartConversion(player: Player): { amount: number; interval: number; empowered: boolean } {
+export function heartRecovery(player: Player): { amount: number; interval: number; empowered: boolean } {
   const item = player.equipment.heartItem; if (!item) return { amount: 0, interval: 1, empowered: false };
   const state = player.heartProgress ??= { cooldown: 0, low: 0, burst: 0, idle: 3 };
   const id = item.definitionId ?? item.id; const level = item.level ?? 1;
@@ -90,5 +91,5 @@ export function heartConversion(player: Player): { amount: number; interval: num
   }
   const relay = player.resonance;
   if (item.effect === 'cycle' && (relay?.recoveryCharges ?? 0) > 0) factor *= level >= 20 ? 1.3 : 1.15;
-  return { amount: item.recovery * factor, interval, empowered: factor > 1 || interval < item.interval };
+  return { amount: (item.recovery + player.energyRecoveryBonus * item.interval) * factor, interval, empowered: factor > 1 || interval < item.interval };
 }

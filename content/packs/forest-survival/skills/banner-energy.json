@@ -5,9 +5,10 @@
   "effect": "banner-energy",
   "interval": 3,
   "cost": 12,
-  "coefficient": 0,
+  "coefficient": 0.2,
   "range": 10,
   "supportSlots": 1,
   "delivery": "nova",
-  "description": "布旗后心法恢复量提高15%，仍支付魔法值。同类取最强，自身额外灵力预算不超过布旗成本80%。5级延长，10级入阵强化恢复，15级低灵力增强，20级归元脉冲。"
+  "description": "布旗后心法恢复量提高15%，每2秒释放从阵缘内收的灵潮，每轮造成20%魔攻伤害。自身额外回灵预算为布旗成本80%，伤害单独计算。5级延长持续，10级入阵强化恢复，15级低灵力增强，20级周期强化灵潮与归元。伤害随技能等级成长。",
+  "skillType": "ranged"
 }

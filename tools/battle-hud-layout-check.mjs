@@ -14,11 +14,11 @@ try {
     const { CombatHud } = await import('/src/hud/combat-hud.tsx');
     const parent = document.getElementById('root'); parent.style.display = 'none';
     const fixture = document.createElement('div'); document.body.appendChild(fixture);
-    const player = { id: 'layout-player', name: '技能布局验证', hp: 186, maxHp: 250, mp: 92, maxMp: 110, energy: 22, capacity: 30 };
-    const abilities = Array.from({ length: 8 }, (_, index) => ({ id: `ability-${index}`, name: `技能 ${index + 1}`, kind: index === 0 ? 'weapon' : 'skill', icon: index === 0 ? 'arrow' : 'wind', interval: 6, remaining: index * .6, cost: 8, state: index === 0 ? '等待供能' : '计时中', triggers: 1 }));
+    const player = { id: 'layout-player', name: '技能布局验证', hp: 186, maxHp: 250, energy: 22, capacity: 30 };
+    const abilities = Array.from({ length: 8 }, (_, index) => ({ id: `ability-${index}`, name: `技能 ${index + 1}`, kind: 'skill', skillType: index === 0 ? 'melee' : 'ranged', icon: index === 0 ? 'arrow' : 'wind', interval: 6, remaining: index * .6, cost: 8, state: index === 0 ? '等待供能' : '计时中', triggers: 1 }));
     const root = dom.default.createRoot(fixture); const element = react.default.createElement(CombatHud, { player, players: [player], abilities }); root.render(element);
   });
-  const slots = page.getByRole('region', { name: '已装备武器与技能' }).getByRole('img');
+  const slots = page.getByRole('region', { name: '已装备近战与远程技能' }).getByRole('img');
   await slots.first().waitFor(); const slotCount = await slots.count(); assert.equal(slotCount, 8);
   for (const width of [1536, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });

@@ -48,7 +48,8 @@ export class PresentationWorld {
     if (!channel || !transfer) return;
     channel.pending = undefined;
     const mine = transfer.owner === this.playerId;
-    const continuous = mine && this.authoritative && this.simulation.round === transfer.state.round && Boolean(this.simulation.preparing) === Boolean(transfer.state.preparing) && !transfer.state.finished;
+    const sameRoster = this.simulation.players.length === transfer.state.players.length && transfer.state.players.every(player => this.simulation.players.some(current => current.id === player.id));
+    const continuous = sameRoster && mine && this.authoritative && this.simulation.round === transfer.state.round && Boolean(this.simulation.preparing) === Boolean(transfer.state.preparing) && !transfer.state.finished;
     const baseline = channel.submitted.get(transfer.ack) ?? (transfer.ack < 0 ? this.ownershipBaseline : undefined);
     if (continuous && baseline) {
       for (const update of transfer.state.players) {
@@ -75,10 +76,9 @@ export class PresentationWorld {
   private mergePlayer(current: Player, change: { before: Player; update: Player }): void {
     const { before, update } = change;
     const hp = Math.min(update.maxHp, current.hp + update.hp - before.hp);
-    const mp = Math.min(update.maxMp, current.mp + update.mp - before.mp);
     const energy = Math.min(update.capacity, current.energy + update.energy - before.energy);
-    current.hp = Math.max(0, hp); current.mp = Math.max(0, mp); current.energy = Math.max(0, energy);
-    const fields = ['connected', 'ready', 'maxHp', 'maxMp', 'capacity', 'stats', 'baseStats', 'characterRanks', 'manaRecovery', 'loadout', 'equipment', 'buildItems', 'buildRevision', 'level', 'experience', 'upgradeCredits', 'waveCredits', 'choiceSequence', 'choices', 'abilityStates', 'reviveRemaining', 'hasteLeft', 'focusLeft', 'shieldLeft', 'lootShield', 'growth', 'companionGranted', 'companionMilestones'] as const;
+    current.hp = Math.max(0, hp); current.energy = Math.max(0, energy);
+    const fields = ['guard', 'characterLevel', 'coinsEarned', 'coinsSpent', 'connected', 'ready', 'maxHp', 'capacity', 'stats', 'baseStats', 'characterRanks', 'energyRecoveryBonus', 'loadout', 'equipment', 'buildItems', 'buildRevision', 'level', 'experience', 'upgradeCredits', 'waveCredits', 'choiceSequence', 'choices', 'abilityStates', 'reviveRemaining', 'hasteLeft', 'focusLeft', 'shieldLeft', 'lootShield', 'growth', 'companionGranted', 'companionMilestones'] as const;
     for (const key of fields) this.mergeField(current, change, key);
   }
   private mergeField<K extends keyof Player>(current: Player, change: { before: Player; update: Player }, key: K): void {
@@ -87,12 +87,16 @@ export class PresentationWorld {
   }
 
   receive(snapshot: Snapshot, arrival: number): void {
+    const difficulty = snapshot.expedition?.difficulty ?? 'normal';
+    if (this.simulation.config.difficulty !== difficulty) this.simulation.config = { ...content, difficulty };
     if (this.authoritative) { this.lastSnapshot = snapshot; this.lastArrival = arrival; return; }
     const previous = this.lastSnapshot;
     const reset = !previous || previous.roomId !== snapshot.roomId || (previous.stage !== 'combat' && snapshot.stage === 'combat');
     const elapsed = previous ? (snapshot.serverTime - previous.serverTime) / 1000 : 0.1;
     if (reset) { this.feedbackReset = true; this.corrections.clear(); this.seenShots.clear(); this.seenEffects.clear(); this.simulation.players = []; this.simulation.enemies = []; this.simulation.projectiles = []; this.simulation.effects = []; this.simulation.hazards = []; this.simulation.poisonWait = {}; }
     this.lastArrival = arrival;
+    this.simulation.experienceOrbs = (snapshot.experienceOrbs ?? []).map(orb => ({ ...orb }));
+    if (snapshot.battleClock !== undefined) this.simulation.clock = snapshot.battleClock;
     this.simulation.round = snapshot.round; this.simulation.preparing = Boolean(snapshot.preparation);
     this.receivePlayers(snapshot.players, { reset, elapsed });
     this.receiveEnemies(snapshot, reset);
@@ -120,7 +124,13 @@ export class PresentationWorld {
         if (existing) Object.assign(existing, effect, { banner }); else this.simulation.effects.push({ ...effect, banner });
         this.seenEffects.set(effect.id, this.simulation.clock + effect.ttl + 1); continue;
       }
-      if (this.seenEffects.has(effect.id)) continue;
+      if (this.seenEffects.has(effect.id)) {
+        if (effect.kind === 'ability-novel-beam') {
+          const existing = this.simulation.effects.find(entry => entry.id === effect.id);
+          if (existing) { existing.facingX = effect.facingX; existing.facingY = effect.facingY; existing.targetId = effect.targetId; }
+        }
+        continue;
+      }
       this.simulation.effects.push({ ...effect }); this.seenEffects.set(effect.id, this.simulation.clock + 5);
     }
     this.lastSnapshot = snapshot;
@@ -135,15 +145,17 @@ export class PresentationWorld {
       if (!player) { const identity = { id: view.id, name: view.name }; player = makePlayer(identity, content); }
       const mine = view.id === this.playerId;
       const oldPosition = { x: player.x, y: player.y, facingX: player.facingX, facingY: player.facingY, dashLeft: player.dashLeft, dashX: player.dashX, dashY: player.dashY, dashCooldown: player.dashCooldown, blocking: player.blocking };
-      const weaponAhead = player.weaponCount > view.weaponCount;
-      const skillAhead = player.skillCount > view.skillCount;
-      const predicted = { weaponCount: player.weaponCount, skillCount: player.skillCount, weaponWait: player.weaponWait, skillWait: player.skillWait, energy: player.energy, mp: player.mp, heartWait: player.heartWait };
+      const meleeAhead = player.meleeCount > view.meleeCount;
+      const rangedAhead = player.rangedCount > view.rangedCount;
+      const predicted = { meleeCount: player.meleeCount, rangedCount: player.rangedCount, meleeWait: player.meleeWait, rangedWait: player.rangedWait, energy: player.energy, heartWait: player.heartWait };
       const oldServer = previous?.players.find(item => item.id === view.id);
+      player.characterLevel = view.characterLevel ?? 1;
       const changedBuild = created || oldServer?.buildRevision !== view.buildRevision;
       const predictedAbilities = player.abilityStates;
       Object.assign(player, view);
       player.banners = view.banners ? { selfBudget: view.banners.selfBudget, buffs: view.banners.buffs.map(buff => ({ ...buff })) } : undefined;
       player.heartProgress = view.heartProgress ? { ...view.heartProgress } : undefined;
+      player.guard = view.guard ? { ...view.guard } : undefined;
       player.resonance = view.resonance ? { ...view.resonance } : undefined;
       if (changedBuild) player.equipment = equipmentRuntime(player.loadout, content, player.buildItems);
       player.abilityStates = (view.abilities ?? []).map(ability => {
@@ -158,9 +170,9 @@ export class PresentationWorld {
           player.x = oldPosition.x; player.y = oldPosition.y;
           const correction = { entity: player, x: view.x - player.x, y: view.y - player.y }; this.corrections.set(view.id, correction);
         }
-        if (weaponAhead && !changedBuild) { player.weaponCount = predicted.weaponCount; player.weaponWait = predicted.weaponWait; }
-        if (skillAhead && !changedBuild) { player.skillCount = predicted.skillCount; player.skillWait = predicted.skillWait; }
-        if (!changedBuild && (weaponAhead || skillAhead)) { player.energy = predicted.energy; player.mp = predicted.mp; player.heartWait = predicted.heartWait; }
+        if (meleeAhead && !changedBuild) { player.meleeCount = predicted.meleeCount; player.meleeWait = predicted.meleeWait; }
+        if (rangedAhead && !changedBuild) { player.rangedCount = predicted.rangedCount; player.rangedWait = predicted.rangedWait; }
+        if (!changedBuild && (meleeAhead || rangedAhead)) { player.energy = predicted.energy; player.heartWait = predicted.heartWait; }
       }
       if (!mine) {
         const dx = oldServer ? view.x - oldServer.x : 0; const dy = oldServer ? view.y - oldServer.y : 0;
@@ -220,6 +232,12 @@ export class PresentationWorld {
       if (existing) {
         existing.vx = view.vx; existing.vy = view.vy; existing.windScale = view.windScale;
         if (view.effect === 'star') { existing.targetId = view.targetId; existing.bounces = view.bounces; existing.travel = Math.max(existing.travel ?? 0, view.travel ?? 0); }
+        if (view.homing) {
+          existing.homing = view.homing; existing.targetId = view.targetId; existing.hitIds = view.hitIds;
+          existing.returning = view.returning; existing.returnable = view.returnable;
+          const travelled = Math.max(existing.homingTravel ?? 0, view.homingTravel ?? 0);
+          existing.homingTravel = travelled;
+        }
         continue;
       }
       if (this.seenShots.has(view.id)) continue;

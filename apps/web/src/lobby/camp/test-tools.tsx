@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { newRequestUuid } from '../../network/request-id';
 import type { FormEvent } from 'react';
 import { testAssetsSchema } from '@web-game-world/contracts';
 import type { TestAssetsData } from '@web-game-world/contracts';
@@ -43,7 +44,7 @@ export default function TestTools(props: TestToolsProps) {
     pending.current = true; setBusy(true); props.onBusyChange(true); setError(''); setNotice('');
     try {
       // 超时重试复用请求编号，避免同一次点击重复发放。
-      if (!grantRequest.current) grantRequest.current = crypto.randomUUID();
+      if (!grantRequest.current) grantRequest.current = newRequestUuid();
       const count = await props.addInventory(grantRequest.current);
       grantRequest.current = null;
       setNotice(`已添加 ${count} 种测试物品，关闭测试工具后按 B 查看背包。`);
@@ -75,6 +76,8 @@ export default function TestTools(props: TestToolsProps) {
   }
 
   return <section className={s.tools} aria-label="测试工具">
+    <a href="?effects=loot">查看掉落、拾取与升级效果</a>
+    <a href="?effects=spawns">查看刷怪位置与连续刷新</a>
     <p>调整当前测试账号的资源，输入调整后的目标数量。</p>
     <button type="button" onClick={refresh} disabled={busy}>刷新当前余额</button>
     {current ? <form className={s.form} onSubmit={save}>

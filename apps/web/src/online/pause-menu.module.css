@@ -1,4 +1,4 @@
-.launcher { position: absolute; z-index: 26; top: 18px; right: 18px; padding: 9px 14px; border: 1px solid #8d9d79; border-radius: 8px; background: #182c28ed; color: #f4ead3; cursor: pointer; }
+.launcher { position: absolute; z-index: 26; top: 27px; right: 42px; display: flex; align-items: center; gap: 7px; padding: 0; border: 0; background: none; color: #fff0cb; font: 17px 'Songti SC', SimSun, serif; text-shadow: 0 1px 3px #17120d; cursor: pointer; }
 .dialog { width: min(380px, calc(100vw - 48px)); box-sizing: border-box; padding: 32px 24px; border: 1px solid #b6a875; border-radius: 16px; background: #182c28; color: #f4ead3; text-align: center; box-shadow: 0 20px 70px #0008; }
 .dialog::backdrop { background: #081612b8; }
 .eyebrow { color: #c7ba8e; font-size: 12px; letter-spacing: 2px; }
@@ -7,4 +7,7 @@
 .dialog button { width: 100%; margin: 12px 0 16px; padding: 13px 20px; border: 1px solid #d6c38e; border-radius: 8px; background: #d6c38e; color: #182c28; font-size: 16px; font-weight: 700; cursor: pointer; }
 .dialog small { display: block; color: #c7ba8e; }
 .dialog button:focus-visible, .launcher:focus-visible { outline: 2px solid #fff0b6; outline-offset: 4px; }
+.launcher:disabled { opacity: .5; cursor: default; }
+@media(max-width:600px) { .launcher { top: 98px; right: 10px; gap: 3px; font-size: 12px; }.launcher > span { width: 23px !important; height: 23px !important; } }
+@media(max-height:500px) and (min-width:601px) { .launcher { top: 8px; right: 12px; font-size: 14px; } }
 .dialog button:disabled, .launcher:disabled { opacity: .6; cursor: default; }

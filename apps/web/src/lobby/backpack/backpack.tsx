@@ -1,8 +1,13 @@
+import { lootColorCss } from '../../game/loot-art';
+import { equipmentCatalog } from '@web-game-world/simulation';
+import { EquipmentIcon } from '../../hud/equipment-icon';
+import content from '../../network/content';
 import { useEffect, useRef, useState } from 'react';
 import type { InventoryCategory, InventoryItemData } from '@web-game-world/contracts';
 import type { BackpackViewProps } from '../../online/lobby-view';
 import s from './backpack.module.css';
 
+const catalog = equipmentCatalog(content);
 const categories: { id: InventoryCategory; label: string }[] = [{ id: 'skill', label: '技能' }, { id: 'equipment', label: '装备' }, { id: 'material', label: '材料' }];
 const names = { skill: '技能', equipment: '装备', material: '材料' };
 const orders = [{ id: 'latest', label: '最新' }, { id: 'name', label: '名称' }, { id: 'quantity', label: '数量' }];
@@ -13,6 +18,8 @@ const iconPositions: Record<string, string> = {
   'test-inventory:material/herb': '0% 100%', 'test-inventory:material/ore': '50% 100%', 'test-inventory:material/wood': '100% 100%'
 };
 function ItemIcon(props: { category?: InventoryCategory; definitionId?: string }) {
+  const item = catalog.find(entry => entry.id === props.definitionId);
+  if (item) return <EquipmentIcon kind={item.kind} effect={item.effect} />;
   const defaults = { skill: '50% 0%', equipment: '0% 50%', material: '50% 100%' };
   const position = props.definitionId ? iconPositions[props.definitionId] : undefined;
   const backgroundPosition = position ?? (props.category ? defaults[props.category] : '0% 0%');
@@ -101,12 +108,12 @@ export function Backpack(props: BackpackViewProps) {
       <nav className={s.tabs} aria-label="物品分类">{categories.map(tab => <button key={tab.id} aria-pressed={category === tab.id} onClick={() => setCategory(tab.id)}>{tab.label}</button>)}</nav>
       <div className={s.tools}><input aria-label="搜索物品" placeholder="搜索物品" value={query} maxLength={24} onChange={event => setQuery(event.target.value)} /><div className={s.sort} aria-label="物品排序">{orders.map(option => <button key={option.id} aria-pressed={order === option.id} onClick={() => setOrder(option.id)}>{option.label}</button>)}</div></div>
       <div className={s.contents} aria-busy={loading}>
-        {loading ? <p className={s.empty} role="status">正在打开行囊…</p> : error ? <div className={s.empty} role="alert"><p>{error}</p><button onClick={() => setReload(reload + 1)}>重新加载</button></div> : filtered.length === 0 ? <div className={s.empty}><ItemIcon category={category} /><p>{search ? '没有找到匹配的物品' : `暂无${names[category]}物品`}</p></div> : <div className={s.grid}>{filtered.map(item => <button className={s.item} key={item.id} onClick={event => { selectedButton.current = event.currentTarget; setSelected(item); }} aria-haspopup="dialog"><ItemIcon category={item.category} definitionId={item.definitionId} /><b>{item.name} · Lv.{item.level}</b><span>数量：{item.quantity}</span></button>)}</div>}
+        {loading ? <p className={s.empty} role="status">正在打开行囊…</p> : error ? <div className={s.empty} role="alert"><p>{error}</p><button onClick={() => setReload(reload + 1)}>重新加载</button></div> : filtered.length === 0 ? <div className={s.empty}><ItemIcon category={category} /><p>{search ? '没有找到匹配的物品' : `暂无${names[category]}物品`}</p></div> : <div className={s.grid}>{filtered.map(item => <button className={s.item} key={item.id} onClick={event => { selectedButton.current = event.currentTarget; setSelected(item); }} aria-haspopup="dialog"><ItemIcon category={item.category} definitionId={item.definitionId} /><b style={{ color: lootColorCss(item.level) }}>{item.name} · Lv.{item.level}</b><span>数量：{item.quantity}</span></button>)}</div>}
       </div>
       <footer className={s.footer}><span>点击物品查看详情</span><span>B 背包 · Esc 关闭</span></footer>
     </dialog>
     <dialog ref={detail} className={s.detail} aria-labelledby={`item-title-${props.mode}`} onCancel={event => { event.preventDefault(); setSelected(null); }}>
-      {selected && <><header className={s.detailHeader}><ItemIcon category={selected.category} definitionId={selected.definitionId} /><h3 id={`item-title-${props.mode}`}>{selected.name}</h3><button className={s.close} aria-label="关闭物品详情" onClick={() => setSelected(null)}>×</button></header><dl className={s.facts}><div><dt>类型</dt><dd>{names[selected.category]}物品</dd></div><div><dt>基础等级</dt><dd>{selected.level}</dd></div><div><dt>数量</dt><dd>{selected.quantity}</dd></div></dl>{selected.effect && <div className={s.effect}><b>{selected.category === 'material' ? '用途' : '关键效果'}</b><p>{selected.effect}</p></div>}<button className={s.back} onClick={() => setSelected(null)}>返回背包</button></>}
+      {selected && <><header className={s.detailHeader}><ItemIcon category={selected.category} definitionId={selected.definitionId} /><h3 id={`item-title-${props.mode}`}>{selected.name}</h3><button className={s.close} aria-label="关闭物品详情" onClick={() => setSelected(null)}>×</button></header><dl className={s.facts}><div><dt>类型</dt><dd>{selected.skillType === 'melee' ? '近战技能' : selected.skillType === 'ranged' ? '远程技能' : `${names[selected.category]}物品`}</dd></div><div><dt>基础等级</dt><dd>{selected.level}</dd></div><div><dt>数量</dt><dd>{selected.quantity}</dd></div></dl>{selected.effect && <div className={s.effect}><b>{selected.category === 'material' ? '用途' : '关键效果'}</b><p>{selected.effect}</p></div>}<button className={s.back} onClick={() => setSelected(null)}>返回背包</button></>}
     </dialog>
   </>;
 }

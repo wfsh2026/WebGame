@@ -1,0 +1,9 @@
+.edge { position: absolute; inset: 0; pointer-events: none; z-index: 2; --edge-size: clamp(18px, 7vmin, 88px); --edge-opacity: 0; }
+.edge[hidden] { display: none; }
+.edge > span { position: absolute; opacity: var(--edge-opacity); will-change: opacity; }
+.edge > span[data-side='top'], .edge > span[data-side='bottom'] { left: 0; right: 0; height: var(--edge-size); }
+.edge > span[data-side='left'], .edge > span[data-side='right'] { top: 0; bottom: 0; width: var(--edge-size); }
+.edge > span[data-side='top'] { top: 0; background: linear-gradient(to bottom, #be221e, #be221e88 28%, transparent); }
+.edge > span[data-side='bottom'] { bottom: 0; background: linear-gradient(to top, #be221e, #be221e88 28%, transparent); }
+.edge > span[data-side='left'] { left: 0; background: linear-gradient(to right, #be221e, #be221e88 28%, transparent); }
+.edge > span[data-side='right'] { right: 0; background: linear-gradient(to left, #be221e, #be221e88 28%, transparent); }

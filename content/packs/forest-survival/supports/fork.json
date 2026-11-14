@@ -2,7 +2,7 @@
   "id": "forest-survival:support/fork",
   "kind": "support",
   "name": "分裂",
-  "host": "skill",
+  "host": "ranged",
   "effect": "fork",
   "description": "首次直接命中分出2枚小弹；3级延长子弹射程，5级子弹可命中2个目标。子弹50%伤害，不再分裂；初始宿主伤害降低15%，耗能增加30%。升级减轻伤害折损。"
 }

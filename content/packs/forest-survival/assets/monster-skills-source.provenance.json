@@ -1,0 +1,9 @@
+{
+  "generator": "image_gen",
+  "createdAt": "2026-11-14",
+  "source": "monster-skills-source.png",
+  "reference": "用户已确认的狼扑、重槌、毒区三栏技能表现概念图",
+  "prompt": "将已确认概念图重新制作为四列五行、真实透明背景的二十个独立技能素材；保留林地木质、荆棘、琥珀、菌丝和晶体材质，强化清晰主体、高亮轮廓及柔和外发光；不包含地图、角色、文字或界面。按行排列：根刺、藤刃、荆棘边缘、爪光；地裂、木槌、重击、盾弧；撞击、箭矢、冲锋尾迹、琥珀囊；爆炸、毒区、孢子、晶体波前；藤链、护盾、菌卵、孵化。",
+  "transparentBackground": true,
+  "exporter": "tools/export-monster-skills.mjs"
+}

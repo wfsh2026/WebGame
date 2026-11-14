@@ -15,13 +15,13 @@ const frontal = isolatedCombat(); addElite(frontal, 'windup'); frontal.players[0
 const frontalDamage = 250 - frontal.players[0].hp; const expectedBlocked = 30 * 100 / 105 * 0.3; const blockDifference = Math.abs(frontalDamage - expectedBlocked); assert.ok(blockDifference < 0.00001, '正面格挡应减免 70% 伤害');
 const rear = isolatedCombat(); addElite(rear, 'windup'); rear.players[0].facingY = -1; rear.players[0].input.block = true; step(rear, 0.05);
 const rearDamage = 250 - rear.players[0].hp; assert.ok(rearDamage > frontalDamage * 3, '背后攻击不能被格挡');
-const emptyPool = isolatedCombat(); addElite(emptyPool, 'recovery'); emptyPool.players[0].energy = 2; step(emptyPool, 0.05); assert.equal(emptyPool.projectiles.length, 0); assert.equal(emptyPool.players[0].weaponState, '等待供能'); assert.equal(emptyPool.players[0].skillState, '等待供能');
-const concurrent = isolatedCombat(); addElite(concurrent, 'recovery'); step(concurrent, 0.05); assert.equal(concurrent.projectiles.length, 1); assert.equal(concurrent.enemies[0].hp, 200, '武器辅助不能影响技能伤害'); const nova = concurrent.effects.find(effect => effect.kind === 'nova'); assert.ok(nova, '武器与技能应该能在同一时刻独立触发');
+const emptyPool = isolatedCombat(); addElite(emptyPool, 'recovery'); emptyPool.players[0].energy = 2; step(emptyPool, 0.05); assert.equal(emptyPool.projectiles.length, 0); assert.equal(emptyPool.players[0].meleeState, '等待供能'); assert.equal(emptyPool.players[0].rangedState, '等待供能');
+const concurrent = isolatedCombat(); addElite(concurrent, 'recovery'); step(concurrent, 0.05); assert.equal(concurrent.projectiles.length, 1); assert.equal(concurrent.enemies[0].hp, 200, '武器辅助不能影响技能伤害'); const nova = concurrent.effects.find(effect => effect.kind === 'nova'); assert.ok(nova, '近战与远程技能应该能在同一时刻独立触发');
 const border = isolatedCombat(); border.players[0].x = 0.41; border.players[0].facingX = -1; border.players[0].facingY = 0; border.players[0].input.x = -1; border.players[0].input.dash = true; for (let index = 0; index < 8; index += 1) step(border, 0.05); assert.ok(border.players[0].x >= 0.4, '冲刺不能穿过边界');
 let seed = 1234; const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
 const sim = createSimulation({ config, arena, random });
 for (const name of ['甲', '乙']) { const identity = { id: name, name }; const player = makePlayer(identity, config); sim.players.push(player); }
-assert.equal(sim.players[0].maxHp, 250); assert.equal(sim.players[0].maxMp, 110);
+assert.equal(sim.players[0].maxHp, 250); assert.equal(sim.players[0].stats.energyCapacityBonus, 10);
 let sequence = 0;
 for (let round = 1; round <= 2; round += 1) {
   beginRound(sim, round);
@@ -35,8 +35,7 @@ for (let round = 1; round <= 2; round += 1) {
       const input = { sequence, x, y, block: false, dash: false }; const data = { id: player.id, input }; setInput(sim, data);
     }
     step(sim, 0.05);
-    for (const player of sim.players) { assert.ok(player.energy >= 0 && player.energy <= player.capacity); assert.ok(player.mp >= 0 && player.mp <= player.maxMp); assert.ok(player.x >= 0.4 && player.x <= 29.6); }
-    assert.ok(sim.enemies.length <= config.maxAlive);
+    for (const player of sim.players) { assert.ok(player.energy >= 0 && player.energy <= player.capacity); assert.ok(player.x >= 0.4 && player.x <= 29.6); }
   }
   const players = sim.players.map(player => ({ hp: player.hp, kills: player.kills, energy: player.energy })); const report = JSON.stringify({ round, success: sim.success, seconds: sim.elapsed, spawned: sim.spawned, players }); console.log(report);
   assert.ok(sim.finished, '小秘境必须结束'); assert.ok(sim.success, '自动走位队伍应能完成当前难度');

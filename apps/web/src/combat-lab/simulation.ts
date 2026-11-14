@@ -1,36 +1,34 @@
 // 仅用于本地机制体验，不作为正式权威战斗实现。
 export interface LabConfig {
-  weaponName?: string;
-  spellName?: string;
-  weaponDamage?: number;
-  spellDamage?: number;
-  mana: number;
+  meleeName?: string;
+  rangedName?: string;
+  meleeDamage?: number;
+  rangedDamage?: number;
   capacity: number;
   initialPool: number;
   recoveryInterval: number;
   recoveryAmount: number;
-  recoveryCost: number;
   speed: number;
   shortage: 'wait' | 'skip';
-  priority: 'weapon' | 'spell';
-  weaponEnabled: boolean;
-  spellEnabled: boolean;
-  weaponInterval: number;
-  spellInterval: number;
-  weaponCost: number;
-  spellCost: number;
-  weaponSupport: 'none' | 'power' | 'economy';
-  spellSupport: 'none' | 'multi' | 'economy';
+  priority: 'melee' | 'ranged';
+  meleeEnabled: boolean;
+  rangedEnabled: boolean;
+  meleeInterval: number;
+  rangedInterval: number;
+  meleeCost: number;
+  rangedCost: number;
+  meleeSupport: 'none' | 'power' | 'economy';
+  rangedSupport: 'none' | 'multi' | 'economy';
 }
 
 export const defaultConfig: LabConfig = {
-  mana: 300, capacity: 60, initialPool: 40, recoveryInterval: 2000, recoveryAmount: 24, recoveryCost: 12,
-  speed: 1, shortage: 'wait', priority: 'weapon', weaponEnabled: true, spellEnabled: true,
-  weaponInterval: 1000, spellInterval: 1600, weaponCost: 8, spellCost: 14, weaponSupport: 'none', spellSupport: 'none',
+  capacity: 60, initialPool: 40, recoveryInterval: 2000, recoveryAmount: 24,
+  speed: 1, shortage: 'wait', priority: 'melee', meleeEnabled: true, rangedEnabled: true,
+  meleeInterval: 1000, rangedInterval: 1600, meleeCost: 8, rangedCost: 14, meleeSupport: 'none', rangedSupport: 'none',
 };
 
 export interface Ability {
-  id: 'weapon' | 'spell';
+  id: 'melee' | 'ranged';
   name: string;
   enabled: boolean;
   interval: number;
@@ -42,7 +40,7 @@ export interface Ability {
 export interface LabEvent {
   id: number;
   time: number;
-  kind: 'weapon' | 'spell' | 'recovery' | 'blocked';
+  kind: 'melee' | 'ranged' | 'recovery' | 'blocked';
   text: string;
   damage: number;
   projectiles: number;
@@ -51,37 +49,34 @@ export interface LabEvent {
 export interface AbilityState { next: number; count: number; spent: number; blocked: boolean }
 export interface LabState {
   time: number;
-  mana: number;
   pool: number;
   nextRecovery: number;
-  converted: number;
-  manaSpent: number;
   damage: number;
   sequence: number;
-  weapon: AbilityState;
-  spell: AbilityState;
+  melee: AbilityState;
+  ranged: AbilityState;
   events: LabEvent[];
 }
 
 export function getAbilities(config: LabConfig): Ability[] {
-  const weaponInterval = Math.round(config.weaponInterval / config.speed);
-  const spellInterval = Math.round(config.spellInterval / config.speed);
-  const weaponCost = config.weaponCost * (config.weaponSupport === 'power' ? 1.5 : config.weaponSupport === 'economy' ? 0.65 : 1);
-  const spellCost = config.spellCost * (config.spellSupport === 'multi' ? 1.6 : config.spellSupport === 'economy' ? 0.65 : 1);
-  const weaponDamage = (config.weaponDamage ?? 40) * (config.weaponSupport === 'power' ? 1.5 : config.weaponSupport === 'economy' ? 0.75 : 1);
-  const spellDamage = (config.spellDamage ?? 60) * (config.spellSupport === 'multi' ? 0.6 : config.spellSupport === 'economy' ? 0.75 : 1);
+  const meleeInterval = Math.round(config.meleeInterval / config.speed);
+  const rangedInterval = Math.round(config.rangedInterval / config.speed);
+  const meleeCost = config.meleeCost * (config.meleeSupport === 'power' ? 1.5 : config.meleeSupport === 'economy' ? 0.65 : 1);
+  const rangedCost = config.rangedCost * (config.rangedSupport === 'multi' ? 1.6 : config.rangedSupport === 'economy' ? 0.65 : 1);
+  const meleeDamage = (config.meleeDamage ?? 40) * (config.meleeSupport === 'power' ? 1.5 : config.meleeSupport === 'economy' ? 0.75 : 1);
+  const rangedDamage = (config.rangedDamage ?? 60) * (config.rangedSupport === 'multi' ? 0.6 : config.rangedSupport === 'economy' ? 0.75 : 1);
   return [
-    { id: 'weapon', name: config.weaponName ?? '飞刃', enabled: config.weaponEnabled, interval: weaponInterval, cost: weaponCost, damage: weaponDamage, projectiles: 1 },
-    { id: 'spell', name: config.spellName ?? '火球', enabled: config.spellEnabled, interval: spellInterval, cost: spellCost, damage: spellDamage, projectiles: config.spellSupport === 'multi' ? 3 : 1 },
+    { id: 'melee', name: config.meleeName ?? '斩击', enabled: config.meleeEnabled, interval: meleeInterval, cost: meleeCost, damage: meleeDamage, projectiles: 1 },
+    { id: 'ranged', name: config.rangedName ?? '火球', enabled: config.rangedEnabled, interval: rangedInterval, cost: rangedCost, damage: rangedDamage, projectiles: config.rangedSupport === 'multi' ? 3 : 1 },
   ];
 }
 
 export function createLabState(config: LabConfig): LabState {
   const abilities = getAbilities(config);
   const initialPool = Math.min(config.capacity, config.initialPool);
-  return { time: 0, mana: config.mana, pool: initialPool, nextRecovery: config.recoveryInterval, converted: 0, manaSpent: 0, damage: 0, sequence: 0,
-    weapon: { next: abilities[0].interval, count: 0, spent: 0, blocked: false },
-    spell: { next: abilities[1].interval, count: 0, spent: 0, blocked: false }, events: [] };
+  return { time: 0, pool: initialPool, nextRecovery: config.recoveryInterval, damage: 0, sequence: 0,
+    melee: { next: abilities[0].interval, count: 0, spent: 0, blocked: false },
+    ranged: { next: abilities[1].interval, count: 0, spent: 0, blocked: false }, events: [] };
 }
 
 function record(state: LabState, event: Omit<LabEvent, 'id' | 'time'>) {
@@ -92,26 +87,20 @@ function record(state: LabState, event: Omit<LabEvent, 'id' | 'time'>) {
 }
 
 export function stepLab(previous: LabState, config: LabConfig): LabState {
-  const state: LabState = { ...previous, time: previous.time + 50, weapon: { ...previous.weapon }, spell: { ...previous.spell }, events: [...previous.events] };
+  const state: LabState = { ...previous, time: previous.time + 50, melee: { ...previous.melee }, ranged: { ...previous.ranged }, events: [...previous.events] };
   if (state.time >= state.nextRecovery) {
     state.nextRecovery += config.recoveryInterval;
     const missing = config.capacity - state.pool;
     const amount = Math.min(missing, config.recoveryAmount);
-    const cost = config.recoveryCost * amount / config.recoveryAmount;
-    if (amount > 0 && state.mana + 0.000001 >= cost) {
-      state.mana = Math.max(0, state.mana - cost);
+    if (amount > 0) {
       state.pool += amount;
-      state.converted += amount;
-      state.manaSpent += cost;
-      const detail = { kind: 'recovery' as const, text: `心法恢复 +${amount.toFixed(1)} 灵力，消耗 ${cost.toFixed(1)} 魔法值`, damage: 0, projectiles: 0 };
-      record(state, detail);
-    } else {
-      const detail = { kind: 'blocked' as const, text: amount <= 0 ? '灵力池已满，本次恢复不扣魔法值' : '魔法值不足以支付本次恢复，本次不转换', damage: 0, projectiles: 0 };
+      const restored = amount.toFixed(1);
+      const detail = { kind: 'recovery' as const, text: `心法恢复 +${restored} 灵力`, damage: 0, projectiles: 0 };
       record(state, detail);
     }
   }
   const abilities = getAbilities(config);
-  if (config.priority === 'spell') abilities.reverse();
+  if (config.priority === 'ranged') abilities.reverse();
   for (const ability of abilities) {
     const branch = state[ability.id];
     if (!ability.enabled || state.time < branch.next) continue;
@@ -136,4 +125,3 @@ export function stepLab(previous: LabState, config: LabConfig): LabState {
   }
   return state;
 }
-

@@ -1,0 +1,7 @@
+:global(body) { margin: 0; font-family: 'Microsoft YaHei', sans-serif; }
+.stage { min-height: 100dvh; position: relative; isolation: isolate; color: #51391e; }
+.stage::before { content: ''; position: fixed; z-index: -2; inset: -8px; background: url('../../../../content/packs/forest-survival/assets/arena-readable.webp') center / cover; filter: brightness(.65); }
+.previewControls { position: fixed; bottom: 0; left: 0; z-index: 100; max-width: min(540px, 100vw); padding: 5px 10px; background: #f2e5c8ee; color: #5a472a; font-size: 11px; }
+.previewControls summary { cursor: pointer; }.previewControls nav { display: flex; flex-wrap: wrap; gap: 8px 12px; padding: 8px 0; }.previewControls a { color: #27664b; }.previewControls button { margin: 5px; border: 1px solid #b69460; background: transparent; color: #71522e; font-size: 11px; }
+.returned { position: absolute; inset: 25%; background: #f2e5c8; padding: 30px; }.returned a { color: #27664b; }
+.combatState { position: absolute; top: 10px; left: 10px; color: #fff0cb; }

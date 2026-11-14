@@ -1,0 +1,20 @@
+{
+  "generator": "image_gen",
+  "createdAt": "2026-11-14",
+  "source": "hud-buffs-source.png",
+  "purpose": "forest-survival HUD; 28px buff slots and 48–80px dash slot",
+  "transparentBackground": true,
+  "grid": {
+    "columns": 4,
+    "rows": 5
+  },
+  "runtime": {
+    "buffs": "runtime/hud-buffs.webp",
+    "buffCell": 64,
+    "dash": "runtime/dash-icon.webp",
+    "dashSize": 128
+  },
+  "preview": "hud-buffs-preview.png",
+  "prompt": "Use case: stylized-concept. Asset type: production game HUD buff and dash icon sprite sheet for a painterly woodland fantasy roguelike. Generate one raster sheet, exactly FOUR equal-width columns and FIVE equal-height rows (20 icons), straight regular grid, suggested canvas 1024x1280. TRUE TRANSPARENT background, no labels, numbers, writing, tile borders or grid lines. Each icon is an independent isolated painted object centered in its cell, occupies about 74 percent of the cell, with wide transparent gutters and soft contained glow; never crosses into another cell. Consistent crafted bronze, woodland leather, crystal and magic materials; strong chunky silhouettes and only essential detailing, readable at 28px, refined high-quality hand-painted RPG inventory art, warm highlights and deep shadows, turquoise/gold/violet accents. Not flat vector art, no simple geometric placeholders. Exact row-major contents: Row 1: (1) DASH, a single leather boot lunging diagonally right with vivid turquoise speed afterimages and wind trail; (2) HASTE, a green feathered boot with a small warm gold wind curl, visibly distinct from dash; (3) FOCUS, a blue jade talisman with a luminous cyan lotus energy core; (4) SHIELD, a solid amber-gold protective shield with leafy metal rim. Row 2: (5) WAR POWER, crimson battle pennant wrapped around a sword with a gold impact flare; (6) WAR TEMPO, orange pennant and crossed swift dagger points; (7) WAR WIND, teal pennant with a feather and fast arrow; (8) WAR ENERGY, blue pennant with flowing spiritual energy crystal. Row 3: (9) WAR GUARD, sturdy moss-green pennant and a stone shield; (10) MELEE RESONANCE, glowing purple sword with a single silver-gold pulse; (11) RANGED RESONANCE, glowing violet magic orb with a bright cyan burst; (12) CYCLE ENERGY, a pair of intertwining jade and gold energy streams entering a crystal. Row 4: (13) STREAM HEART EMPOWERMENT, flowing turquoise stream coiling around a jade stone; (14) SPRING HEART EMPOWERMENT, three bright turquoise droplets rising from a spring blossom; (15) OCEAN HEART EMPOWERMENT, deep blue curling ocean wave cradling a pearl; (16) CYCLE RECOVERY CHARGES, luminous double jade spirit crystals with gold spiral glow. Row 5: (17) ATTACK HASTE STACKS, three short silver blades fanning outward in a bright green speed trail; (18) ENERGY SAVING CHARGES, jade gem held by a bronze leaf clasp, warm small stored-energy sparks; (19) OVERLOAD READY, glowing fiery orange sword tip with thick contained impact glow; (20) THUNDER STAFF CHARGE, a bronze wooden staff head with bright violet lightning between its prongs. Keep the spatial order exact. No additional objects, no scenery, no text, no checkerboard. The entire sheet must be crop-ready with evenly spaced independent cells.",
+  "exporter": "tools/export-hud-icons.mjs"
+}

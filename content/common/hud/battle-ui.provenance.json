@@ -1,0 +1,16 @@
+{
+  "source": "AI generated for WebGameWorld from the user-approved battle UI concept",
+  "reference": "development/features/battle-ui/content/approved-framed.png",
+  "framesSource": "development/features/battle-ui/content/frames-source.png",
+  "framesExport": "node development/features/battle-ui/export-frames.mjs",
+  "framesProcessing": "Crop individual art regions; remove faint outer matte below alpha 72; normalize dark neutral fills to translucent black at alpha at most 120; export WebP at display sizes.",
+  "frames": ["player-frame.webp", "team-frame.webp", "utility-frame.webp", "skill-frame.webp", "income-frame.webp", "actions-frame.webp", "buff-frame.webp", "team-heading.webp"],
+  "original": "development/features/battle-ui/content/hud-icons-source.png",
+  "runtime": "battle-controls.webp",
+  "waveTitleSource": "development/features/battle-ui/content/wave-title-source.png",
+  "waveTitleRuntime": "wave-title.webp",
+  "export": "node development/features/battle-ui/export-art.mjs",
+  "cells": ["dash", "block", "reward", "build", "bag", "safe", "schedule", "menu"],
+  "layout": { "columns": 4, "rows": 2, "cellSize": 128 },
+  "prompt": "Transparent 4-by-2 hand-painted forest fantasy HUD atlas: matching cyan dash and shield discs, gift box, build scroll, leather backpack, lockbox, map scroll and settings gear; no text or panel backgrounds."
+}

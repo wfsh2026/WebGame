@@ -1,0 +1,162 @@
+.expeditions { position: relative; min-width: 0; color: #4c331d; font-size: 15px; }
+.expeditions button, .detailDialog button { touch-action: manipulation; cursor: pointer; }
+.expeditions button:focus-visible, .expeditions input:focus-visible, .detailDialog button:focus-visible { outline: 2px solid #23715d; outline-offset: 3px; }
+.heading { position: relative; display: flex; align-items: flex-start; justify-content: flex-end; height: 43px; }
+.heading h1 { position: absolute; top: -52px; left: 50%; transform: translateX(-50%); display: grid; place-items: center; width: 320px; height: 83px; margin: 0; padding: 10px 24px; background: url('../../../../../content/common/lobby/shop-ui-title.webp') center / 100% 100% no-repeat; color: #fff0c8; font: 700 34px 'Songti SC', SimSun, serif; letter-spacing: 4px; text-shadow: 0 1px 2px #163f35; }
+.expeditions .close, .detailDialog .close { flex-shrink: 0; width: 38px; height: 36px; padding: 0; border: 0; border-radius: 0; background: url('../../../../../content/common/lobby/shop-ui-close.webp') center / 100% 100% no-repeat; color: transparent; }
+.layout { display: grid; grid-template-columns: minmax(0, 38fr) minmax(0, 62fr); gap: 22px; }
+.destination { display: flex; flex-direction: column; align-items: center; min-width: 0; text-align: center; }
+.portal { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: fill; }
+.expeditions .destination h2 { margin: 13px 0 8px; color: #4c2d14; font: 700 33px/1.25 'Songti SC', SimSun, serif; letter-spacing: 2px; }
+.expeditions .meta { width: 90%; margin: 0; padding: 5px 7px; background: url('../../../../../content/common/lobby/shop-ui-card.webp') center / 100% 100% no-repeat; color: #5e3a19; font: 700 19px/1.4 'Songti SC', SimSun, serif; white-space: nowrap; }
+.expeditions .summary { margin: 10px 0 7px; color: #634421; font: 17px/1.5 'Songti SC', SimSun, serif; }
+.expeditions .detailsLink { margin: 0 0 14px; padding: 2px 4px; border: 0; background: none; color: #75542e; font-size: 15px; line-height: 22px; text-decoration: underline; text-underline-offset: 4px; }
+.expeditions .detailsLink:hover { background: none; color: #1a6653; }
+.expeditions .action { flex-shrink: 0; min-width: 104px; min-height: 42px; padding: 6px 14px; border: 0; border-radius: 0; background: url('../../../../../content/common/lobby/shop-ui-control.webp') center / 100% 100% no-repeat; color: #fff0cb; font: 700 22px/28px 'Songti SC', SimSun, serif; white-space: nowrap; }
+.expeditions .create { width: 90%; min-height: 58px; margin-top: auto; font-size: 28px; line-height: 36px; letter-spacing: 2px; }
+.expeditions .action:hover:not(:disabled) { background: url('../../../../../content/common/lobby/shop-ui-control.webp') center / 100% 100% no-repeat; filter: brightness(1.08); }
+.expeditions .close:hover:not(:disabled), .detailDialog .close:hover { background: url('../../../../../content/common/lobby/shop-ui-close.webp') center / 100% 100% no-repeat; filter: brightness(1.08); }
+.expeditions button:disabled { opacity: .5; cursor: not-allowed; }
+.rooms { min-width: 0; padding-left: 22px; border-left: 1px solid #b5904f; }
+.expeditions .sectionTitle { display: flex; align-items: center; gap: 10px; margin: 0; color: #4f3016; font: 700 24px/1.4 'Songti SC', SimSun, serif; white-space: nowrap; }
+.sectionTitle::after { content: ''; flex: 1; height: 1px; margin-left: 4px; background: #b68d4e99; }
+.join { display: flex; gap: 12px; margin-top: 16px; }
+.join input { flex: 1; min-width: 0; width: 0; height: 46px; padding: 10px 14px; border: 0; border-radius: 0; background: url('../../../../../content/common/lobby/shop-ui-card.webp') center / 100% 100% no-repeat; color: #52391e; font: 16px/24px 'Microsoft YaHei', system-ui, sans-serif; }
+.join input::placeholder { color: #8b6c42; opacity: 1; }
+.roomHeading { margin: 27px 0 15px; }
+.count { display: inline-flex; justify-content: center; min-width: 30px; padding: 0 7px; border-radius: 20px; background: #b78d4b30; font: 700 20px/28px Georgia, serif; font-variant-numeric: tabular-nums; }
+.roomList { display: grid; align-content: start; gap: 9px; min-height: 243px; }
+.room { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 14px; min-height: 75px; padding: 10px 15px; background: url('../../../../../content/common/lobby/expedition-ui-row.webp') center / 100% 100% no-repeat; }
+.roomIdentity { min-width: 0; }
+.expeditions .room h3 { overflow: hidden; margin: 0 0 4px; color: #513015; font: 700 23px/1.25 'Songti SC', SimSun, serif; text-overflow: ellipsis; white-space: nowrap; }
+.roomCode { display: block; overflow: hidden; color: #82643e; font: 14px/1.5 'Microsoft YaHei', system-ui, sans-serif; text-overflow: ellipsis; white-space: nowrap; }
+.occupancy { padding-left: 14px; border-left: 1px solid #b5904f60; color: #61401c; font: 18px/1.4 Georgia, 'Microsoft YaHei', serif; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.room .action { min-width: 96px; }
+.empty { display: grid; align-content: center; justify-items: center; min-height: 243px; padding: 18px; background: url('../../../../../content/common/lobby/shop-ui-card.webp') center / 100% 100% no-repeat; text-align: center; color: #755536; }
+.empty strong { font: 700 22px/1.5 'Songti SC', SimSun, serif; }
+.expeditions .empty p { margin: 10px 0 0; font-size: 14px; line-height: 1.6; }
+.pagination { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 10px; }
+.expeditions .pagination .action { width: 34px; min-width: 34px; min-height: 30px; padding: 0; font: 24px/30px Georgia, serif; }
+.pagination > span { color: #7a5b37; font-size: 13px; font-variant-numeric: tabular-nums; }
+.expeditions .feedback { margin: 10px 0 0; padding: 10px 14px; background: url('../../../../../content/common/lobby/shop-ui-card.webp') center / 100% 100% no-repeat; color: #8d3c22; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+.guide { width: 100%; margin-top: 12px; text-align: left; }
+.guide > aside { margin: 0; }
+.detailDialog { box-sizing: border-box; width: 460px; max-width: calc(100vw - 28px); max-height: calc(100dvh - 36px); padding: 12px; border: 16px solid transparent; background: url('../../../../../content/common/lobby/shop-ui-panel.webp') center / 100% 100% no-repeat; background-origin: border-box; color: #55391f; overflow: auto; box-shadow: 0 16px 60px #131e1970; }
+.detailDialog::backdrop { background: #15281e65; }
+.detailHeader { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.detailDialog .detailHeader h2 { margin: 0; color: #4c2d14; font: 700 22px/1.4 'Songti SC', SimSun, serif; }
+.detailDialog dl { margin: 16px 0 0; }
+.detailDialog dl > div + div { margin-top: 16px; }
+.detailDialog dt { font-weight: 700; font-size: 15px; }
+.detailDialog dd { margin: 6px 0 0; font-size: 14px; line-height: 1.7; }
+@media (min-width: 600px) and (max-width: 850px) {
+  .layout { grid-template-columns: minmax(0, 36fr) minmax(0, 64fr); gap: 16px; }
+  .rooms { padding-left: 16px; }
+  .expeditions .destination h2 { font-size: 28px; }
+  .expeditions .meta { width: 100%; font-size: 16px; }
+  .expeditions .summary { font-size: 15px; }
+  .expeditions .sectionTitle { font-size: 21px; }
+  .room { gap: 8px; padding-inline: 10px; }
+  .expeditions .room h3 { font-size: 19px; }
+  .occupancy { padding-left: 8px; font-size: 15px; }
+  .expeditions .action { min-width: 76px; font-size: 20px; }
+  .room .action { min-width: 68px; padding-inline: 8px; }
+  .join { gap: 8px; }
+  .join input { padding-inline: 10px; font-size: 14px; }
+}
+@media (max-height: 599px) and (min-width: 600px) {
+  .layout { max-height: calc(100dvh - 124px); padding-bottom: 3px; overflow-y: auto; overscroll-behavior: contain; }
+  .heading { height: 30px; }
+  .heading h1 { top: -38px; width: 260px; height: 67px; font-size: 28px; }
+  .portal { width: auto; max-width: 100%; max-height: 125px; }
+  .expeditions .destination h2 { margin-top: 7px; font-size: 25px; }
+  .expeditions .summary { margin: 5px 0; font-size: 14px; }
+  .expeditions .detailsLink { margin-bottom: 7px; font-size: 13px; }
+  .expeditions .meta { padding-block: 3px; font-size: 16px; }
+  .expeditions .create { min-height: 42px; font-size: 22px; line-height: 28px; }
+  .join { margin-top: 9px; }
+  .roomHeading { margin: 15px 0 10px; }
+  .roomList, .empty { min-height: 153px; }
+  .room { min-height: 72px; }
+}
+@media (max-width: 599px) {
+  .heading { height: 35px; }
+  .heading h1 { top: -38px; width: 224px; height: 58px; padding-inline: 20px; font-size: 25px; letter-spacing: 2px; }
+  .expeditions .close { width: 29px; height: 28px; }
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 18px; max-height: calc(100dvh - 124px); padding-bottom: 3px; overflow-y: auto; overscroll-behavior: contain; }
+  .destination { display: grid; grid-template-columns: 104px minmax(0, 1fr); column-gap: 12px; text-align: left; }
+  .portal { grid-row: 1 / 4; height: 104px; object-fit: cover; border-radius: 2px; }
+  .expeditions .destination h2 { margin: 0; font-size: 27px; letter-spacing: 1px; }
+  .expeditions .meta { width: 100%; padding: 4px 0; background: none; font-size: 16px; }
+  .expeditions .summary { display: none; }
+  .expeditions .detailsLink { justify-self: start; margin: 0; padding: 0; font-size: 14px; }
+  .expeditions .create { grid-column: 1 / -1; width: 100%; min-height: 45px; margin-top: 12px; font-size: 23px; line-height: 28px; }
+  .guide { grid-column: 1 / -1; }
+  .rooms { padding: 15px 0 0; border-left: 0; border-top: 1px solid #b5904f80; }
+  .expeditions .sectionTitle { gap: 8px; font-size: 21px; }
+  .join { gap: 8px; margin-top: 10px; }
+  .join input { height: 42px; padding-inline: 10px; font-size: 14px; }
+  .expeditions .action { min-width: 76px; min-height: 40px; padding-inline: 10px; font-size: 20px; line-height: 26px; }
+  .expeditions .create { min-height: 45px; font-size: 23px; }
+  .roomHeading { margin: 18px 0 10px; }
+  .roomList { min-height: 151px; gap: 9px; }
+  .room { min-height: 71px; gap: 8px; padding: 9px 10px; }
+  .expeditions .room h3 { font-size: 20px; }
+  .roomCode { font-size: 12px; }
+  .occupancy { padding-left: 0; border-left: 0; font-size: 15px; }
+  .room .action { min-width: 62px; padding-inline: 7px; font-size: 18px; }
+  .empty { min-height: 151px; padding: 12px; }
+  .empty strong { font-size: 20px; }
+  .expeditions .empty p { font-size: 13px; }
+  .detailDialog { padding: 8px; border-width: 13px; }
+  .detailDialog .detailHeader h2 { font-size: 19px; }
+}
+@media (max-width: 359px) {
+  .destination { grid-template-columns: 84px minmax(0, 1fr); column-gap: 10px; }
+  .portal { height: 92px; }
+  .expeditions .destination h2 { font-size: 24px; }
+  .expeditions .meta { font-size: 14px; }
+  .room { gap: 6px; padding-inline: 8px; }
+  .expeditions .room h3 { font-size: 18px; }
+  .room .occupancy { font-size: 12px; }
+  .room .action { min-width: 54px; padding-inline: 6px; font-size: 17px; }
+}
+@media (max-height: 650px) and (max-width: 599px) {
+  .heading { height: 30px; }
+  .layout { gap: 12px; max-height: calc(100dvh - 116px); }
+  .destination { grid-template-columns: 80px minmax(0, 1fr); }
+  .portal { height: 80px; }
+  .expeditions .destination h2 { font-size: 24px; }
+  .expeditions .meta { padding-block: 2px; font-size: 14px; }
+  .expeditions .detailsLink { font-size: 13px; line-height: 20px; }
+  .expeditions .create { margin-top: 8px; min-height: 40px; font-size: 22px; }
+  .rooms { padding-top: 10px; }
+  .expeditions .sectionTitle { font-size: 19px; }
+  .join { margin-top: 6px; }
+  .join input { height: 38px; font-size: 13px; }
+  .expeditions .action { min-height: 38px; }
+  .expeditions .create { min-height: 40px; }
+  .roomHeading { margin: 12px 0 8px; }
+  .roomList { min-height: 131px; gap: 7px; }
+  .room { min-height: 62px; padding-block: 7px; }
+  .pagination { margin-top: 6px; }
+  .expeditions .pagination .action { min-height: 27px; line-height: 27px; }
+  .empty { min-height: 131px; }
+}
+@media (max-height: 429px) and (min-width: 600px) {
+  .roomList, .empty { min-height: 75px; }
+}
+@media (max-height: 399px) and (min-width: 600px) {
+  .portal { max-height: 95px; }
+  .expeditions .summary { display: none; }
+  .expeditions .destination h2 { margin: 5px 0; font-size: 24px; }
+  .expeditions .create { min-height: 38px; font-size: 22px; }
+  .expeditions .sectionTitle { font-size: 21px; }
+  .roomHeading { margin: 12px 0 8px; }
+}
+
+.difficulty { display: flex; gap: 6px; width: 100%; margin: 4px 0; }
+.expeditions .difficulty button { flex: 1; min-width: 0; min-height: 36px; padding: 5px 4px; border: 1px solid #a98b4e; background: #d8bc7d33; color: #65431d; font: 700 14px/1.4 'Songti SC', SimSun, serif; }
+.expeditions .difficulty button[aria-pressed="true"] { background: #315a45; border-color: #315a45; color: #fff1c7; }
+.expeditions .difficultyHint { margin: 5px 0 12px; color: #75542e; font-size: 12px; line-height: 1.6; }
+.expeditions .meta { white-space: normal; font-size: 15px; }

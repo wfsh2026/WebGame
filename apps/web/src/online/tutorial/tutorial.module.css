@@ -1,0 +1,41 @@
+.card { position: relative; min-width: 0; padding: 14px 16px 12px; border: 1px solid #edc75d; border-radius: 9px; color: #fff1c2; background: linear-gradient(135deg, #233b29f5, #12251ff5); box-shadow: 0 8px 26px #0005, inset 0 0 0 3px #d5b15512; font-size: 14px; line-height: 1.5; }
+.floating { position: absolute; top: 9%; right: 1.5%; z-index: 4; width: clamp(200px, 23%, 320px); }
+.card header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; color: #f5d771; font-size: 12px; }
+.card strong { display: block; color: #ffe69a; font-size: 19px; }
+.card p { margin: 5px 0 10px; color: #e6e1c8; font-size: 13px; line-height: 1.6; }
+.card button, .settings button { cursor: pointer; }
+.card.card header button { padding: 2px 0; border: 0; background: transparent; color: #cfbf91; font-size: 12px; }
+.controls { display: flex; flex: none; gap: 10px; }
+.card.card .action { padding: 7px 12px; border: 1px solid #e7bf5c; border-radius: 5px; color: #fff0b5; background: #52603b; font-size: 13px; }
+.card.card .resume { display: block; width: 100%; padding: 0; border: 0; background: transparent; color: #f5d771; text-align: left; }
+.hint { display: flex; align-items: flex-start; gap: 10px; margin: 10px 0; padding: 10px 14px; border: 1px solid #e9bd46; border-radius: 7px; background: #ffe095; color: #352a12; font-size: 13px; line-height: 1.6; }
+.hint > span { flex: none; font-size: 22px; line-height: 1.1; }
+.hint strong { display: block; color: #3c2b0d; font-size: 14px; }
+.hint p { margin: 3px 0 0 !important; color: #514221 !important; font-size: 13px !important; line-height: 1.6 !important; }
+.target { outline: 2px solid #ffdb5f !important; outline-offset: 3px; box-shadow: 0 0 15px #ffd34f65 !important; animation: guide-glow 2.5s ease-in-out infinite; }
+.target:disabled { animation: none; outline: none !important; box-shadow: none !important; }
+.facilityTarget > span { color: #fff0a2 !important; filter: drop-shadow(0 0 6px #f4c54f); }
+.facilityTarget::before { content: '▼'; position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%); z-index: 3; color: #ffe064; font-size: clamp(16px, 2.6cqw, 36px); filter: drop-shadow(0 2px 2px #513d15); animation: guide-point 2s ease-in-out infinite; pointer-events: none; }
+.facilityTarget i { opacity: 1 !important; border-color: #ffda59 !important; }
+.facilityTarget .facilityTip { position: absolute; top: -55px; right: 105%; width: max-content; max-width: 240px; padding: 8px 12px; background: #ffe095; color: #3a2a0e; border: 1px solid #dcac37; border-radius: 8px; font-size: clamp(11px, 1.1cqw, 16px); line-height: 1.5; pointer-events: none; }
+.settings { padding: 14px 0; border-top: 1px solid #c3a56c44; }
+.settings p { color: #c9c9b5; }
+.settings button + button { margin-left: 8px; }
+.error.error { color: #ffdda6; }
+.battleGuide { position: absolute; top: 82px; right: 12px; z-index: 7; width: min(280px, calc(100vw - 24px)); }
+.compact { padding: 8px 12px; }
+.compact strong { font-size: 14px; }
+.compact > p:not(.error) { display: none; }
+.compact header { margin-bottom: 4px; }
+.card .error button { margin-left: 8px; border: 0; background: transparent; color: #ffe393; text-decoration: underline; }
+@keyframes guide-glow { 50% { filter: brightness(1.12); } }
+@keyframes guide-point { 50% { translate: 0 -4px; } }
+@media (min-width: 601px) and (max-width: 1000px) { .floating { top: auto; bottom: 8%; right: 31%; width: min(280px, 35%); } }
+@media (max-width: 600px) {
+  .floating { position: fixed; top: auto; right: 10px; bottom: max(10px, env(safe-area-inset-bottom)); width: min(300px, calc(100vw - 20px)); }
+  .card { padding: 10px 12px; }
+  .card strong { font-size: 16px; }
+  .facilityTarget .facilityTip { display: none; }
+  .hint { padding: 8px 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .target, .facilityTarget::before { animation: none; } }

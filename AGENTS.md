@@ -42,7 +42,7 @@
 | 新功能开发、开发体验或旧演示迁移 | [开发区入口](development/AGENTS.md)及[先测试网页、确认后正式发布的流程](deploy/release-workflow.md)，再按领域读取规范 |
 | 功能转正、发布产物或环境隔离 | [开发与发布流程](deploy/release-workflow.md) |
 | 死亡、全队失败、物品损失、装备掉落或经验惩罚 | [死亡与失败惩罚](docs/gameplay/failure-penalties.md)，再读取结算与经济规范 |
-| 心法、武器、技能、辅助、战斗供能或攻击计时 | [核心战斗规则](docs/gameplay/core-combat.md)，再按内容或模块入口读取对应规范 |
+| 心法、技能、辅助、战斗供能或攻击计时 | [核心战斗规则](docs/gameplay/core-combat.md)，再按内容或模块入口读取对应规范 |
 | 角色、地图、怪物、技能、事件、美术或内容包 | [内容分类入口](content/AGENTS.md)，再选择对应类型 |
 | 角色与怪物显示、移动、冲刺、格挡或基础行为 | [实体显示与控制](docs/gameplay/entity-controls.md) |
 | 网页界面、游戏表现、输入 | [客户端入口](apps/web/AGENTS.md) |
@@ -56,5 +56,7 @@
 | 新玩法扩展接口 | [扩展规则](packages/content-sdk/RULES.md) |
 | 资源与配置工具 | [工具入口](tools/AGENTS.md) |
 | 部署配置 | [部署入口](deploy/AGENTS.md) |
+
+文档仅记录已确认规则或可核实事实，不写入待确认事项、未采纳方案或猜测；缺少决定时在对话中提出，确认后再写入。详细要求见 [文档维护规则](docs/development.md#文档维护)。
 
 同一规则只在所属领域文档维护，其他文件保留一句适用说明和链接；新增规则优先修改原文，避免在末尾反复追加。入口只维护导航，新增内容类型时补充对应规则文件和路由。

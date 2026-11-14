@@ -10,5 +10,6 @@
   "supportSlots": 1,
   "delivery": "projectile",
   "effect": "fireball",
-  "description": "命中爆炸，半径1.5米；5级留下1.5秒余火，每0.5秒造成15%伤害；10级半径2米、余火3秒，同玩家余火不叠伤。"
+  "description": "命中爆炸，半径1.5米；5级留下1.5秒余火，每0.5秒造成15%伤害；10级半径2米、余火3秒，同玩家余火不叠伤。",
+  "skillType": "ranged"
 }

@@ -1,0 +1,48 @@
+{
+  "createdAt": "2026-11-14",
+  "generator": "built-in image_gen",
+  "reference": "development/features/expedition-ui/content/expedition-approved.png",
+  "assets": [
+    {
+      "name": "portal",
+      "source": "development/features/expedition-ui/content/portal-source.png",
+      "runtime": "content/common/lobby/expedition-ui-portal.webp",
+      "purpose": "秘境入口的林地传送门插画",
+      "display": "桌面约 340×213，手机缩略图 80–104 像素",
+      "export": {
+        "width": 800,
+        "height": 500,
+        "format": "WebP",
+        "quality": 0.94
+      },
+      "layers": "不透明插画及其窄金边；名称、人数和所有动态文本由 React 显示",
+      "animation": "无",
+      "prompt": "Create a production-ready standalone forest portal illustration for a fantasy web game's expedition-selection UI. The input is the user-approved UI design reference. Extract/recreate ONLY the landscape picture inside its left panel: the moss-covered ancient stone arch with a cyan glowing spiral emblem on its keystone, translucent turquoise magic passage, sunlit wooded clearing, ferns and white flowers, warm sunlight from upper left, small camp tent and blue-green cloth banner at left, hand-painted polished forest fantasy style. Preserve its composition and colors very closely. Output a landscape image at approximately 8:5 aspect ratio with the artwork filling the canvas, a very thin sculpted beveled GOLD PICTURE FRAME around the exact outer edge with clipped decorative corners as in the reference. No parchment margin, no UI panel, no text, letters, numbers, buttons, people or mockup. Crisp readable shapes at 330x205 display size. Opaque landscape illustration, not transparent. This is the separate actual game illustration asset, not the entire UI screenshot."
+    },
+    {
+      "name": "row",
+      "source": "development/features/expedition-ui/content/row-source.png",
+      "runtime": "content/common/lobby/expedition-ui-row.webp",
+      "purpose": "等待房间行的羊皮纸与金框",
+      "display": "桌面约 534×75，手机随行宽缩放",
+      "export": {
+        "width": 1000,
+        "height": 150,
+        "format": "WebP",
+        "quality": 0.94,
+        "trimAlphaThreshold": 20
+      },
+      "layers": "空白纸面与金边；外部透明；房间名、编号、人数和按钮独立渲染",
+      "animation": "无",
+      "prompt": "Production UI asset, recreate the BLANK waiting-room row plate from the right side of the provided approved game UI reference. ONLY one very wide short HORIZONTAL ROW FRAME, aspect ratio about 6.7:1, tightly framed to the canvas with almost no outside margin. Pale warm ivory parchment interior with a soft subtle texture; thin distinct sculpted golden double-line beveled border, restrained angled clipped corners, slight raised golden chamfer and gentle shadow. Closely match the room row border in the reference. Empty clean interior across the entire width: NO text, no symbols, no separator lines, no numbers, no buttons, no illustrations. Straight-on flat UI element. The frame and parchment interior are opaque, outside the clipped corners is genuinely transparent. No other UI or sheet of elements. The displayed final target is about 500x76 pixels; keep the border beautifully readable and only 2–3 px thick at final display size."
+    }
+  ],
+  "sharedAssets": [
+    "shop-ui-panel.webp",
+    "shop-ui-title.webp",
+    "shop-ui-card.webp",
+    "shop-ui-control.webp",
+    "shop-ui-close.webp"
+  ],
+  "exportCommand": "node tools/export-expedition-ui.mjs"
+}

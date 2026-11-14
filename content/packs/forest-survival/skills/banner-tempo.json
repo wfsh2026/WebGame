@@ -5,9 +5,10 @@
   "effect": "banner-tempo",
   "interval": 3,
   "cost": 12,
-  "coefficient": 0,
+  "coefficient": 0.2,
   "range": 10,
   "supportSlots": 1,
   "delivery": "nova",
-  "description": "布旗后范围内出手间隔缩短10%，增加灵力需求，不加速心法和布旗。5级延长持续，10级驻留加速，15级离阵保留更久，20级周期急攻。"
+  "description": "布旗后范围内出手间隔缩短10%，增加灵力需求；每0.75秒朝阵内最近敌人发出锋芒，命中造成20%魔攻伤害。5级延长持续，10级驻留加速，15级延长离阵保留，20级周期强化锋芒与急攻。伤害随技能等级成长，旗阵攻击周期独立计算。",
+  "skillType": "ranged"
 }

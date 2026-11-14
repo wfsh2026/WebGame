@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { defaultFeedbackSettings } from './combat-feedback';
-import type { FeedbackSettings } from './combat-feedback';
+import type { FeedbackSettings, HealthState } from './combat-feedback';
 import { OnlineScene } from './online-scene';
 import type { SceneBridge } from './online-scene';
 
@@ -12,7 +12,14 @@ export class BattleRuntime {
   private parent?: HTMLDivElement;
   private listeners = new Set<(state: BattleLoading) => void>();
   private state: BattleLoading = { progress: 0, ready: false, error: '' };
-  constructor(private bridge: SceneBridge) {
+  private health: HealthState = 'normal';
+  private healthListeners = new Set<() => void>();
+  constructor(private bridge: SceneBridge, private sceneFactory?: (bridge: SceneBridge) => OnlineScene) {
+    this.bridge.healthChanged = state => {
+      if (this.health === state) return;
+      this.health = state;
+      for (const listener of this.healthListeners) listener();
+    };
     this.bridge.feedback = { ...defaultFeedbackSettings };
     try {
       const saved = localStorage.getItem('combat-feedback');
@@ -23,6 +30,26 @@ export class BattleRuntime {
     } catch { /* 默认设置仍可使用。 */ }
   }
   get feedbackSettings(): FeedbackSettings { return this.bridge.feedback ?? defaultFeedbackSettings; }
+  readHealth = (): HealthState => this.health;
+  readGuard(): { blocking: boolean; windowLeft: number; counterLeft: number } | undefined {
+    const world = this.scene?.world; const snapshot = this.bridge.current;
+    if (!this.bridge.active || !snapshot || !world || world.lastSnapshot?.roomId !== snapshot.roomId || world.simulation.round !== snapshot.round) return;
+    const player = world.localPlayer;
+    if (!player) return;
+    return { blocking: player.blocking, windowLeft: player.guard?.windowLeft ?? 0, counterLeft: player.guard?.counterLeft ?? 0 };
+  }
+  readDashCooldown(): number | undefined { return this.scene?.world.localPlayer?.dashCooldown; }
+  readAbilityCooldown(itemId: string): number | undefined {
+    const world = this.scene?.world;
+    const snapshot = this.bridge.current;
+    if (!this.bridge.active || !snapshot || !world || world.lastSnapshot?.roomId !== snapshot.roomId || world.simulation.round !== snapshot.round) return;
+    const ability = world.localPlayer?.abilityStates.find(state => state.itemId === itemId);
+    return ability?.remaining;
+  }
+  subscribeHealth = (listener: () => void): (() => void) => {
+    this.healthListeners.add(listener);
+    return () => { this.healthListeners.delete(listener); };
+  };
   setFeedback(settings: FeedbackSettings): void {
     this.bridge.feedback = settings;
     try { const value = JSON.stringify(settings); localStorage.setItem('combat-feedback', value); } catch { /* 设置继续在当前页面生效。 */ }
@@ -42,7 +69,7 @@ export class BattleRuntime {
     const host = document.createElement('div');
     host.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;visibility:hidden;pointer-events:none;';
     document.body.appendChild(host); this.host = host;
-    const scene = new OnlineScene(this.bridge); this.scene = scene;
+    const scene = this.sceneFactory ? this.sceneFactory(this.bridge) : new OnlineScene(this.bridge); this.scene = scene;
     scene.onLoading = state => {
       if (this.scene !== scene) return;
       this.publish(state);

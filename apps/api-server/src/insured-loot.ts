@@ -1,3 +1,4 @@
+import { canonicalEquipmentId } from '@web-game-world/simulation';
 import type { Prisma } from '@prisma/client';
 import type { EquipmentItem } from '@web-game-world/simulation';
 import type { RoundResult } from '@web-game-world/contracts';
@@ -8,7 +9,8 @@ export async function settleInsuredLoot(tx: Prisma.TransactionClient, data: { ru
     for (const loot of player.safe ?? []) {
       if (loot.category !== 'insured' || seen.has(loot.id) || loot.wave > data.result.round) throw new Error('RULE:保险箱来源无效');
       seen.add(loot.id);
-      const item = catalog.find(entry => entry.id === loot.definitionId);
+      const definitionId = canonicalEquipmentId(loot.definitionId);
+      const item = catalog.find(entry => entry.id === definitionId);
       if (!item || loot.level > 20) throw new Error('RULE:保险箱物品无效');
       const category = item.kind === 'skill' || item.kind === 'support' ? 'skill' : 'equipment';
       const effect = (item.description ?? item.name).slice(0, 96);

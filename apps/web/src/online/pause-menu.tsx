@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { HudIcon } from '../hud/hud-icon';
 import type { Snapshot } from '@web-game-world/contracts';
 import type { BattleRuntime } from '../game/battle-runtime';
 import s from './pause-menu.module.css';
@@ -10,11 +11,12 @@ export function PauseMenu({ snapshot, runtime, change, connection }: PauseMenuPr
   const paused = Boolean(snapshot.paused);
   const solo = snapshot.players.length === 1;
   const connected = connection === '已连接权威房间';
+  const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
     const panel = dialog.current;
-    if (paused && panel && !panel.open) { panel.showModal(); resume.current?.focus(); }
-    else if (!paused && panel?.open) panel.close();
-  }, [paused]);
+    if ((paused || menuOpen) && panel && !panel.open) { panel.showModal(); resume.current?.focus(); }
+    else if (!paused && !menuOpen && panel?.open) panel.close();
+  }, [paused, menuOpen]);
   useEffect(() => {
     const unsubscribe = runtime.subscribe(state => { if (state.ready) runtime.setPaused(paused); });
     return unsubscribe;
@@ -31,14 +33,18 @@ export function PauseMenu({ snapshot, runtime, change, connection }: PauseMenuPr
     window.addEventListener('keydown', keyDown, true);
     return () => window.removeEventListener('keydown', keyDown, true);
   }, [paused, solo, connected, change]);
+  function openMenu(): void { if (solo) change(true); else setMenuOpen(true); }
+  function closeMenu(): void { if (paused && connected) change(false); else setMenuOpen(false); }
+  function restoreFocus(): void { const canvas = document.querySelector<HTMLCanvasElement>('canvas'); canvas?.focus({ preventScroll: true }); }
   return <>
-    {solo && !paused && <button className={s.launcher} onClick={() => change(true)} disabled={!connected}>暂停 · ESC</button>}
-    <dialog ref={dialog} className={s.dialog} aria-labelledby="pause-title" onCancel={event => { event.preventDefault(); if (connected) change(false); }}>
-      <span className={s.eyebrow}>林地围猎 · 单人战斗</span>
-      <h2 id="pause-title">战斗已暂停</h2>
-      <p>战场与计时已冻结，准备好后继续冒险。</p>
-      <button ref={resume} onClick={() => change(false)} disabled={!connected}>继续战斗</button>
-      <small>{connected ? '按 ESC 也可继续' : '连接恢复后可继续战斗'}</small>
+    {!paused && <button className={s.launcher} onClick={openMenu} disabled={!connected} aria-haspopup="dialog"><HudIcon name="menu" size={32} />菜单</button>}
+    <dialog ref={dialog} className={s.dialog} aria-labelledby="pause-title" onClose={restoreFocus} onCancel={event => { event.preventDefault(); closeMenu(); }}>
+      <span className={s.eyebrow}>林地围猎 · {solo ? '单人战斗' : '多人联机'}</span>
+      <h2 id="pause-title">{paused ? '战斗已暂停' : '战斗菜单'}</h2>
+      <p>{paused ? '战场与计时已冻结，准备好后继续冒险。' : '联机战斗持续进行。'}</p>
+      <p>WASD 移动 · Shift 冲刺 · Space 格挡</p>
+      <button ref={resume} onClick={closeMenu} disabled={paused && !connected}>{paused ? '继续战斗' : '返回战斗'}</button>
+      {paused && <small>{connected ? '按 ESC 也可继续' : '连接恢复后可继续战斗'}</small>}
     </dialog>
   </>;
 }

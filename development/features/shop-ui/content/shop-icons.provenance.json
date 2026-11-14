@@ -1,0 +1,27 @@
+{
+  "generator": "image_gen.imagegen",
+  "mode": "built-in",
+  "createdAt": "2026-11-14",
+  "reference": "shop-ui-approved.png",
+  "master": "shop-icons-source.png",
+  "runtime": "content/common/lobby/shop-ui-icons.webp",
+  "specification": {
+    "usage": "商店心法、技能和辅助宝石专用圆形金框商品图标",
+    "grid": [
+      8,
+      5
+    ],
+    "runtimeSize": [
+      1024,
+      640
+    ],
+    "displaySize": [
+      88,
+      88
+    ],
+    "transparency": "圆形金框外为真实透明通道，框内保留深色宝石底",
+    "animation": "静态；与战斗特效素材分开",
+    "referenceSkills": "火球、飞刃、寒棘、奔雷链、驻灵剑阵、缚灵陷阵直接采用已确认效果稿的图标，独立导出为shop-ui-skills.webp"
+  },
+  "prompt": "Use case: game UI production icon atlas. The attached approved shop screenshot is a STYLE REFERENCE. Generate ONE icon sheet for all 40 shop goods, matching the screenshot's rich hand-painted spell medallions: substantial sculpted warm gold circular rim with small pointed compass-like ornamental tips, luminous jewel-like dark teal or midnight blue INNER BACKPLATE, vivid readable central illustration. These are framed UI product illustrations, NOT loose combat VFX sprites. Every medallion has the same size, rim, lighting and visual weight as the orange fireball icon in the reference. Exact REGULAR GRID 8 columns x 5 rows, all cells identical 256x256, output 2048x1280. Real alpha transparency outside each circular gold medallion, no text, no labels, no numbers, no borders between cells. Each cell has 8% clear transparent margins and the medallion fills 84% of the cell. The full center disk inside the rim is opaque dark jewel material. Specific cells left-to-right, top-to-bottom: ROW 1: 1 blue water spiral (stream heart), 2 bright cyan upward water fountain (spring heart), 3 deep blue ocean wave (ocean heart), 4 intertwined teal and purple energy cycle (cycle heart), 5 silver broad curved sword, 6 two crossed slender daggers, 7 long leaf-shaped spear head, 8 heavy stone war hammer. ROW 2: 9 lightning-wrapped wooden staff, 10 silver wind blade in motion, 11 homing white-blue star mote, 12 roaring orange fireball, 13 sharp icy blue thorns, 14 golden electric paper talisman, 15 straight piercing blue cosmic beam, 16 branching purple lightning chain. ROW 3: 17 dark green decay curse skull, 18 vertical glowing jade swords in a summoning circle, 19 glowing green-gold root trap rune, 20 red war banner with sword sigil, 21 orange banner with crossed arrows, 22 green feather banner, 23 blue spirit-water banner, 24 brown gold shield banner. ROW 4: 25 teal energy-saving gemstone, 26 red overload gemstone with bright cracks, 27 lime-green swiftness wing gemstone, 28 violet expanding aura gemstone, 29 three diverging orange projectiles gemstone, 30 bronze knockback burst gemstone, 31 interlocking gold-purple resonance crystals, 32 forked cyan crystal. ROW 5: 33 double timed purple projectile crystal, 34 bronze concentric aftershock crystal, 35 spreading emerald curse shards, 36 amber hourglass gemstone, 37 violet lingering mist gemstone, 38 twin blue banner crystals, 39 focused red crystal lens, 40 teal tracking eye gemstone. Keep generous separation and strictly centered artwork in every grid cell, none touching other cells. Maintain the SAME gold circular medallion frame for all 40, and the same 3/4 softly painted fantasy finish. No parchment background, no characters, no scene, no captions, no typography, no checkerboard. Highly polished UI icons matching the provided shop reference."
+}

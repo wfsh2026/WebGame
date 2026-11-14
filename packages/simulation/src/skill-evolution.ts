@@ -1,6 +1,7 @@
 import type { Effect, Enemy, Player, Projectile, Simulation, Vec } from './index';
+import { initializeHoming } from './homing';
 
-export interface EvolutionShot { overload?: number; areaLevel?: number; areaScale?: number; releaseLevel?: number; releaseGroup?: string; terminal?: boolean; level?: number; fork?: number; spread?: number; echo?: number; delay?: number; returning?: boolean; returnable?: boolean; originX?: number; originY?: number; travel?: number; bounces?: number; secondary?: boolean }
+export interface EvolutionShot { overload?: number; areaLevel?: number; areaScale?: number; releaseLevel?: number; releaseGroup?: string; releaseAngle?: number; terminal?: boolean; level?: number; fork?: number; spread?: number; echo?: number; delay?: number; returning?: boolean; returnable?: boolean; originX?: number; originY?: number; travel?: number; bounces?: number; secondary?: boolean }
 export interface EvolutionEffect { edge?: boolean; innerRadius?: number; innerWidth?: number; shape?: string; targetId?: string; slow?: number; markPower?: number; markRemaining?: number; spreadCount?: number; groupId?: string; damage?: number; tick?: number; delay?: number; sourceId?: string; hitIds?: string[]; ring?: boolean }
 interface Hit { enemy: Enemy; player?: Player; damage: number; source?: Vec; bypassShield?: boolean }
 export interface EvolutionActions { hurt: (sim: Simulation, hit: Hit) => void }
@@ -90,7 +91,7 @@ export function evolveImpact(sim: Simulation, data: { shot: Projectile; enemy: E
       }
       const vx = Math.cos(angle) * speed; const vy = Math.sin(angle) * speed;
       const child: Projectile = { ...shot, id: `${shot.id}-fork-${side}`, vx, vy, ttl: shot.fork >= 3 ? .4 : .25, damage: shot.damage * .5, pierces: shot.fork >= 15 ? 3 : shot.fork >= 5 ? 2 : 1, secondary: true, targetId, resonance: 0, overload: 0, echo: 0, areaLevel: 0, returnable: false, fork: 0, spread: 0, bounces: 0, bounce: false, hitIds: [enemy.id], delay: 0 };
-      sim.projectiles.push(child);
+      initializeHoming(sim, child); sim.projectiles.push(child);
     }
     shot.fork = 0;
   }

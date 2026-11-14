@@ -11,11 +11,17 @@ model Account {
   name         String @unique
   passwordHash String
   role         String?
+  characterLevel Int @default(1)
+  characterGrowth Json @default("{\"power\":0,\"magic\":0,\"vitality\":0,\"spirit\":0,\"movement\":0,\"haste\":0,\"luck\":0}")
+  characterGrowthRevision Int @default(0)
+  activeRunId String?
+  previousLoadout Json?
   loadout      Json?
   loadoutRevision Int @default(0)
   shopOffers   Json?
   shopRevision Int @default(0)
   character    Json?
+  tutorial     Json?
   coins        Int @default(0)
   materials    Int @default(0)
   inventory    InventoryEntry[]
@@ -36,6 +42,7 @@ model Session {
   @@index([expiresAt])
 }
 model Run {
+  difficulty String @default("normal")
   id String @id
   roomId String
   contentVersion String
@@ -47,10 +54,18 @@ model Run {
   createdAt DateTime @default(now())
 }
 model Participant {
+  baseCleared Boolean @default(false)
+  hellEntered Boolean @default(false)
+  hellFloor Int @default(0)
+  outcome String @default("active")
   runId String
   accountId String
   run Run @relation(fields: [runId], references: [id])
   account Account @relation(fields: [accountId], references: [id])
+  entryLoadout Json?
+  entryItems Json?
+  earned Int @default(0)
+  spent Int @default(0)
   settled Boolean @default(false)
   coins Int @default(0)
   materials Int @default(0)
@@ -87,6 +102,7 @@ model PersonalRoundRecord {
 }
 
 model AccountItem {
+  definitionId String?
   accountId String
   itemId String
   level Int @default(1)
@@ -95,6 +111,7 @@ model AccountItem {
   @@id([accountId, itemId])
 }
 model ShopPurchase {
+  tabId String?
   accountId String
   requestId String
   itemId String
@@ -109,6 +126,7 @@ model ShopPurchase {
 }
 
 model ShopRefresh {
+  tabId String?
   accountId String
   requestId String
   sourceRevision Int
@@ -165,4 +183,27 @@ model TestAssetAdjustment {
   materialsAfter Int
   createdAt DateTime @default(now())
   @@index([accountId, createdAt])
+}
+
+model AdventurePurchase {
+  accountId String
+  requestId String
+  kind String
+  coins Int
+  receipt Json
+  createdAt DateTime @default(now())
+  @@id([accountId, requestId])
+}
+model GrowthRefresh {
+  runId String
+  accountId String
+  requestId String
+  choiceId Int
+  source String
+  refreshCount Int
+  coins Int
+  receipt Json
+  createdAt DateTime @default(now())
+  @@id([runId, accountId, requestId])
+  @@unique([runId, accountId, choiceId, refreshCount])
 }

@@ -5,9 +5,10 @@ import type { BattleViewport } from './battle-entities';
 import atlasUrl from '../../../../content/packs/forest-survival/assets/runtime/ability-atlas.webp';
 import resonanceUrl from '../../../../content/packs/forest-survival/assets/runtime/resonance-atlas.webp';
 import animationUrl from '../../../../content/packs/forest-survival/assets/ability-animation.webp';
+import { buffTexture } from './buff-art';
 
 interface Point { x: number; y: number }
-interface Appearance { width: number; height: number; angle: number; alpha: number; top?: boolean; tint?: number; additive?: boolean }
+interface Appearance { width: number; height: number; angle: number; alpha: number; top?: boolean; tint?: number; additive?: boolean; ground?: boolean }
 interface TrailPoint extends Point { time: number; angle: number }
 interface ShotTrail { points: TrailPoint[]; first: number; seen: number; frame: number; owner: string; effect: string; empowered: boolean }
 interface RenderContext { sim: Simulation; viewport: BattleViewport; playerId: string }
@@ -47,7 +48,9 @@ export class AbilityEffects {
     let sprite = this.sprites[this.used];
     if (!sprite) { sprite = this.scene.add.image(0, 0, texture, cell); this.sprites.push(sprite); }
     this.used += 1; sprite.setVisible(true); sprite.setTexture(texture, cell); sprite.setPosition(position.x, position.y);
-    sprite.setDepth(appearance.top ? 8 : 3); sprite.setDisplaySize(appearance.width, appearance.height); sprite.setRotation(appearance.angle); sprite.setAlpha(appearance.alpha);
+    const depth = appearance.top ? 8 : appearance.ground ? 1.3 : 1.7;
+    const opacity = appearance.additive && !appearance.top ? .6 : 1;
+    sprite.setDepth(depth); sprite.setDisplaySize(appearance.width, appearance.height); sprite.setRotation(appearance.angle); sprite.setAlpha(appearance.alpha * opacity);
     sprite.setTint(appearance.tint ?? 0xffffff); sprite.setBlendMode(appearance.additive ? Phaser.BlendModes.ADD : Phaser.BlendModes.NORMAL);
   }
   private recoveryText(position: Point, alpha: number): void {
@@ -60,7 +63,7 @@ export class AbilityEffects {
     this.usedLabels += 1; if (label.text !== '+灵力') label.setText('+灵力'); label.setVisible(true); label.setPosition(position.x, position.y); label.setAlpha(alpha);
   }
   private screen(position: Point, viewport: BattleViewport): Point { return { x: viewport.ox + position.x * viewport.unit, y: viewport.oy + position.y * viewport.unit }; }
-  private opacity(owner: string | undefined, playerId: string): number { return owner && owner !== playerId ? .3 : 1; }
+  private opacity(owner: string | undefined, playerId: string): number { return owner && owner !== playerId ? .18 : 1; }
   private phase(id: string): number {
     let value = 0; for (let index = 0; index < id.length; index += 1) value = (value * 31 + id.charCodeAt(index)) >>> 0;
     return (value % 1000) / 1000 * Math.PI * 2;
@@ -86,13 +89,6 @@ export class AbilityEffects {
       const sparkle = { width: unit * .22, height: unit * .22, angle: sparkAngle, alpha: pulse * .7, top: true, additive: true };
       this.draw(43, spark, sparkle);
     }
-    for (const player of sim.players) {
-      if (player.hp <= 0 || (player.resonance?.buffLeft ?? 0) <= 0) continue;
-      const position = this.screen(player, viewport); position.y += unit * .75;
-      const alpha = this.opacity(player.id, playerId); const pulse = 1 + Math.sin(sim.clock * 7) * .1;
-      const appearance = { width: .72 * unit * pulse, height: .46 * unit * pulse, angle: Math.sin(sim.clock * 3) * .15, alpha, top: true };
-      this.draw(21, position, appearance);
-    }
   }
   private combo(context: RenderContext): void {
     const player = context.sim.players.find(entry => entry.id === context.playerId);
@@ -111,26 +107,6 @@ export class AbilityEffects {
         this.draw(item.effect === 'dual' ? 5 : 44, position, appearance);
       }
       row += 1;
-    }
-  }
-  private growthStatus(context: RenderContext): void {
-    const player = context.sim.players.find(entry => entry.id === context.playerId); if (!player || player.hp <= 0) return;
-    const statuses: string[] = [];
-    for (const branch of player.equipment.branches) {
-      const state = player.abilityStates.find(entry => entry.itemId === branch.item.id)?.progress; if (!state) continue;
-      const pieces: string[] = [];
-      if (state.charges > 0) pieces.push(`节能×${state.charges}`);
-      if (state.overload > 0) pieces.push(state.overloadCast ? '过载出手' : '过载就绪');
-      if (state.stacks >= 1) { const stacks = Math.floor(state.stacks); pieces.push(`迅捷×${stacks}`); }
-      if (pieces.length) statuses.push(`${branch.item.name}：${pieces.join(' / ')}`);
-    }
-    if (player.resonance?.buffLeft) statuses.push(`${player.resonance.finisher ? '强化' : ''}共鸣：等待${player.resonance.buffKind === 'weapon' ? '近战' : '远程'}`);
-    const center = this.screen(player, context.viewport);
-    for (let index = 0; index < Math.min(3, statuses.length); index += 1) {
-      if (this.usedLabels >= 20) break;
-      let label = this.labels[this.usedLabels];
-      if (!label) { const style = { fontSize: '11px', color: '#c9ead7', stroke: '#143c41', strokeThickness: 3 }; label = this.scene.add.text(0, 0, '', style); label.setOrigin(.5); label.setDepth(9); this.labels.push(label); }
-      this.usedLabels += 1; label.setText(statuses[index]); label.setVisible(true); label.setAlpha(.85); label.setPosition(center.x, center.y - context.viewport.unit * 1.2 - index * 14);
     }
   }
   private projectile(shot: Projectile, context: RenderContext): void {
@@ -173,6 +149,10 @@ export class AbilityEffects {
     if (shot.empowered || shot.overload) {
       const orbit = { x: position.x + Math.cos(age * 12) * unit * .28, y: position.y + Math.sin(age * 12) * unit * .28 };
       const accent = { width: unit * .4, height: unit * .4, angle: age * 5, alpha, additive: true }; this.draw(21, orbit, accent);
+    }
+    if (shot.empowered) {
+      const glow = { width: width * 1.45, height: height * 1.45, angle: age * 3, alpha: alpha * .8, additive: true };
+      this.resonanceAccent('resonance-spark', position, glow);
     }
   }
   private tails(context: RenderContext): void {
@@ -244,6 +224,24 @@ export class AbilityEffects {
       const cell = 40 + Math.min(3, Math.floor(p * 4)); const spark = { width: reach * .7, height: reach * .7, angle: sweep, alpha: alpha * .65, additive: true };
       this.draw(cell, position, spark);
     }
+    if (effect.empowered) {
+      const slash = { width: reach * 1.1, height: reach * 1.1, angle: sweep, alpha: alpha * .95 };
+      this.resonanceAccent('resonance-slash', position, slash);
+      const flare = { width: reach * .8, height: reach * .8, angle: sweep, alpha: alpha * .9, additive: true };
+      this.resonanceAccent('resonance-spark', position, flare);
+    }
+  }
+  private resonanceAccent(frame: string, position: Point, appearance: Appearance): void {
+    if (this.used >= 600 || appearance.alpha <= .01) return;
+    const margin = Math.max(appearance.width, appearance.height);
+    if (position.x < -margin || position.y < -margin || position.x > this.scene.scale.width + margin || position.y > this.scene.scale.height + margin) return;
+    let sprite = this.sprites[this.used];
+    if (!sprite) { sprite = this.scene.add.image(0, 0, buffTexture, frame); this.sprites.push(sprite); }
+    this.used += 1; sprite.setTexture(buffTexture, frame); sprite.setPosition(position.x, position.y);
+    sprite.setDisplaySize(appearance.width, appearance.height); sprite.setRotation(appearance.angle); sprite.setAlpha(appearance.alpha);
+    sprite.setDepth(1.7); sprite.clearTint(); sprite.setVisible(true);
+    const blend = appearance.additive ? Phaser.BlendModes.SCREEN : Phaser.BlendModes.NORMAL;
+    sprite.setBlendMode(blend);
   }
   private supportAccent(data: { owner?: string; sourceId?: string; position: Point; size: number; age: number; alpha: number }, context: RenderContext): void {
     const player = context.sim.players.find(entry => entry.id === data.owner);
@@ -308,7 +306,7 @@ export class AbilityEffects {
     if (effect.kind === 'ability-ice-ground' || effect.kind === 'ability-cracked-ground') {
       const ice = effect.kind === 'ability-ice-ground'; const frameIndex = Math.floor(sim.clock * 5) % 3; const frame = (ice ? 36 : 44) + frameIndex;
       const size = effect.radius * unit * 2; const fade = Math.min(1, effect.ttl * 3);
-      const appearance = { width: size, height: size, angle: ice ? sim.clock * .08 : 0, alpha: alpha * .35 * fade, additive: true }; this.draw(frame, origin, appearance); return;
+      const appearance = { width: size, height: size, angle: ice ? sim.clock * .08 : 0, alpha: alpha * .3 * fade, additive: true, ground: true }; this.draw(frame, origin, appearance); return;
     }
     if (effect.kind === 'ability-area-edge') {
       const size = effect.radius * unit * 2; const angle = Math.atan2(effect.facingY ?? 0, effect.facingX ?? 1);
@@ -347,7 +345,7 @@ export class AbilityEffects {
     }
     if (effect.kind === 'ability-burning') {
       const fade = Math.min(1, effect.ttl * 3); const size = effect.radius * unit * 2;
-      const appearance = { width: size, height: size, angle: age * .08, alpha: alpha * .45 * fade };
+      const appearance = { width: size, height: size, angle: age * .08, alpha: alpha * .35 * fade, ground: true };
       const frame = 32 + Math.floor(age * 10) % 3; this.draw(frame, origin, appearance);
       const count = effect.owner === playerId ? 4 : 2;
       for (let index = 0; index < count; index += 1) {
@@ -389,7 +387,7 @@ export class AbilityEffects {
     const base = array ? 76 : curse || effect.kind === 'ability-novel-poison-burst' ? 72 : 80;
     const stage = Math.floor(age * 9) % 4; const frame = trap && (effect.delay ?? 0) > 0 ? 80 : base + stage;
     const size = unit * (array ? 2 : curse ? 1.2 : effect.radius * 2);
-    const appearance = { width: size, height: size, angle: 0, alpha: alpha * (trap ? .55 : .9), additive: true };
+    const appearance = { width: size, height: size, angle: 0, alpha: alpha * (trap ? .4 : .9), additive: true, ground: trap || array };
     this.draw(frame, center, appearance);
     if (array) for (let index = 0; index < 3; index += 1) {
       const angle = sim.clock * 2 + index * Math.PI * 2 / 3;
@@ -403,7 +401,7 @@ export class AbilityEffects {
     if (sim.clock < this.previousClock || group !== this.group) this.trails.clear();
     this.previousClock = sim.clock; this.group = group;
     const context = { sim, viewport, playerId };
-    this.status(context); this.combo(context); this.growthStatus(context);
+    this.status(context); this.combo(context);
     // Own attacks reserve the budget before remote decoration.
     for (const mine of [true, false]) {
       for (const shot of sim.projectiles) if (!shot.hostile && (shot.owner === playerId) === mine) this.projectile(shot, context);

@@ -67,4 +67,4 @@ corepack pnpm --filter @web-game-world/web dev
 
 例如，调整怪物配置时读取 [内容分类入口](content/AGENTS.md) 和 [怪物规则](content/rules/enemies.md)；修改奖励发放时读取 [业务服务入口](apps/api-server/AGENTS.md) 和 [结算规则](apps/api-server/rules/settlement.md)。
 
-按需读取 [首版参数](docs/implementation/forest-survival.md)、[实现限制](docs/implementation/limitations.md)或[历史验证](docs/verification/history.md)。目标设备、平台通用人数范围、PvP、角色经营及峰值资源预算仍需后续确定，不能把首版参数扩大为全平台规则。
+按需读取 [首版参数](docs/implementation/forest-survival.md)、[实现限制](docs/implementation/limitations.md)或[历史验证](docs/verification/history.md)。首版参数不作为全平台规则。

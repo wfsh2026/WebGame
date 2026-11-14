@@ -1,0 +1,7 @@
+{
+  "tool": "image_gen",
+  "created": "2026-11-14",
+  "purpose": "Coral bramble danger perimeter; transparent source, cropped and exported to 256px WebP.",
+  "prompt": "Use case: stylized-concept. Asset type: transparent 2D game danger-boundary texture. Generate exactly ONE horizontal continuous thin organic bramble filament, pale coral-red thorn tips on a dark charcoal-plum woody core, muted cream glints, visible dark outline that separates it from both light stone and green grass. Top-down painterly forest ruins game aesthetic, crisp readable at small display size. The bramble runs left-to-right straight along its main axis, has tiny irregular thorns branching slightly up/down, no leaves, no lettering, no circles, no icons, no panel, no frame, no shadows cast on any background, no diffuse glow, no particles, no repeats or sheet. Keep branching confined to a narrow horizontal strip, roughly 4:1 overall silhouette aspect, centered tightly in a landscape transparent canvas, with only modest transparent padding. Left and right tips thin naturally, side-by-side pieces can overlap to make a continuous boundary. Colors remain coral #ff796f with near-black #211921 core. True transparent background. This is final reusable source artwork for a skill warning perimeter, not a map or diagram.",
+  "runtime": "content/packs/forest-survival/assets/danger-edge.webp"
+}

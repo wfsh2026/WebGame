@@ -1,0 +1,5 @@
+ALTER TABLE "Account" ADD COLUMN "characterLevel" INTEGER NOT NULL DEFAULT 1, ADD COLUMN "activeRunId" TEXT, ADD COLUMN "previousLoadout" JSONB;
+ALTER TABLE "AccountItem" ADD COLUMN "definitionId" TEXT;
+ALTER TABLE "Participant" ADD COLUMN "entryLoadout" JSONB, ADD COLUMN "entryItems" JSONB, ADD COLUMN "earned" INTEGER NOT NULL DEFAULT 0, ADD COLUMN "spent" INTEGER NOT NULL DEFAULT 0;
+CREATE TABLE "AdventurePurchase" ("accountId" TEXT NOT NULL, "requestId" TEXT NOT NULL, "kind" TEXT NOT NULL, "coins" INTEGER NOT NULL, "receipt" JSONB NOT NULL, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY ("accountId", "requestId"));
+CREATE TABLE "GrowthRefresh" ("runId" TEXT NOT NULL, "accountId" TEXT NOT NULL, "requestId" TEXT NOT NULL, "choiceId" INTEGER NOT NULL, "source" TEXT NOT NULL, "refreshCount" INTEGER NOT NULL, "coins" INTEGER NOT NULL, "receipt" JSONB NOT NULL, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY ("runId", "accountId", "requestId"), UNIQUE ("runId", "accountId", "choiceId", "refreshCount"));

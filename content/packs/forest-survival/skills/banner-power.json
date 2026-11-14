@@ -5,9 +5,10 @@
   "effect": "banner-power",
   "interval": 3,
   "cost": 10,
-  "coefficient": 0,
+  "coefficient": 0.45,
   "range": 10,
   "supportSlots": 1,
   "delivery": "nova",
-  "description": "布旗后范围内直接伤害提高12%；同类取最强。5级扩大范围，10级入阵强化下一击，15级驻留蓄势，20级周期军威脉冲。"
+  "description": "布旗后直接伤害提高12%，每1.5秒释放外扩军威冲击，每轮对每个敌人造成45%魔攻伤害。5级扩大范围，10级入阵强化下一击，15级驻留蓄势，20级每6秒强化攻击与军威。伤害随技能等级成长，布旗一次付费，自身同类重叠取强。",
+  "skillType": "ranged"
 }

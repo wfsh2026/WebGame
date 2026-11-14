@@ -1,0 +1,42 @@
+{
+  "generator": "image_gen.imagegen",
+  "mode": "built-in",
+  "createdAt": "2026-11-14",
+  "approvedPreview": "development/features/shop-ui/content/shop-ui-approved.png",
+  "userDirection": "按已确认的紧凑商店效果稿开发，保留暖纸色、青绿饰板与金框，移除基础构筑状态与底部技能搭配跳转。",
+  "prompts": {
+    "skin": "Create a production GAME UI TEXTURE ATLAS matching the attached approved shop mockup. NO WORDS NO LETTERS NO NUMBERS NO ICONS NO CONTENT. This is a blank skin asset sheet, not a new mockup. Precisely 1536x1024 landscape image, divided into EXACTLY FOUR equal rectangular cells, a precise 2 columns by 2 rows grid. Cell bounds are (0,0,768,512), (768,0,768,512), (0,512,768,512), (768,512,768,512). No gap, no padding between tiles, no labels, all borders aligned with the edges of their quadrant. Every cell is a single blank nine-slice scalable rectangle and fills its quadrant edge to edge. TOP LEFT: full shop outer panel: hand painted warm ivory parchment center, delicately carved polished antique-gold frame around all four edges with layered thin forest-teal inset rim and organic ivy leaves confined to the four corners. Corner ornament takes at most 65px per corner, all straight edges thinner than 20px. Center completely empty evenly lit parchment, subtly grainy but quiet for readable dynamic dark text. TOP RIGHT: product card: pale cream parchment with tasteful softly embossed antique gold/sepia thin inset rectangular frame, corner engraving smaller than 50px, mostly empty bright paper, no icons, no dividing lines. BOTTOM LEFT: blank teal enamel title plaque: rectangular deep forest teal center, fine aged gold beveled outer rim and sculpted gold leaf corner accents, perfectly blank center, every ornament remains inside quadrant. BOTTOM RIGHT: blank teal purchase-button surface: rich emerald teal painted enamel face, fine double beveled warm gold edge, restrained gold cut corner detailing, no text no shadow outside boundary. The left and right cells are independent separate skin textures; never draw any ornament across quadrant boundaries. These will be split into four images and rendered via CSS nine-slice border-image, so all decorative details must live in corners, edge runs are straight and repeatable and centers smooth. Match the reference's warm parchment, forest teal, hand painted gold fantasy materials. Do not draw a complete assembled UI. No arrows, no circular emblems, no item art, no forest scene, no typography, no drop shadows, no blur, no gutters. Crisp detailed 2D game asset.",
+    "title": "Create a SINGLE production UI title plaque sprite for the attached approved fantasy shop. This is a NEW isolated text-free UI asset, NOT the assembled interface. Use the reference image only for the forest-teal enamel and hand-painted polished antique-gold sculpted trim style. WIDE HORIZONTAL plaque with width-to-height ratio about 4.4:1, shallow frame, full blank teal center reserved for dynamic Chinese title. Shape is a horizontal elongated hexagonal banner with subtly pointed left/right sides, fine double beveled gold border, small tasteful ornamental leaf flourishes in corners and a tiny golden botanical crest at top center. Keep ornament delicate; compact UI needs a large clear teal text area. Material hand-painted antique gold over deep forest-green enamel exactly like the reference central 营地商店 title sign. Do not include any written text, letters, numbers, circular medallion or labels. No parchment, no paper backdrop, no forest background. REAL alpha transparency around the entire silhouette and crest, including angular side corners. Sharp detailed clean edges, no matte fringe, no checkerboard. Entire plaque fits within the image with small transparent margins. Output horizontal banner composition."
+  },
+  "masters": [
+    "development/features/shop-ui/content/shop-ui-source.png",
+    "development/features/shop-ui/content/shop-ui-title-source.png",
+    "development/features/shop-ui/content/shop-icons-source.png"
+  ],
+  "specification": {
+    "usage": "公共营地商店的面板、商品卡片、按钮、标题牌、货币、分类符号与40个商品图标",
+    "expectedPanelWidth": 920,
+    "heartPanelWidth": 760,
+    "cardDisplayWidth": "技能和辅助约280像素；心法两列；窄屏按可用宽度排列",
+    "titleDisplaySize": [300, 80],
+    "coinDisplaySize": [27, 27],
+    "composition": "面板、卡片和按钮采用完整背景纹理，避免九宫格缩小边框雕花；从已确认效果稿提取边缘、按钮、金币和六个技能图标，保留空白纸面和青绿中心。标题单独保留透明轮廓。",
+    "layers": "面板、卡片、控件、标题、金币和商品图标分别导出，名称、价格、状态和按钮文字由网页渲染。商品使用独立金框图标，不复用战斗特效图。",
+    "transparency": "标题、金币、分类符号和商品图标使用真实透明通道，其余纸面和漆面不透明。",
+    "animation": "静态界面素材"
+  },
+  "runtime": [
+    { "file": "shop-ui-panel.webp", "width": 1432, "height": 776 },
+    { "file": "shop-ui-card.webp", "width": 448, "height": 256 },
+    { "file": "shop-ui-control.webp", "width": 166, "height": 58 },
+    { "file": "shop-ui-title.webp", "width": 640, "height": 166 },
+    { "file": "shop-ui-coin.webp", "width": 46, "height": 46 },
+    { "file": "shop-ui-close.webp", "width": 64, "height": 60 },
+    { "file": "shop-ui-tabs.webp", "width": 144, "height": 48 },
+    { "file": "shop-ui-skills.webp", "width": 444, "height": 296 },
+    { "file": "shop-ui-icons.webp", "width": 1024, "height": 640 }
+  ],
+  "export": "node tools/export-shop-ui.mjs",
+  "format": "WebP，quality 0.94–0.96；原稿为PNG；金币和六个技能图标从用户批准的效果图提取并作圆形透明裁切。",
+  "iconsProvenance": "development/features/shop-ui/content/shop-icons.provenance.json"
+}

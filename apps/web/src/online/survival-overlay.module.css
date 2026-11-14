@@ -1,21 +1,16 @@
-.heading { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); display: grid; min-width: 220px; padding: 8px 28px; text-align: center; border: 1px solid #c6aa68; border-radius: 16px 16px 30px 30px; color: #f8e5b5; background: #10271eeb; box-shadow: 0 3px 18px #0005; pointer-events: none; }
-.heading b { font: bold 24px/1.3 'Songti SC', SimSun, serif; letter-spacing: 4px; }.heading span { font-size: 11px; margin-top: 3px; }.heading strong { font: 32px/1.2 Georgia, serif; font-variant-numeric: tabular-nums; letter-spacing: 4px; }
-.reward { position: absolute; top: 18px; right: 18px; width: 225px; color: #f8e5b5; font-size: 13px; }
-.compact { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-left: auto; padding: 9px 17px; color: inherit; font: inherit; background: #10271eed; border: 1px solid #c6aa68; border-radius: 25px; cursor: pointer; }.compact:focus-visible { outline: 2px solid #fff1b9; outline-offset: 3px; }
-.details { margin-top: 8px; padding: 16px; background: #10271ef5; border: 1px solid #c6aa68; border-radius: 12px; box-shadow: 0 6px 24px #0005; }.details h3 { font: bold 20px 'Songti SC', SimSun, serif; margin: 0 0 14px; text-align: center; }.details p { display: flex; justify-content: space-between; margin: 9px 0; }.details small { display: block; text-align: center; margin-top: 15px; }.progress { height: 8px; border: 1px solid #bfa263; border-radius: 8px; overflow: hidden; margin-top: 15px; background: #13201a; }.progress span { display: block; height: 100%; background: #dfbc6a; }.milestones { display: flex; justify-content: space-between; font-size: 10px; margin-top: 5px; }
-@media (max-width: 600px) { .heading { top: 8px; min-width: 0; padding: 6px 12px; left: auto; right: 8px; transform: none; }.heading b { font-size: 15px; letter-spacing: 1px; }.heading strong { font-size: 24px; }.heading span { font-size: 10px; }.reward { top: 100px; right: 8px; width: 195px; font-size: 11px; }.compact { padding: 6px 10px; }.details { padding: 12px; } }
-
-.schedule { position: absolute; right: 18px; top: 210px; width: 245px; max-height: 45vh; overflow-y: auto; box-sizing: border-box; padding: 12px; color: #e6ead6; background: #10271ee8; border: 1px solid #8c9b73; border-radius: 12px; font-size: 12px; }
-.schedule p { margin: 7px 0; line-height: 1.5; }
-.schedule small { display: block; line-height: 1.5; }
-.schedule button { margin-top: 8px; border: 1px solid #b2b88d; border-radius: 5px; color: inherit; background: #284637; padding: 6px; cursor: pointer; }
-.imminent { color: #ffe0a0; font-weight: bold; }
-.cycle { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-.cycle li { padding: 4px; border: 1px solid transparent; }
-.cycle li[aria-current] { border-color: #efd18b; color: #ffe0a0; }
-@media (max-width: 600px) { .schedule { right: 8px; top: 155px; width: min(205px, 58vw); max-height: 35vh; padding: 8px; font-size: 10px; } .cycle { grid-template-columns: 1fr; } }
-
-.rightPanel { position: absolute; top: 18px; right: 18px; bottom: 165px; width: 245px; overflow-y: auto; pointer-events: none; }
-.rightPanel > .reward, .rightPanel > .schedule { position: relative; top: auto; right: auto; width: 100%; max-height: none; pointer-events: auto; }
-.rightPanel > .schedule { margin-top: 10px; }
-@media (max-width: 600px) { .rightPanel { top: 135px; right: 8px; width: min(205px, 58vw); bottom: 165px; } }
+.heading { position: absolute; z-index: 9; top: 13px; left: 50%; transform: translateX(-50%); width: clamp(290px, 27vw, 410px); color: #fff0cb; text-align: center; pointer-events: none; font: 17px/1.45 'Songti SC', SimSun, serif; text-shadow: 0 1px 3px #17120d; }
+.heading h1 { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; height: 51px; margin: 0; padding: 0 28px; background: url('../../../../content/common/hud/wave-title.webp') center / 100% 100% no-repeat; font: 700 clamp(19px, 1.65vw, 27px)/1.15 'Songti SC', SimSun, serif; white-space: nowrap; letter-spacing: 1px; }
+.heading h1 > span { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.information { margin: -5px 17px 0; padding: 7px 10px 8px; border-radius: 0 0 18px 18px; background: rgb(0 0 0 / 35%); }
+.information p { margin: 0; font-variant-numeric: tabular-nums; }.information span { margin: 0 5px; }
+.rightPanel { position: absolute; z-index: 11; top: 19px; right: 18px; width: 350px; min-height: 78px; padding: 8px 24px 12px; background: url('../../../../content/common/hud/utility-frame.webp') center / 100% 100% no-repeat; color: #fff0cb; font: 16px/1.5 'Songti SC', SimSun, serif; text-shadow: 0 1px 3px #17120d; }
+.launcher { display: flex; align-items: center; gap: 7px; padding: 0; border: 0; color: inherit; background: none; font: inherit; text-shadow: inherit; cursor: pointer; }
+.next { display: flex; justify-content: flex-end; margin: 3px 0 0; font-size: 15px; }.elapsed { flex-shrink: 0; white-space: nowrap; }
+.lastSurvivor { position: absolute; z-index: 10; top: 135px; left: 50%; transform: translateX(-50%); color: #ffd4b2; font: 14px 'Microsoft YaHei', sans-serif; text-shadow: 0 1px 3px #000; text-align: center; }
+.dialog { width: min(560px, 92vw); max-height: 80dvh; overflow: auto; padding: 22px 26px; border: 1px solid #ac975f; border-radius: 12px; background: #14271f; color: #f4e9cb; font: 14px/1.7 'Microsoft YaHei', sans-serif; }
+.dialog::backdrop { background: #07120db0; }.dialog header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }.dialog h2 { margin: 0; font: 25px SimSun, serif; }.dialog button { border: 1px solid #9b8a58; border-radius: 5px; padding: 5px 10px; background: #254b3c; color: inherit; cursor: pointer; }.dialog header button { border: 0; background: none; font-size: 24px; }.cycle { padding-left: 22px; }.cycle [aria-current] { color: #ffe099; }
+.launcher:focus-visible, .dialog button:focus-visible { outline: 2px solid #ffe2a0; outline-offset: 4px; }
+@media (max-width: 1100px) { .heading { width: 29vw; min-width: 255px; font-size: 13px; }.heading h1 { height: 43px; font-size: 19px; }.rightPanel { width: 235px; font-size: 14px; }.next { font-size: 12px; } }
+@media (max-width: 600px) { .heading { top: 8px; left: auto; right: 5px; transform: none; min-width: 0; width: 53vw; font-size: 10px; }.heading h1 { height: 34px; padding: 0 14px; font-size: 12px; letter-spacing: 0; }.information { margin: -3px 8px 0; padding: 5px 3px 6px; border-radius: 0 0 10px 10px; }.information span { margin: 0 2px; }.rightPanel { top: 98px; right: 10px; width: 44vw; font-size: 12px; }.launcher { gap: 3px; }.launcher > span { width: 23px !important; height: 23px !important; }.next { margin-top: 5px; font-size: 10px; text-align: left; }.lastSurvivor { top: 175px; left: auto; right: 8px; transform: none; max-width: 46vw; font-size: 10px; }.dialog { padding: 16px; } }
+@media (max-height: 500px) and (min-width: 601px) { .heading { top: 5px; font-size: 11px; }.heading h1 { height: 34px; font-size: 16px; }.information { padding: 5px; }.rightPanel { top: 8px; right: 12px; width: 215px; }.next { font-size: 10px; }.lastSurvivor { top: 95px; font-size: 11px; } }
+@media (max-width: 600px) { .next { justify-content: flex-start; gap: 2px 7px; }.nextName { max-width: 100%; } }

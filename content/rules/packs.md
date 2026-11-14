@@ -16,7 +16,6 @@
 content/packs/<pack-id>/
 ├─ manifest.json
 ├─ hearts/
-├─ weapons/
 ├─ skills/
 ├─ supports/
 ├─ maps/
@@ -30,12 +29,12 @@ content/packs/<pack-id>/
 
 ### 独立内容与清单职责
 
-- 心法、武器、技能和辅助分别存放在 `hearts/`、`weapons/`、`skills/`、`supports/`，每份内容具有独立 ID，通过 ID 建立业务引用，不复制整份属性作为引用。
-- ID 沿用 `<pack-id>:<kind>/<name>`，对应类型为 `heart`、`weapon`、`skill`、`support`。精确字段及加载索引由内容格式模块统一实现。
-- `manifest.json` 保存包信息、兼容版本、入口、编排及内容引用，不再承载所有具体心法、武器、技能和辅助属性。
+- 心法、技能和辅助分别存放在 `hearts/`、`skills/`、`supports/`，每份内容具有独立 ID，通过 ID 建立业务引用，不复制整份属性作为引用。
+- ID 沿用 `<pack-id>:<kind>/<name>`，对应类型为 `heart`、`skill`、`support`。精确字段及加载索引由内容格式模块统一实现。
+- `manifest.json` 保存包信息、兼容版本、入口、编排及内容引用，不再承载所有具体心法、技能和辅助属性。
 - 清单可以登记包内文件路径供加载器定位；内容之间使用 ID 引用，不能用跨包文件路径绕过公开依赖。
 - 未发布内容位于 `development/features/<feature-id>/content/`，使用相同的包内分类结构；转正时保持内容 ID 稳定，不将开发目录当作正式依赖。
-- 当前首包的这些配置仍内嵌于清单，Schema 与加载器也采用内嵌结构。以上是已确认的目标规范，迁移需要同步修改内容、Schema、引用解析与消费端，不能只拆文件便宣称可加载。本次不执行配置迁移。
+- 当前首包已通过 `equipmentFiles` 登记独立文件，客户端、API 和房间共用 Schema 及引用解析。技能统一 `kind: skill` 与 `skillType: melee | ranged`；旧 `weapon/<name>` 引用映射至 `skill/<name>`，历史飞刃、疾风刃及旧初始物品使用显式别名。定义 ID 迁移不改变物品实例身份、已购数量或价格；商店货架与上一局构筑在读取时归一化。
 
 清单格式由 `packages/content-schema` 统一实现，至少包含以下信息；字段名和具体 Schema 在实现时统一落地，创作者不能自行约定另一套格式。
 

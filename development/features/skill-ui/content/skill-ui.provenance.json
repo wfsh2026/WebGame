@@ -1,0 +1,10 @@
+{
+  "purpose": "技能搭配界面的浅金构筑盘、空装备槽、辅助槽和锁定槽",
+  "source": "skill-ui-source.png",
+  "reference": "skill-ui-approved.png",
+  "origin": "根据用户确认的技能搭配效果稿，使用内置图片生成工具制作透明素材，复用现有商店的面板、标题和装备图标。",
+  "prompt": "Transparent 2 by 2 fantasy UI sprite sheet: pale engraved circular constellation dial without nodes; empty antique gold equipment medallion; empty auxiliary gem socket; lotus engraved locked equipment medallion. No text, numbers or labels. Match approved parchment and forest teal gold UI.",
+  "layout": "原稿按2列2行分割；构筑盘768px、装备槽与锁定槽192px、辅助槽128px，透明WebP。",
+  "export": "node tools/export-skill-ui.mjs",
+  "runtime": ["content/common/lobby/skill-ui-dial.webp", "content/common/lobby/skill-ui-frame.webp", "content/common/lobby/skill-ui-gem.webp", "content/common/lobby/skill-ui-locked.webp"]
+}

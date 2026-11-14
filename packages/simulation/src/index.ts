@@ -1,78 +1,98 @@
+export * from './guard';
+import { counterDamage, guardHit, resetGuard, stepGuard } from './guard';
+import type { GuardState } from './guard';
+export * from './expedition';
+import { clearExpeditionCombat, expeditionWave } from './expedition';
+import type { ExpeditionDifficulty, ExpeditionRules } from './expedition';
+export * from './adventure-progression';
 import { SpatialEnemies } from './spatial-enemies';
+import { guideHoming, homingStats, initializeHoming } from './homing';
+export { homingStats } from './homing';
 const collisionGrids = new WeakMap<Simulation, SpatialEnemies>();
 import { bannerCast, bannerDamage, bannerFlight, bannerGuard, bannerRecovery, spendBannerRecovery, stepBanners, bannerWind, bannerBuff } from './banners';
 import type { BannerState, BannerField, MeleeCast } from './banners';
 export * from './banners';
+import { stepBannerCombat } from './banner-combat';
 import { castNovel, stepNovel } from './novel-skills';
 import type { NovelFields } from './novel-skills';
-import { abilityProgress, attackInterval, castModifiers, prepareRhythm, commitCast, heartConversion } from './combat-rhythm';
+import { abilityProgress, attackInterval, castModifiers, prepareRhythm, commitCast, heartRecovery } from './combat-rhythm';
 import type { AbilityProgress, HeartProgress } from './combat-rhythm';
 export * from './combat-rhythm';
 export * from './ability-growth';
 import { addGrowthField, aftershock, evolveImpact, returnProjectile, stepEvolution, transferDeathMarks } from './skill-evolution';
 import type { EvolutionShot, EvolutionEffect } from './skill-evolution';
 import { planWave, spawnWaveBatch, waveProfile } from './waves';
+import type { CompositionRules, WaveDirector } from './wave-composition';
+export * from './wave-composition';
 import type { SpawnGroup, WaveSchedule } from './waves';
 import type { WaveMix, WaveEntry } from './waves';
 export * from './waves';
 import { updateResonance, consumeResonance, recordAbilityHit, resonanceState } from './resonance';
 import type { ResonanceState, ThunderMark } from './resonance';
 import { protectedBy, stepEnemyHazards, stepEnemyTactic } from './enemy-tactics';
+import { enemyAbilities, enemyShielded } from './enemy-abilities';
+import type { EnemyAbilityState } from './enemy-abilities';
+import { enemyCombatArea, stepEnemyCombat } from './enemy-combat';
+export * from './enemy-abilities';
 import type { EnemyActions, EnemyHazard } from './enemy-tactics';
 export type { EnemyHazard } from './enemy-tactics';
-import { defaultEquipment, equipmentRuntime, isBanner } from './equipment';
+import { defaultEquipment, equipmentRuntime, heartCapacity, isBanner } from './equipment';
 import type { EquipmentLoadout, EquipmentSupport, EquipmentItem } from './equipment';
 export * from './equipment';
 export * from './build-growth';
+export * from './combat-experience';
+import { dropCombatExperience, settleClaimedExperience, stepExperience } from './combat-experience';
+import type { ExperienceOrb } from './combat-experience';
 export * from './character-growth';
 import { awardCombatGrowth } from './build-growth';
 import type { BuildItem } from './equipment';
 import type { GrowthChoice } from './build-growth';
 import { calculateCharacterStats } from './characters';
-import type { CharacterBuild, CharacterStats } from './characters';
+import type { CharacterBuild, CharacterStats, CharacterPoints } from './characters';
 export * from './characters';
 export * from './survival';
 export interface Vec { x: number; y: number }
 export interface Obstacle extends Vec { width: number; height: number }
 export interface EnemyDefinition { kind: string; name?: string; behavior?: string; rank?: string; hp: number; speed: number; radius: number; damage: number; windup: number; recovery: number; reach: number }
-export interface WaveDefinition { groups?: SpawnGroup[]; interval: number; count: number; kinds: string[]; name?: string; hint?: string; mix?: WaveMix[]; stageMixes?: WaveMix[][]; eliteChance?: number; bossChance?: number; guarantee?: 'none' | 'elite' | 'boss'; healthMultiplier?: number; damageMultiplier?: number; squirrels?: boolean }
-export interface SimConfig { cycleWaves?: boolean; equipmentDefinitions?: EquipmentItem[]; waves?: WaveDefinition[]; revivalSeconds?: number; supportDefinitions?: EquipmentSupport[]; roundDuration: number; maxAlive: number; maxSpawned: number; character: { points: { power: number; magic: number; vitality: number; spirit: number; movement: number; haste: number; luck?: number } }; heart: { capacity: number; interval: number; recovery: number; manaCost: number; slots?: number }; weapon: { interval: number; cost: number; coefficient: number; speed: number; range: number; supportSlots?: number }; skill: { interval: number; cost: number; coefficient: number; range: number; supportSlots?: number }; support: { host?: string; costMultiplier: number; damageMultiplier: number }; enemies: EnemyDefinition[] }
+export interface WaveDefinition { composition?: CompositionRules; bossPools?: string[][]; groups?: SpawnGroup[]; interval: number; count: number; kinds: string[]; name?: string; hint?: string; mix?: WaveMix[]; stageMixes?: WaveMix[][]; eliteChance?: number; bossChance?: number; guarantee?: 'none' | 'elite' | 'boss'; healthMultiplier?: number; damageMultiplier?: number; squirrels?: boolean }
+export interface SimConfig { difficulty?: ExpeditionDifficulty; expedition?: ExpeditionRules; cycleWaves?: boolean; equipmentDefinitions?: EquipmentItem[]; waves?: WaveDefinition[]; revivalSeconds?: number; supportDefinitions?: EquipmentSupport[]; roundDuration: number; character: { points: { power: number; magic: number; vitality: number; spirit: number; movement: number; haste: number; luck?: number } }; heart: { capacity: number; interval: number; recovery: number; slots?: number }; meleeSkill: { interval: number; cost: number; coefficient: number; speed: number; range: number; supportSlots?: number }; rangedSkill: { interval: number; cost: number; coefficient: number; range: number; supportSlots?: number }; support: { host?: string; costMultiplier: number; damageMultiplier: number }; enemies: EnemyDefinition[] }
 export interface Motion extends Vec { facingX: number; facingY: number }
-export interface Controls extends Vec { sequence: number; block: boolean; dash: boolean; position?: Motion }
+export interface Controls extends Vec { blockPress?: number; sequence: number; block: boolean; dash: boolean; position?: Motion }
 export interface AbilityState { progress?: AbilityProgress; itemId: string; remaining: number; count: number; state: string }
-export interface Player extends Vec { banners?: BannerState; heartProgress?: HeartProgress; growthNotices?: string[]; contactNextAt?: number; fusionNotices?: string[]; hasteLeft: number; focusLeft: number; shieldLeft: number; lootShield: number; baseStats: CharacterStats; characterRanks: Record<string, number>; manaRecovery: number; resonance?: ResonanceState; companionGranted?: boolean; companionMilestones?: number[]; buildItems: BuildItem[]; buildRevision: number; level: number; experience: number; upgradeCredits: number; waveCredits: number; choiceSequence: number; choices: GrowthChoice[]; abilityStates: AbilityState[]; loadout: EquipmentLoadout; equipment: ReturnType<typeof equipmentRuntime>; stats: CharacterStats; id: string; name: string; facingX: number; facingY: number; hp: number; maxHp: number; mp: number; maxMp: number; energy: number; capacity: number; weaponWait: number; skillWait: number; weaponState: string; skillState: string; dashCooldown: number; blocking: boolean; connected: boolean; ready: boolean; growth: ('power' | 'energy' | 'vitality')[]; kills: number; damage: number; blocked: number; input: Controls; inputAt: number; dashLeft: number; dashX: number; dashY: number; heartWait: number; sequence: number; weaponCount: number; skillCount: number; clientDriven: boolean; survivalSeconds: number; reviveRemaining: number; assists: number }
-export interface Enemy extends Vec { thunderResiduals?: Record<string, number>; strongFrostAt?: Record<string, number>; frostMarks?: Record<string, number>; frostCasts?: Record<string, string>; burnUntil?: Record<string, number>; bornWave?: number; healthScale?: number; damageScale?: number; thunderMarks?: Record<string, ThunderMark>; slowUntil?: number; slowFactor?: number; knockbackAt?: number; id: string; kind: string; radius: number; hp: number; maxHp: number; state: string; facingX: number; facingY: number; timer: number; targetId: string; definition: EnemyDefinition; contributors?: Record<string, number>; attackX?: number; attackY?: number; originX?: number; originY?: number; attackCount?: number; combo?: number; hitIds?: string[]; killerId?: string; linkId?: string; linkWait?: number; parentId?: string; summonCount?: number; escapeLeft?: number }
-export interface Projectile extends Vec, EvolutionShot { windScale?: number; sourceId?: string; resonance?: number; empowered?: boolean; markDuration?: number; id: string; owner: string; vx: number; vy: number; ttl: number; damage: number; hostile?: boolean; effect?: string; castId?: string; targetId?: string; pierces?: number; hitIds?: string[]; blast?: number; slow?: number; slowDuration?: number; bounce?: boolean }
-export interface Effect extends Vec, EvolutionEffect, NovelFields { banner?: BannerField; melee?: MeleeCast; charged?: boolean; targetId?: string; targetKind?: 'player' | 'enemy'; damage?: number; absorbed?: number; killed?: boolean; flavor?: string; castId?: string; level?: number; swing?: number; angle?: number; width?: number; owner?: string; empowered?: boolean; id: string; radius: number; kind: string; ttl: number; duration?: number; facingX?: number; facingY?: number }
+export interface Player extends Vec { guard?: GuardState; characterLevel?: number; coinsEarned?: number; coinsSpent?: number; banners?: BannerState; heartProgress?: HeartProgress; growthNotices?: string[]; contactNextAt?: number; fusionNotices?: string[]; hasteLeft: number; focusLeft: number; shieldLeft: number; lootShield: number; baseStats: CharacterStats; characterRanks: Record<string, number>; energyRecoveryBonus: number; resonance?: ResonanceState; companionGranted?: boolean; companionMilestones?: number[]; buildItems: BuildItem[]; buildRevision: number; level: number; experience: number; upgradeCredits: number; waveCredits: number; choiceSequence: number; choices: GrowthChoice[]; abilityStates: AbilityState[]; loadout: EquipmentLoadout; equipment: ReturnType<typeof equipmentRuntime>; stats: CharacterStats; id: string; name: string; facingX: number; facingY: number; hp: number; maxHp: number; energy: number; capacity: number; meleeWait: number; rangedWait: number; meleeState: string; rangedState: string; dashCooldown: number; blocking: boolean; connected: boolean; ready: boolean; growth: ('power' | 'energy' | 'vitality')[]; kills: number; damage: number; blocked: number; input: Controls; inputAt: number; dashLeft: number; dashX: number; dashY: number; heartWait: number; sequence: number; meleeCount: number; rangedCount: number; clientDriven: boolean; survivalSeconds: number; reviveRemaining: number; assists: number }
+export interface Enemy extends Vec { abilities?: EnemyAbilityState; expiresAt?: number; chainDepth?: number; thunderResiduals?: Record<string, number>; strongFrostAt?: Record<string, number>; frostMarks?: Record<string, number>; frostCasts?: Record<string, string>; burnUntil?: Record<string, number>; bornWave?: number; healthScale?: number; damageScale?: number; thunderMarks?: Record<string, ThunderMark>; slowUntil?: number; slowFactor?: number; knockbackAt?: number; id: string; kind: string; radius: number; hp: number; maxHp: number; state: string; facingX: number; facingY: number; timer: number; targetId: string; definition: EnemyDefinition; contributors?: Record<string, number>; attackX?: number; attackY?: number; originX?: number; originY?: number; attackCount?: number; combo?: number; hitIds?: string[]; killerId?: string; linkId?: string; linkWait?: number; parentId?: string; summonCount?: number; escapeLeft?: number }
+export interface Projectile extends Vec, EvolutionShot { homing?: number; homingTravel?: number; windScale?: number; sourceId?: string; resonance?: number; empowered?: boolean; markDuration?: number; id: string; owner: string; vx: number; vy: number; ttl: number; damage: number; hostile?: boolean; effect?: string; castId?: string; targetId?: string; pierces?: number; hitIds?: string[]; blast?: number; slow?: number; slowDuration?: number; bounce?: boolean }
+export interface Effect extends Vec, EvolutionEffect, NovelFields { amount?: number; banner?: BannerField; melee?: MeleeCast; charged?: boolean; targetId?: string; targetKind?: 'player' | 'enemy'; damage?: number; absorbed?: number; killed?: boolean; flavor?: string; castId?: string; level?: number; swing?: number; angle?: number; width?: number; owner?: string; empowered?: boolean; id: string; radius: number; kind: string; ttl: number; duration?: number; facingX?: number; facingY?: number }
 export interface Arena { width: number; height: number; spawns: Vec[]; enemySpawns: Vec[]; obstacles: Obstacle[] }
-export interface Simulation { waveSchedules: WaveSchedule[]; spawnHistory: Vec[]; waveBossPlanned: boolean; spawnIssued: number; preparing?: boolean; defeated: Enemy[]; waveQueue: WaveEntry[]; hazards: EnemyHazard[]; poisonWait: Record<string, number>; config: SimConfig; arena: Arena; players: Player[]; enemies: Enemy[]; projectiles: Projectile[]; effects: Effect[]; elapsed: number; clock: number; spawnWait: number; spawned: number; nextId: number; round: number; random: () => number; finished: boolean; success: boolean; presentationOnly: boolean; partySize: number; castHits: Record<string, { ids: string[]; until: number }> }
+export interface Simulation { experienceOrbs: ExperienceOrb[]; waveDirector?: WaveDirector; waveSchedules: WaveSchedule[]; spawnHistory: Vec[]; waveBossPlanned: boolean; spawnIssued: number; preparing?: boolean; defeated: Enemy[]; waveQueue: WaveEntry[]; hazards: EnemyHazard[]; poisonWait: Record<string, number>; config: SimConfig; arena: Arena; players: Player[]; enemies: Enemy[]; projectiles: Projectile[]; effects: Effect[]; elapsed: number; clock: number; spawnWait: number; spawned: number; nextId: number; round: number; random: () => number; finished: boolean; success: boolean; presentationOnly: boolean; partySize: number; castHits: Record<string, { ids: string[]; until: number }> }
 
 export function makePlayer(identity: { id: string; name: string }, config: SimConfig): Player {
   const points = config.character.points;
   const build = { points: { ...points, luck: points.luck ?? 0 }, talents: [] };
   const stats = calculateCharacterStats(build);
-  const maxHp = stats.maxHp; const maxMp = stats.maxMp;
+  const maxHp = stats.maxHp;
   const loadout = defaultEquipment(config);
   const equipment = equipmentRuntime(loadout, config);
-  return { ...identity, hasteLeft: 0, focusLeft: 0, shieldLeft: 0, lootShield: 0, baseStats: { ...stats }, characterRanks: {}, manaRecovery: 5, buildItems: [], buildRevision: 0, level: 1, experience: 0, upgradeCredits: 0, waveCredits: 0, choiceSequence: 0, choices: [], abilityStates: [], loadout, equipment, stats, x: 15, y: 11, facingX: 0, facingY: 1, hp: maxHp, maxHp, mp: maxMp, maxMp, energy: config.heart.capacity, capacity: config.heart.capacity, weaponWait: 0, skillWait: 0, weaponState: '就绪', skillState: '就绪', dashCooldown: 0, blocking: false, connected: true, ready: false, growth: [], kills: 0, damage: 0, blocked: 0, input: { sequence: 0, x: 0, y: 0, block: false, dash: false }, inputAt: 0, dashLeft: 0, dashX: 0, dashY: 1, heartWait: config.heart.interval, sequence: -1, weaponCount: 0, skillCount: 0, clientDriven: false, survivalSeconds: 0, reviveRemaining: 0, assists: 0 };
+  const capacity = heartCapacity(equipment.heartItem, stats.energyCapacityBonus);
+  return { ...identity, guard: { windowLeft: 0, counterLeft: 0, press: 0, held: false, triggered: false }, hasteLeft: 0, focusLeft: 0, shieldLeft: 0, lootShield: 0, baseStats: { ...stats }, characterRanks: {}, energyRecoveryBonus: 0, buildItems: [], buildRevision: 0, level: 1, experience: 0, upgradeCredits: 0, waveCredits: 0, choiceSequence: 0, choices: [], abilityStates: [], loadout, equipment, stats, x: 15, y: 11, facingX: 0, facingY: 1, hp: maxHp, maxHp, energy: capacity, capacity, meleeWait: 0, rangedWait: 0, meleeState: '就绪', rangedState: '就绪', dashCooldown: 0, blocking: false, connected: true, ready: false, growth: [], kills: 0, damage: 0, blocked: 0, input: { sequence: 0, x: 0, y: 0, block: false, dash: false }, inputAt: 0, dashLeft: 0, dashX: 0, dashY: 1, heartWait: config.heart.interval, sequence: -1, meleeCount: 0, rangedCount: 0, clientDriven: false, survivalSeconds: 0, reviveRemaining: 0, assists: 0 };
 }
 
 export function applyEquipment(player: Player, data: { loadout: EquipmentLoadout; config: SimConfig }): void {
   player.loadout = data.loadout;
   player.equipment = equipmentRuntime(data.loadout, data.config);
   player.abilityStates = [];
-  player.capacity = player.equipment.heartItem?.capacity ?? 0;
+  player.capacity = heartCapacity(player.equipment.heartItem, player.stats.energyCapacityBonus);
   player.energy = player.capacity;
-  player.weaponWait = 0; player.skillWait = 0; player.heartWait = player.equipment.heartItem?.interval ?? data.config.heart.interval;
+  player.meleeWait = 0; player.rangedWait = 0; player.heartWait = player.equipment.heartItem?.interval ?? data.config.heart.interval;
 }
 
-export function applyCharacterBuild(player: Player, build: CharacterBuild): void {
-  const stats = calculateCharacterStats(build);
-  player.baseStats = { ...stats }; player.stats = stats; player.maxHp = stats.maxHp; player.hp = stats.maxHp; player.maxMp = stats.maxMp; player.mp = stats.maxMp;
+export function applyCharacterBuild(player: Player, build: CharacterBuild, growth?: CharacterPoints): void {
+  const stats = calculateCharacterStats(build, growth);
+  player.baseStats = { ...stats }; player.stats = stats; player.maxHp = stats.maxHp; player.hp = stats.maxHp; player.capacity = heartCapacity(player.equipment.heartItem, stats.energyCapacityBonus); player.energy = player.capacity;
 }
 
 export function createSimulation(options: { config: SimConfig; arena: Arena; random: () => number }): Simulation {
-  return { ...options, waveSchedules: [], spawnHistory: [], waveBossPlanned: false, spawnIssued: 0, defeated: [], waveQueue: [], hazards: [], poisonWait: {}, players: [], enemies: [], projectiles: [], effects: [], elapsed: 0, clock: 0, spawnWait: 0, spawned: 0, nextId: 0, round: 1, finished: false, success: false, presentationOnly: false, partySize: 1, castHits: {} };
+  return { ...options, experienceOrbs: [], waveSchedules: [], spawnHistory: [], waveBossPlanned: false, spawnIssued: 0, defeated: [], waveQueue: [], hazards: [], poisonWait: {}, players: [], enemies: [], projectiles: [], effects: [], elapsed: 0, clock: 0, spawnWait: 0, spawned: 0, nextId: 0, round: 1, finished: false, success: false, presentationOnly: false, partySize: 1, castHits: {} };
 }
 
 export function waveDefinition(sim: Simulation): WaveDefinition {
@@ -87,7 +107,7 @@ export function beginRound(sim: Simulation, round: number): void {
     sim.players.forEach((player, index) => {
       const spawn = sim.arena.spawns[index % sim.arena.spawns.length];
       player.survivalSeconds = 0; player.x = spawn.x; player.y = spawn.y;
-      player.blocking = false; player.dashLeft = 0;
+      player.blocking = false; player.dashLeft = 0; resetGuard(player);
     });
   }
   planWave(sim);
@@ -96,19 +116,19 @@ export function beginRound(sim: Simulation, round: number): void {
 export function revivePlayer(sim: Simulation, player: Player): void {
   if (sim.finished || player.hp > 0 || player.reviveRemaining > 0 || !player.connected) return;
   const living = sim.players.some(item => item.hp > 0);
-  if (!living) return;
-  player.hp = player.maxHp; player.mp = player.maxMp; player.energy = player.capacity;
+  if (!living && !(sim.preparing && sim.config.expedition)) return;
+  player.hp = player.maxHp; player.energy = player.capacity;
   for (const ability of player.abilityStates) ability.remaining = 0;
-  player.weaponWait = 0; player.skillWait = 0; player.dashLeft = 0; player.blocking = false;
+  player.meleeWait = 0; player.rangedWait = 0; player.dashLeft = 0; player.blocking = false; resetGuard(player);
 }
 
 export function recoverInHall(sim: Simulation): void {
   sim.enemies = []; sim.projectiles = []; sim.effects = []; sim.hazards = []; sim.poisonWait = {};
   for (const player of sim.players) {
-    player.hp = player.maxHp; player.mp = player.maxMp; player.energy = player.capacity; player.banners = undefined;
-    player.weaponWait = 0; player.skillWait = 0; player.heartWait = player.equipment.heartItem?.interval ?? sim.config.heart.interval;
+    player.hp = player.maxHp; player.energy = player.capacity; player.banners = undefined;
+    player.meleeWait = 0; player.rangedWait = 0; player.heartWait = player.equipment.heartItem?.interval ?? sim.config.heart.interval;
     for (const ability of player.abilityStates) ability.remaining = 0; player.dashCooldown = 0;
-    player.blocking = false; player.dashLeft = 0;
+    player.blocking = false; player.dashLeft = 0; resetGuard(player);
   }
 }
 
@@ -145,14 +165,15 @@ function addEffect(sim: Simulation, effect: { targetId?: string; targetKind?: 'p
   if (effect.id && sim.effects.some(item => item.id === effect.id)) return;
   sim.nextId += 1; const id = effect.id ?? `fx-${sim.nextId}`; const ttl = effect.duration ?? 0.3; sim.effects.push({ ...effect, id, ttl });
 }
-function hurtEnemy(sim: Simulation, event: { enemy: Enemy; player?: Player; damage: number; source?: Vec; bypassShield?: boolean; flavor?: string; castId?: string }): void {
+function hurtEnemy(sim: Simulation, event: { counterEligible?: boolean; chainDepth?: number; enemy: Enemy; player?: Player; damage: number; source?: Vec; bypassShield?: boolean; flavor?: string; castId?: string }): void {
   if (event.enemy.hp <= 0 || event.enemy.state === 'detonating') return;
   if (sim.presentationOnly) return;
   const protector = protectedBy(sim, event.enemy);
   const bannerBonus = event.player ? bannerDamage(event.player, event) : 1;
-  let damage = event.damage * bannerBonus * (protector ? .4 : 1);
+  const counter = event.counterEligible === false ? 1 : counterDamage(event.player);
+  let damage = event.damage * bannerBonus * counter * (protector ? .4 : 1);
   const source = event.source ?? event.player;
-  if (event.enemy.definition.behavior === 'shield' && source && !event.bypassShield) {
+  if (enemyShielded(event.enemy) && source && !event.bypassShield) {
     const offset = { x: source.x - event.enemy.x, y: source.y - event.enemy.y }; const direction = unit(offset);
     const front = direction.x * event.enemy.facingX + direction.y * event.enemy.facingY >= 0.5;
     if (front) { damage *= 0.25; const effect = { x: event.enemy.x, y: event.enemy.y, radius: event.enemy.radius + .15, kind: 'shield-hit' }; addEffect(sim, effect); }
@@ -164,17 +185,20 @@ function hurtEnemy(sim: Simulation, event: { enemy: Enemy; player?: Player; dama
     event.enemy.contributors[event.player.id] = sim.clock;
   }
   if (event.enemy.hp <= 0) {
+    event.enemy.killerId = event.player?.id;
     if (event.enemy.definition.behavior === 'bomb') {
       event.enemy.hp = 1; event.enemy.state = 'detonating'; event.enemy.timer = event.enemy.definition.windup;
+      const ability = enemyAbilities(event.enemy); ability.windup = event.enemy.definition.windup;
+      event.enemy.chainDepth = event.chainDepth ?? 0;
       event.enemy.attackCount = (event.enemy.attackCount ?? 0) + 1; event.enemy.killerId = event.player?.id;
       return;
     }
     transferDeathMarks(sim, event.enemy);
-    if (event.player) { event.player.kills += 1; awardCombatGrowth(sim, event.player, true); } event.enemy.state = 'dead';
+    if (event.player) { event.player.kills += 1; awardCombatGrowth(sim, event.player, true); const reward = { enemy: event.enemy, kill: true }; dropCombatExperience(sim, event.player, reward); } event.enemy.state = 'dead';
     if (event.player && !event.enemy.parentId) sim.defeated.push(event.enemy);
     for (const player of sim.players) {
       const contribution = event.enemy.contributors?.[player.id];
-      if (player.id !== event.player?.id && contribution !== undefined && sim.clock - contribution <= 15) { player.assists += 1; awardCombatGrowth(sim, player, false); }
+      if (player.id !== event.player?.id && contribution !== undefined && sim.clock - contribution <= 15) { player.assists += 1; awardCombatGrowth(sim, player, false); const reward = { enemy: event.enemy, kill: false }; dropCombatExperience(sim, player, reward); }
     }
   }
   const offset = { x: event.enemy.x - (source?.x ?? event.enemy.x), y: event.enemy.y - (source?.y ?? event.enemy.y) }; const direction = unit(offset);
@@ -191,7 +215,8 @@ function playerStep(sim: Simulation, player: Player, dt: number): void {
   player.shieldLeft = Math.max(0, player.shieldLeft - dt); if (player.shieldLeft === 0) player.lootShield = 0;
   if (player.hp <= 0) {
     player.blocking = false; player.dashLeft = 0;
-    player.weaponState = '灵魂状态'; player.skillState = '灵魂状态';
+    resetGuard(player);
+    player.meleeState = '灵魂状态'; player.rangedState = '灵魂状态';
     player.reviveRemaining = Math.max(0, player.reviveRemaining - dt);
     const fresh = player.connected && sim.clock - player.inputAt <= 0.6;
     if (fresh && !player.clientDriven) {
@@ -224,45 +249,44 @@ function playerStep(sim: Simulation, player: Player, dt: number): void {
     }
   }
   player.input.dash = false;
-  player.mp = Math.min(player.maxMp, player.mp + player.manaRecovery * dt);
+  stepGuard(player, dt);
   prepareRhythm(sim, player, dt);
   player.heartWait -= dt;
   const heart = player.equipment.heartItem;
   if (heart && player.heartWait <= 0) {
-    const conversion = heartConversion(player); player.heartWait += conversion.interval;
+    const recovery = heartRecovery(player); player.heartWait += recovery.interval;
     const bonus = player.growth.includes('energy') ? 1.25 : 1;
     const resonance = resonanceState(player);
     const extra = heart.effect === 'cycle' ? resonance.energyBoost : 0;
-    const baseRecovery = conversion.amount * bonus + extra; const bannerExtra = bannerRecovery(player, baseRecovery);
+    const baseRecovery = recovery.amount * bonus + extra; const bannerExtra = bannerRecovery(player, baseRecovery);
     const room = player.capacity - player.energy; const baseline = Math.min(baseRecovery, room);
     const amount = Math.min(baseRecovery + bannerExtra, room);
-    const cost = amount / heart.recovery * heart.manaCost * (player.focusLeft > 0 ? .8 : 1);
-    if (amount > 0 && player.mp >= cost) {
-      player.mp -= cost; player.energy += amount; spendBannerRecovery(player, amount - baseline);
+    if (amount > 0) {
+      player.energy += amount; spendBannerRecovery(player, amount - baseline);
       if (extra > 0) resonance.energyBoost = 0;
       if ((resonance.recoveryCharges ?? 0) > 0) resonance.recoveryCharges = (resonance.recoveryCharges ?? 0) - 1;
       const heartId = heart.definitionId ?? heart.id;
       const flavor = heart.effect === 'cycle' ? 'cycle' : heartId.endsWith('/spring') ? 'spring' : heartId.endsWith('/ocean') ? 'ocean' : 'stream';
       const stamp = sim.clock.toFixed(3);
-      const effect = { level: heart.level ?? 1, empowered: extra > 0 || conversion.empowered, id: `recover-${player.id}-${stamp}`, owner: player.id, x: player.x, y: player.y, radius: 1, kind: `ability-recover-${flavor}`, duration: .65 };
+      const effect = { level: heart.level ?? 1, empowered: extra > 0 || recovery.empowered, id: `recover-${player.id}-${stamp}`, owner: player.id, x: player.x, y: player.y, radius: 1, kind: `ability-recover-${flavor}`, duration: .65 };
       if (!sim.presentationOnly) addEffect(sim, effect);
     }
   }
-  for (const kind of ['weapon', 'skill']) {
+  for (const skillType of ['melee', 'ranged']) {
     for (const branch of player.equipment.branches) {
-      if (branch.item.kind !== kind) continue;
+      if (branch.item.skillType !== skillType) continue;
       let state = player.abilityStates.find(item => item.itemId === branch.item.id);
       if (!state) { state = { itemId: branch.item.id, remaining: 0, count: 0, state: '就绪' }; player.abilityStates.push(state); }
       const event = { branch, state, dt };
       abilityStep(sim, player, event);
     }
   }
-  const weapon = player.equipment.branches.find(branch => branch.item.kind === 'weapon');
-  const skill = player.equipment.branches.find(branch => branch.item.kind === 'skill');
-  const weaponState = player.abilityStates.find(item => item.itemId === weapon?.item.id);
-  const skillState = player.abilityStates.find(item => item.itemId === skill?.item.id);
-  player.weaponWait = weaponState?.remaining ?? 0; player.skillWait = skillState?.remaining ?? 0;
-  player.weaponState = weaponState?.state ?? '未装备'; player.skillState = skillState?.state ?? '未装备';
+  const melee = player.equipment.branches.find(branch => branch.item.skillType === 'melee');
+  const skill = player.equipment.branches.find(branch => branch.item.skillType === 'ranged');
+  const meleeState = player.abilityStates.find(item => item.itemId === melee?.item.id);
+  const rangedState = player.abilityStates.find(item => item.itemId === skill?.item.id);
+  player.meleeWait = meleeState?.remaining ?? 0; player.rangedWait = rangedState?.remaining ?? 0;
+  player.meleeState = meleeState?.state ?? '未装备'; player.rangedState = rangedState?.state ?? '未装备';
 }
 
 function starTarget(sim: Simulation, data: { origin: Vec; direction: Vec; range: number; excluded: string[]; reserved: string[]; forwardOnly?: boolean }): Enemy | undefined {
@@ -306,7 +330,7 @@ function abilityStep(sim: Simulation, player: Player, event: { branch: Player['e
   const level = item.level ?? 1; const evolved = level >= 5; const mastery = level >= 10;
   const baseRange = item.effect === 'spear' ? mastery ? 3.6 : evolved ? 3.3 : item.range ?? 3 : item.range ?? 0;
   const sweepReady = item.effect === 'slash' && level >= 15 && progress.landed >= 3;
-  const range = item.kind === 'weapon' ? (baseRange + (sweepReady ? .35 : 0)) * branch.areaMultiplier : baseRange;
+  const range = item.skillType === 'melee' ? (baseRange + (sweepReady ? .35 : 0)) * branch.areaMultiplier : baseRange;
   const array = item.effect === 'sword-array' ? sim.effects.find(effect => effect.kind === 'ability-novel-array' && effect.owner === player.id && effect.sourceId === item.id && effect.ttl > 0) : undefined;
   const target = nearest(sim, array ?? player, array ? 5 : range);
   if (item.effect === 'star-beam' && sim.effects.some(effect => effect.kind === 'ability-novel-beam' && effect.owner === player.id && effect.sourceId === item.id && effect.ttl > 0)) { state.state = '持续施放'; return; }
@@ -318,19 +342,19 @@ function abilityStep(sim: Simulation, player: Player, event: { branch: Player['e
   }
   state.state = player.blocking ? '格挡中' : state.remaining > 0 ? '计时中' : !target ? '无目标' : player.energy < cost ? '等待供能' : '就绪';
   if (!player.equipment.heart || state.state !== '就绪' || !target) return;
-  const weapon = item.kind === 'weapon';
-  const attack = weapon ? player.stats.physicalAttack : player.stats.magicalAttack;
-  const empowered = consumeResonance(player, item.kind);
+  const melee = item.skillType === 'melee';
+  const attack = melee ? player.stats.physicalAttack : player.stats.magicalAttack;
+  const empowered = consumeResonance(player, item.skillType ?? 'ranged');
   const damage = (1 + empowered) * ((item.damage ?? 0) + attack * (item.coefficient ?? 0)) * branch.damageMultiplier * modifiers.damage;
   player.energy -= cost; state.remaining = attackInterval(player, branch, state); state.count += 1; state.state = '已触发';
-  if (weapon) player.weaponCount += 1; else player.skillCount += 1;
+  if (melee) player.meleeCount += 1; else player.rangedCount += 1;
   const id = `${player.id}-${item.id}-${state.count}`;
   const overloaded = modifiers.overloaded; progress.spent = modifiers.saved; commitCast(player, branch, state);
   if (overloaded) progress.overloadCast = state.count;
   const novel = { player, branch, target, damage, id, state, cost }; const novelActions = { hurt: hurtEnemy };
   if (castNovel(sim, novel, novelActions)) return;
   const delta = { x: target.x - player.x, y: target.y - player.y }; const aim = unit(delta);
-  if (weapon) {
+  if (melee) {
     const wind = bannerWind(player); const delay = .12 / wind;
     const pending: Effect = { id: `windup-${id}`, groupId: id, owner: player.id, sourceId: item.id, level, x: player.x, y: player.y, facingX: aim.x, facingY: aim.y, radius: range, damage, kind: 'ability-melee-windup', duration: delay + .1, ttl: delay + .1, delay, melee: { count: state.count, range, empowered, overloaded, target: target.id } };
     sim.effects.push(pending); return;
@@ -348,20 +372,21 @@ function abilityStep(sim: Simulation, player: Player, event: { branch: Player['e
       const selected = starTarget(sim, search); targetId = selected?.id ?? target.id; starTargets.push(targetId);
     }
     const blast = item.effect === 'fireball' ? (mastery ? 2 : 1.5) * branch.areaMultiplier : 0;
-    const projectile: Projectile = { overload: overloaded ? branch.supportLevels.overload : 0, areaLevel: branch.supportLevels.area ?? 0, areaScale: branch.areaMultiplier, level, fork: branch.fork, spread: branch.spread, echo: branch.echo, returnable: item.effect === 'blade' && mastery, originX: player.x, originY: player.y, bounces: item.effect === 'star' ? mastery ? 2 : evolved ? 1 : 0 : 0, sourceId: item.id, resonance: empowered > 0 ? 0 : branch.resonance, empowered: empowered > 0, markDuration: mastery ? 8 : 6, id: `shot-${id}-${index}`, castId: id, effect: item.effect, targetId, travel: 0, x: player.x, y: player.y, owner: player.id, vx, vy, ttl: range / projectileSpeed * (multiple >= 10 && side ? 1.2 : 1), damage: damage * (multiple >= 15 && side ? 1.1 : 1), pierces: item.effect === 'blade' ? mastery ? 4 : evolved ? 3 : 2 : item.effect === 'thunder-seal' && mastery ? 2 : 1, hitIds: [], blast, slow: item.effect === 'frost' ? mastery ? .35 : .25 : 0, slowDuration: mastery ? 3 : 2, bounce: item.effect === 'star' && evolved };
+    const projectile: Projectile = { homing: branch.supportLevels.homing, overload: overloaded ? branch.supportLevels.overload : 0, areaLevel: branch.supportLevels.area ?? 0, areaScale: branch.areaMultiplier, level, fork: branch.fork, spread: branch.spread, echo: branch.echo, returnable: item.effect === 'blade' && mastery, originX: player.x, originY: player.y, bounces: item.effect === 'star' ? mastery ? 2 : evolved ? 1 : 0 : 0, sourceId: item.id, resonance: empowered > 0 ? 0 : branch.resonance, empowered: empowered > 0, markDuration: mastery ? 8 : 6, id: `shot-${id}-${index}`, castId: id, effect: item.effect, targetId, travel: 0, x: player.x, y: player.y, owner: player.id, vx, vy, ttl: range / projectileSpeed * (multiple >= 10 && side ? 1.2 : 1), damage: damage * (multiple >= 15 && side ? 1.1 : 1), pierces: item.effect === 'blade' ? mastery ? 4 : evolved ? 3 : 2 : item.effect === 'thunder-seal' && mastery ? 2 : 1, hitIds: [], blast, slow: item.effect === 'frost' ? mastery ? .35 : .25 : 0, slowDuration: mastery ? 3 : 2, bounce: item.effect === 'star' && evolved };
+    initializeHoming(sim, projectile);
     sim.projectiles.push(projectile);
     const cadence = branch.unleash >= 3 ? 3 : 4;
     if (branch.unleash && (state.count - progress.origin) % cadence === 0) {
       const repeats = branch.unleash >= 5 ? 2 : 1;
       for (let repeat = 1; repeat <= repeats; repeat += 1) {
-        const delayed: Projectile = { ...projectile, id: `${projectile.id}-unleash-${repeat}`, castId: `${id}-unleash-${repeat}`, releaseLevel: branch.unleash, releaseGroup: `${id}-release`, delay: repeat * (branch.unleash >= 15 ? .12 : .18), damage: damage * .45, secondary: true, resonance: 0, overload: 0, areaLevel: 0, fork: 0, spread: 0, echo: 0, returnable: false, hitIds: [] };
+        const delayed: Projectile = { ...projectile, homingTravel: 0, id: `${projectile.id}-unleash-${repeat}`, castId: `${id}-unleash-${repeat}`, targetId: target.id, releaseLevel: branch.unleash, releaseGroup: `${id}-release`, releaseAngle: angle, delay: repeat * (branch.unleash >= 15 ? .12 : .18), damage: damage * .45, secondary: true, resonance: 0, overload: 0, areaLevel: 0, fork: 0, spread: 0, echo: 0, returnable: false, hitIds: [] };
         sim.projectiles.push(delayed);
       }
     }
   }
 }
 
-function executeWeapon(sim: Simulation, player: Player, castEffect: Effect): void {
+function executeMeleeSkill(sim: Simulation, player: Player, castEffect: Effect): void {
   const pending = castEffect.melee; if (!pending) return;
   const branch = player.equipment.branches.find(entry => entry.item.id === castEffect.sourceId);
   const actual = player.abilityStates.find(entry => entry.itemId === castEffect.sourceId);
@@ -373,9 +398,9 @@ function executeWeapon(sim: Simulation, player: Player, castEffect: Effect): voi
   const damage = castEffect.damage ?? 0; const id = castEffect.groupId ?? castEffect.id;
   const sweepReady = item.effect === 'slash' && level >= 15 && progress.landed >= 3;
   const aim = { x: castEffect.facingX ?? 0, y: castEffect.facingY ?? 1 };
-    const sweepWeapon = item.effect === 'slash' || item.effect === 'thunder-staff';
+    const sweepSkill = item.effect === 'slash' || item.effect === 'thunder-staff';
     const finisher = item.effect === 'dual' && evolved && (state.count - progress.origin) % (mastery ? 3 : 4) === 0;
-    const angle = finisher ? mastery ? 120 : 90 : sweepWeapon && evolved ? mastery ? 180 : 150 : item.angle ?? 120;
+    const angle = finisher ? mastery ? 120 : 90 : sweepSkill && evolved ? mastery ? 180 : 150 : item.angle ?? 120;
     const threshold = Math.cos(angle * Math.PI / 360);
     const circle = evolved && item.effect === 'hammer' && (state.count - progress.origin) % (mastery ? 3 : 4) === 0 || item.effect === 'slash' && level >= 20 && sweepReady;
     const staffBoost = progress.staff > 0; progress.staff = 0;
@@ -397,7 +422,7 @@ function executeWeapon(sim: Simulation, player: Player, castEffect: Effect): voi
       if (staffBoost) multiplier *= 1.3;
       if (overloaded && (branch.supportLevels.overload ?? 0) >= 10 && !notified) multiplier *= 1.25;
       if (!notified) {
-        const hit = { kind: 'weapon', sourceId: item.id, resonance: empowered > 0 ? 0 : branch.resonance };
+        const hit = { kind: 'melee', sourceId: item.id, resonance: empowered > 0 ? 0 : branch.resonance };
         recordAbilityHit(player, hit); notified = true;
         if (overloaded) { progress.overload = 0; progress.overloadCast = 0; }
       }
@@ -460,7 +485,7 @@ function stepMelee(sim: Simulation, dt: number, localPlayerId?: string): void {
     if (sim.presentationOnly && localPlayerId && effect.owner !== localPlayerId) continue;
     effect.delay = Math.max(0, (effect.delay ?? 0) - dt); if (effect.delay > 0) continue;
     effect.ttl = 0; const player = sim.players.find(entry => entry.id === effect.owner);
-    if (player) executeWeapon(sim, player, effect);
+    if (player) executeMeleeSkill(sim, player, effect);
   }
 }
 
@@ -485,7 +510,7 @@ function hitProjectile(sim: Simulation, shot: Projectile, data: { enemy: Enemy; 
     if (group.ids.includes(enemy.id) || enemy.hp <= 0 || enemy.state === 'detonating') continue;
     if (group.ids.length === 0) {
       if (shot.overload) { const state = data.player.abilityStates.find(entry => entry.itemId === shot.sourceId); if (state?.progress && shot.castId === `${data.player.id}-${shot.sourceId}-${state.progress.overloadCast}`) { state.progress.overload = 0; state.progress.overloadCast = 0; } }
-      const hit = { kind: 'skill', sourceId: shot.sourceId ?? '', resonance: shot.resonance ?? 0 };
+      const hit = { kind: 'ranged', sourceId: shot.sourceId ?? '', resonance: shot.resonance ?? 0 };
       if (!shot.secondary && !shot.returning) recordAbilityHit(data.player, hit);
     }
     group.ids.push(enemy.id); impacted = true;
@@ -532,10 +557,7 @@ export function enemyBehavior(enemy: Enemy): string {
   return enemy.definition.behavior ?? (enemy.kind === 'swift' ? 'wolf' : enemy.kind === 'elite' ? 'hammer' : 'tree');
 }
 export function enemyAttackArea(enemy: Enemy): { x: number; y: number; radius: number; length: number; width: number } {
-  const behavior = enemyBehavior(enemy);
-  const radius = behavior === 'bomb' ? enemy.definition.reach : behavior === 'hammer' ? 1.25 : enemy.radius + enemy.definition.reach;
-  const length = behavior === 'wolf' ? 4.5 : behavior === 'shield' ? 1.8 : enemy.definition.reach;
-  return { x: enemy.attackX ?? enemy.x, y: enemy.attackY ?? enemy.y, radius, length, width: enemy.radius * 2 + .25 };
+  return enemyCombatArea(enemy);
 }
 function contactDamage(sim: Simulation): void {
   if (sim.presentationOnly) return;
@@ -544,6 +566,8 @@ function contactDamage(sim: Simulation): void {
     let touching: Enemy | undefined;
     for (const enemy of sim.enemies) {
       if (enemy.hp <= 0 || enemy.state === 'detonating' || enemy.state === 'escaped') continue;
+      if (enemy.definition.behavior === 'squirrel' || enemy.definition.behavior === 'protector' || enemy.definition.behavior === 'brood') continue;
+      if (enemy.state !== 'chase') continue;
       const separation = distance(player, enemy);
       if (separation > enemy.radius + .4) continue;
       if (!touching || enemy.definition.damage > touching.definition.damage) touching = enemy;
@@ -558,15 +582,16 @@ function contactDamage(sim: Simulation): void {
 function hurtPlayer(sim: Simulation, player: Player, hit: { source: Vec; damage: number; blockable?: boolean }): void {
   if (sim.presentationOnly || player.hp <= 0) return;
   const delta = { x: hit.source.x - player.x, y: hit.source.y - player.y }; const direction = unit(delta);
-  const guarded = hit.blockable !== false && player.blocking && direction.x * player.facingX + direction.y * player.facingY >= .5;
-  const rawDamage = hit.damage * 100 / (100 + player.stats.physicalDefense) * (guarded ? .3 : 1);
-  const protection = bannerGuard(player, rawDamage); const damage = protection.damage;
+  const rawDamage = hit.damage * 100 / (100 + player.stats.physicalDefense);
+  const guard = guardHit(player, rawDamage);
+  const guarded = guard.kind !== 'hurt';
+  const protection = guard.damage > 0 ? bannerGuard(player, guard.damage) : { damage: 0, absorbed: 0 }; const damage = protection.damage;
   const absorbed = Math.min(player.lootShield, damage); player.lootShield -= absorbed;
   const actual = Math.min(player.hp, damage - absorbed);
   player.hp = Math.max(0, player.hp - actual);
-  if (player.hp === 0) { player.reviveRemaining = sim.config.revivalSeconds ?? 15; player.blocking = false; player.dashLeft = 0; player.weaponState = '灵魂状态'; player.skillState = '灵魂状态'; }
+  if (player.hp === 0) { resetGuard(player); player.reviveRemaining = sim.config.revivalSeconds ?? 15; player.blocking = false; player.dashLeft = 0; player.meleeState = '灵魂状态'; player.rangedState = '灵魂状态'; }
   if (guarded) player.blocked += 1;
-  const effect: Effect = { id: `impact-${sim.nextId + 1}`, ttl: .5, duration: .5, targetId: player.id, targetKind: 'player', damage: actual, absorbed: absorbed + protection.absorbed, killed: player.hp <= 0, facingX: -direction.x, facingY: -direction.y, x: player.x, y: player.y, radius: .5, kind: guarded ? 'block' : actual <= 0 ? 'absorb' : 'hurt' }; addEffect(sim, effect);
+  const effect: Effect = { id: `impact-${sim.nextId + 1}`, ttl: .5, duration: .5, targetId: player.id, targetKind: 'player', damage: actual, absorbed: absorbed + protection.absorbed, killed: player.hp <= 0, facingX: -direction.x, facingY: -direction.y, x: player.x, y: player.y, radius: .5, kind: guarded ? guard.kind : actual <= 0 ? 'absorb' : 'hurt' }; addEffect(sim, effect);
 }
 function segmentDistance(point: Vec, segment: { from: Vec; to: Vec }): number {
   const dx = segment.to.x - segment.from.x; const dy = segment.to.y - segment.from.y; const squared = dx * dx + dy * dy;
@@ -574,23 +599,8 @@ function segmentDistance(point: Vec, segment: { from: Vec; to: Vec }): number {
   const t = clamp(projection, 0, 1); const nearest = { x: segment.from.x + dx * t, y: segment.from.y + dy * t };
   return distance(point, nearest);
 }
-function enemyEffect(sim: Simulation, enemy: Enemy, kind: string): void {
-  const area = enemyAttackArea(enemy);
-  const behavior = enemyBehavior(enemy);
-  const effect = { id: `${enemy.id}-attack-${enemy.attackCount ?? 0}-${kind}`, x: behavior === 'hammer' ? area.x : enemy.x, y: behavior === 'hammer' ? area.y : enemy.y, radius: area.radius, kind, duration: .55, facingX: enemy.facingX, facingY: enemy.facingY };
-  addEffect(sim, effect);
-}
-function beginEnemyAttack(enemy: Enemy, target: Vec): void {
-  const behavior = enemyBehavior(enemy);
-  const delta = { x: target.x - enemy.x, y: target.y - enemy.y }; const aim = unit(delta);
-  enemy.facingX = aim.x; enemy.facingY = aim.y;
-  enemy.state = behavior === 'bomb' ? 'detonating' : 'windup'; enemy.timer = enemy.definition.windup;
-  enemy.originX = enemy.x; enemy.originY = enemy.y; enemy.attackCount = (enemy.attackCount ?? 0) + 1; enemy.hitIds = [];
-  const separation = length(delta); const offset = Math.min(separation, enemy.definition.reach);
-  enemy.attackX = enemy.x + aim.x * offset; enemy.attackY = enemy.y + aim.y * offset;
-}
 function explodeEnemy(sim: Simulation, enemy: Enemy): void {
-  enemyEffect(sim, enemy, 'enemy-blast');
+  const effect = { id: `${enemy.id}-explosion-${enemy.attackCount}`, x: enemy.x, y: enemy.y, radius: enemy.definition.reach, kind: 'enemy-blast', duration: .55 }; addEffect(sim, effect);
   if (!sim.presentationOnly) {
     const area = enemyAttackArea(enemy);
     const owner = sim.players.find(player => player.id === enemy.killerId);
@@ -600,131 +610,42 @@ function explodeEnemy(sim: Simulation, enemy: Enemy): void {
     }
     for (const victim of sim.enemies) {
       if (victim === enemy || victim.hp <= 0) continue;
+      if (victim.definition.behavior === 'bomb' && (enemy.chainDepth ?? 0) >= 2) continue;
       const separation = distance(victim, enemy);
-      if (separation <= area.radius + victim.radius) { const hit = { enemy: victim, player: owner, damage: enemy.definition.damage * 3, source: enemy, bypassShield: true }; hurtEnemy(sim, hit); }
+      if (separation <= area.radius + victim.radius) { const hit = { counterEligible: false, enemy: victim, player: owner, damage: enemy.definition.damage * 3, source: enemy, bypassShield: true, chainDepth: (enemy.chainDepth ?? 0) + 1 }; hurtEnemy(sim, hit); }
     }
-    if (owner) { owner.kills += 1; awardCombatGrowth(sim, owner, true); if (!enemy.parentId) sim.defeated.push(enemy); }
+    if (owner) { owner.kills += 1; awardCombatGrowth(sim, owner, true); const reward = { enemy, kill: true }; dropCombatExperience(sim, owner, reward); if (!enemy.parentId) sim.defeated.push(enemy); }
     for (const player of sim.players) {
       const contribution = enemy.contributors?.[player.id];
-      if (player !== owner && contribution !== undefined && sim.clock - contribution <= 15) { player.assists += 1; awardCombatGrowth(sim, player, false); }
+      if (player !== owner && contribution !== undefined && sim.clock - contribution <= 15) { player.assists += 1; awardCombatGrowth(sim, player, false); const reward = { enemy, kill: false }; dropCombatExperience(sim, player, reward); }
     }
     enemy.hp = 0; transferDeathMarks(sim, enemy);
   }
   enemy.state = 'spent';
 }
-function executeEnemyAttack(sim: Simulation, enemy: Enemy): void {
-  const behavior = enemyBehavior(enemy); const area = enemyAttackArea(enemy);
-  if (behavior === 'wolf' || behavior === 'shield') { enemy.state = 'charge'; enemy.timer = area.length / (behavior === 'wolf' ? 10 : 6); return; }
-  if (behavior === 'archer') {
-    const count = enemy.definition.rank === 'boss' ? 5 : enemy.definition.rank === 'elite' ? 3 : 1;
-    const angle = Math.atan2(enemy.facingY, enemy.facingX);
-    for (let index = 0; index < count; index += 1) {
-      const direction = angle + (index - (count - 1) / 2) * .22; const dx = Math.cos(direction); const dy = Math.sin(direction);
-      const shot = { id: `${enemy.id}-arrow-${enemy.attackCount}-${index}`, owner: enemy.id, hostile: true, x: enemy.x + dx * enemy.radius, y: enemy.y + dy * enemy.radius, vx: dx * 8, vy: dy * 8, ttl: enemy.definition.reach / 8, damage: enemy.definition.damage };
-      sim.projectiles.push(shot);
-    }
-    enemyEffect(sim, enemy, 'enemy-shot');
-  } else {
-    const center = behavior === 'hammer' ? { x: area.x, y: area.y } : enemy;
-    for (const player of sim.players) {
-      const separation = distance(player, center); const delta = { x: player.x - enemy.x, y: player.y - enemy.y }; const aim = unit(delta);
-      const inSector = behavior === 'hammer' || aim.x * enemy.facingX + aim.y * enemy.facingY >= .5;
-      if (separation <= area.radius + .4 && inSector) { const hit = { source: enemy, damage: enemy.definition.damage }; hurtPlayer(sim, player, hit); }
-    }
-    const kind = behavior === 'hammer' ? 'enemy-smash' : 'enemy-sweep'; enemyEffect(sim, enemy, kind);
-  }
-  enemy.state = 'recovery'; enemy.timer = enemy.definition.recovery;
-}
-function chargeEnemy(sim: Simulation, enemy: Enemy, dt: number): void {
-  const behavior = enemyBehavior(enemy); const speed = behavior === 'wolf' ? 10 : 6; const duration = Math.min(dt, enemy.timer);
-  const from = { x: enemy.x, y: enemy.y };
-  const destination = { x: enemy.x + enemy.facingX * speed * duration, y: enemy.y + enemy.facingY * speed * duration };
-  const allowed = legal(sim.arena, destination, enemy.radius);
-  if (allowed) { enemy.x = destination.x; enemy.y = destination.y; }
-  const segment = { from, to: enemy }; const area = enemyAttackArea(enemy);
-  enemy.hitIds ??= [];
-  for (const player of sim.players) {
-    if (enemy.hitIds.includes(player.id)) continue;
-    const separation = segmentDistance(player, segment);
-    if (separation <= area.width / 2 + .4) {
-      enemy.hitIds.push(player.id);
-      const source = { x: player.x - enemy.facingX, y: player.y - enemy.facingY };
-      const hit = { source, damage: enemy.definition.damage }; hurtPlayer(sim, player, hit);
-    }
-  }
-  enemy.timer -= dt;
-  if (enemy.timer <= 0 || (from.x === enemy.x && from.y === enemy.y)) {
-    const kind = behavior === 'wolf' ? 'enemy-claw' : 'enemy-shield'; enemyEffect(sim, enemy, kind);
-    enemy.state = 'recovery'; enemy.timer = enemy.definition.recovery;
-  }
-}
 function enemyStep(sim: Simulation, enemy: Enemy, dt: number): void {
   if (enemy.hp <= 0 || enemy.state === 'spent' || enemy.state === 'escaped') return;
-  const tactic = { dt, actions: enemyActions }; const handled = stepEnemyTactic(sim, enemy, tactic); if (handled) return;
-  const definition = enemy.definition; const behavior = enemyBehavior(enemy);
-  if (enemy.state === 'detonating') { enemy.timer -= dt; if (enemy.timer <= 0) explodeEnemy(sim, enemy); return; }
-  if (enemy.state === 'windup') { enemy.timer -= dt; if (enemy.timer <= 0) executeEnemyAttack(sim, enemy); return; }
-  if (enemy.state === 'charge') { chargeEnemy(sim, enemy, dt); return; }
-  if (enemy.state === 'retreat') {
-    const duration = Math.min(dt, enemy.timer);
-    const movement = { x: -enemy.facingX * definition.speed * duration, y: -enemy.facingY * definition.speed * duration, radius: enemy.radius };
-    move(sim, enemy, movement); enemy.timer -= dt;
-    if (enemy.timer <= 0) enemy.state = 'chase';
-    return;
-  }
-  let target = sim.players.find(player => player.id === enemy.targetId && player.hp > 0);
-  if (!target) {
-    let limit = Infinity;
-    for (const player of sim.players) { if (player.hp <= 0) continue; const separation = distance(enemy, player); if (separation < limit || (separation === limit && player.id < (target?.id ?? '~'))) { target = player; limit = separation; } }
-    enemy.targetId = target?.id ?? '';
-  }
-  if (enemy.state === 'recovery') {
-    enemy.timer -= dt;
-    if (enemy.timer > 0) return;
-    if (behavior === 'archer' && target) {
-      const separation = distance(enemy, target);
-      if (separation < 3) { enemy.state = 'retreat'; enemy.timer = .6; return; }
-    }
-    const comboLimit = definition.rank === 'boss' ? 2 : definition.rank === 'elite' ? 1 : 0;
-    if (target && (behavior === 'wolf' || behavior === 'tree' || behavior === 'hammer') && (enemy.combo ?? 0) < comboLimit) {
-      enemy.combo = (enemy.combo ?? 0) + 1; beginEnemyAttack(enemy, target); return;
-    }
-    enemy.combo = 0; enemy.state = 'chase';
-  }
-  if (!target) { enemy.state = 'seek'; return; }
-  const delta = { x: target.x - enemy.x, y: target.y - enemy.y }; const aim = unit(delta); const separation = length(delta);
-  if (behavior === 'shield') {
-    const current = Math.atan2(enemy.facingY, enemy.facingX); const desired = Math.atan2(aim.y, aim.x);
-    const difference = desired - current; const sine = Math.sin(difference); const cosine = Math.cos(difference); const wrapped = Math.atan2(sine, cosine);
-    const turn = clamp(wrapped, -dt * 1.4, dt * 1.4); const angle = current + turn;
-    enemy.facingX = Math.cos(angle); enemy.facingY = Math.sin(angle);
-  } else { enemy.facingX = aim.x; enemy.facingY = aim.y; }
-  const trigger = behavior === 'wolf' ? 4.3 : behavior === 'shield' ? 2.2 : behavior === 'bomb' ? 1.8 : definition.reach + enemy.radius + .4;
-  const aligned = behavior !== 'shield' || enemy.facingX * aim.x + enemy.facingY * aim.y > .93;
-  if (separation <= trigger && aligned) {
-    const crowded = sim.enemies.some(other => {
-      if (other === enemy || (other.state !== 'windup' && other.state !== 'charge')) return false;
-      const nearby = distance(other, enemy); return nearby < 2.5;
-    });
-    if (!crowded || behavior === 'bomb') { beginEnemyAttack(enemy, target); return; }
-  }
-  enemy.state = 'chase';
-  const slow = (enemy.slowUntil ?? 0) > sim.clock ? 1 - (enemy.slowFactor ?? 0) : 1;
-  const movement = { x: enemy.facingX * definition.speed * dt * slow, y: enemy.facingY * definition.speed * dt * slow, radius: enemy.radius };
-  if (behavior === 'archer' && separation <= definition.reach) return;
-  const previous = { x: enemy.x, y: enemy.y }; move(sim, enemy, movement);
-  if (previous.x === enemy.x && previous.y === enemy.y) {
-    const side = { x: -aim.y * definition.speed * dt * slow, y: aim.x * definition.speed * dt * slow, radius: enemy.radius }; move(sim, enemy, side);
-  }
+  if (enemy.expiresAt !== undefined && sim.clock >= enemy.expiresAt) { enemy.hp = 0; enemy.state = 'escaped'; return; }
+  const context = { dt, actions: enemyActions };
+  const handled = stepEnemyTactic(sim, enemy, context);
+  if (!handled) stepEnemyCombat(sim, enemy, context);
 }
-const enemyActions: EnemyActions = { move, legal, hurt: hurtPlayer, effect: addEffect };
+const enemyActions: EnemyActions = { move, legal, hurt: hurtPlayer, effect: addEffect, detonate: explodeEnemy };
 
 export function step(sim: Simulation, dt: number, localPlayerId?: string): void {
-  if (sim.finished) return;
-  if (sim.preparing) {
-    sim.effects = sim.effects.filter(effect => !effect.banner && !effect.melee);
+  if (sim.finished) {
+    settleClaimedExperience(sim);
+    sim.effects = sim.effects.filter(effect => !effect.kind.startsWith('banner-'));
     for (const player of sim.players) player.banners = undefined;
-    if (!sim.presentationOnly && sim.players.every(player => player.hp <= 0)) { sim.finished = true; sim.success = false; return; }
+    return;
+  }
+  if (sim.preparing) {
+    sim.clock += dt; stepExperience(sim);
+    for (const effect of sim.effects) if (effect.kind === 'experience-absorb') effect.ttl -= dt;
+    sim.effects = sim.effects.filter(effect => effect.ttl > 0);
+    sim.effects = sim.effects.filter(effect => !effect.kind.startsWith('banner-') && !effect.melee);
+    for (const player of sim.players) player.banners = undefined;
+    if (!sim.presentationOnly && !sim.config.expedition && sim.players.every(player => player.hp <= 0)) { settleClaimedExperience(sim); sim.finished = true; sim.success = false; return; }
     for (const player of sim.players) {
       if (player.hp <= 0) player.reviveRemaining = Math.max(0, player.reviveRemaining - dt);
       const fresh = player.connected && sim.clock - player.inputAt <= .6;
@@ -734,16 +655,21 @@ export function step(sim: Simulation, dt: number, localPlayerId?: string): void 
         move(sim, player, movement);
         if (direction.x || direction.y) { player.facingX = direction.x; player.facingY = direction.y; }
       }
-      player.input.dash = false; player.blocking = false;
+      player.input.dash = false; player.blocking = false; stepGuard(player, dt);
     }
     return;
   }
   if (!sim.presentationOnly) {
     const wiped = sim.players.every(player => player.hp <= 0);
-    if (wiped) { sim.finished = true; sim.success = false; return; }
+    if (wiped) { settleClaimedExperience(sim); sim.finished = true; sim.success = false; return; }
     for (const player of sim.players) player.survivalSeconds += dt;
   }
   sim.elapsed += dt; sim.clock += dt;
+  const timedWave = expeditionWave(sim.config, sim.round);
+  if (!sim.presentationOnly && sim.config.expedition && timedWave && sim.elapsed >= timedWave.interval) {
+    sim.elapsed = timedWave.interval; clearExpeditionCombat(sim); return;
+  }
+  stepExperience(sim);
   const spawnActions = { legal }; spawnWaveBatch(sim, spawnActions);
   stepBanners(sim, dt, localPlayerId);
   for (const player of sim.players) {
@@ -758,32 +684,55 @@ export function step(sim: Simulation, dt: number, localPlayerId?: string): void 
   if (!sim.presentationOnly) contactDamage(sim);
   if (!sim.presentationOnly) {
     const wiped = sim.players.every(player => player.hp <= 0);
-    if (wiped) { sim.finished = true; sim.success = false; return; }
+    if (wiped) { settleClaimedExperience(sim); sim.finished = true; sim.success = false; return; }
   }
   let grid = collisionGrids.get(sim);
   if (!grid) { grid = new SpatialEnemies(); collisionGrids.set(sim, grid); }
-  if (!sim.presentationOnly) grid.rebuild(sim.enemies);
+  const homingActive = sim.projectiles.some(shot => (shot.homing ?? 0) > 0);
+  if (!sim.presentationOnly || homingActive) grid.rebuild(sim.enemies);
   const projectilesAtStart = sim.projectiles.length;
+  const releaseTargets = new Map<string, Enemy | undefined>();
   for (let shotIndex = 0; shotIndex < projectilesAtStart; shotIndex += 1) {
     const shot = sim.projectiles[shotIndex];
     if (shot.ttl <= 0) continue;
     if ((shot.delay ?? 0) > 0) {
       const owner = sim.players.find(player => player.id === shot.owner);
-      if (!owner || owner.hp <= 0 || !owner.equipment.branches.some(branch => branch.item.id === shot.sourceId)) { shot.ttl = 0; continue; }
+      const branch = owner?.equipment.branches.find(entry => entry.item.id === shot.sourceId);
+      if (!owner || owner.hp <= 0 || !branch) { shot.ttl = 0; continue; }
       shot.delay = Math.max(0, (shot.delay ?? 0) - dt); if (shot.delay > 0) continue;
       shot.x = owner.x; shot.y = owner.y;
-      if ((shot.releaseLevel ?? 0) >= 10) {
-        const key = shot.releaseGroup ?? shot.id; const selected = sim.castHits[key]?.ids[0];
-        const locked = (shot.releaseLevel ?? 0) >= 20 ? sim.enemies.find(enemy => enemy.id === selected && enemy.hp > 0) : undefined;
-        const target = locked ?? nearest(sim, owner, 9);
-        if (target) {
-          sim.castHits[key] = { ids: [target.id], until: sim.clock + 8 }; shot.targetId = target.id;
-          const direction = { x: target.x - owner.x, y: target.y - owner.y }; const aim = unit(direction); const speed = Math.hypot(shot.vx, shot.vy); shot.vx = aim.x * speed; shot.vy = aim.y * speed;
+      if (shot.releaseLevel) {
+        const batch = shot.castId ?? shot.id; const key = shot.releaseGroup ?? batch;
+        if (!releaseTargets.has(batch)) {
+          const selected = shot.releaseLevel >= 20 ? sim.castHits[key]?.ids[0] ?? shot.targetId : shot.targetId;
+          const range = branch.item.range ?? 9;
+          let target = sim.enemies.find(enemy => {
+            if (enemy.id !== selected || enemy.hp <= 0 || enemy.state === 'detonating' || enemy.state === 'escaped') return false;
+            const separation = distance(enemy, owner); return separation <= range;
+          });
+          if (!target && shot.releaseLevel >= 10) target = nearest(sim, owner, range);
+          releaseTargets.set(batch, target);
+          if (target && shot.releaseLevel >= 20) sim.castHits[key] = { ids: [target.id], until: sim.clock + 8 };
         }
+        const target = releaseTargets.get(batch);
+        if (!target) { shot.ttl = 0; continue; }
+        shot.targetId = target.id;
+        const angle = Math.atan2(target.y - owner.y, target.x - owner.x) + (shot.releaseAngle ?? 0);
+        const speed = Math.hypot(shot.vx, shot.vy);
+        shot.vx = Math.cos(angle) * speed; shot.vy = Math.sin(angle) * speed;
+        initializeHoming(sim, shot);
       }
     }
     bannerFlight(sim, shot);
     if (shot.effect === 'star') guideStar(sim, shot, dt);
+    if (shot.homing && !shot.returning && !shot.hostile) {
+      const settings = homingStats(shot.homing);
+      const lower = { x: shot.x - settings.range, y: shot.y - settings.range };
+      const upper = { x: shot.x + settings.range, y: shot.y + settings.range };
+      const candidates = grid.segment(lower, upper);
+      const guidance = { dt, candidates };
+      guideHoming(sim, shot, guidance);
+    }
     let flight = Math.min(dt, shot.ttl);
     if (shot.returning) {
       const owner = sim.players.find(player => player.id === shot.owner);
@@ -834,7 +783,11 @@ export function step(sim: Simulation, dt: number, localPlayerId?: string): void 
     }
   }
   for (const shot of sim.projectiles) returnProjectile(shot);
-  if (!sim.presentationOnly) { const evolutionActions = { hurt: hurtEnemy }; stepEvolution(sim, dt, evolutionActions); stepNovel(sim, dt, evolutionActions); }
+  if (!sim.presentationOnly) {
+    const bannerActions = { hurt: hurtEnemy, legal, segmentDistance, enemies: grid };
+    stepBannerCombat(sim, dt, bannerActions);
+    const evolutionActions = { hurt: hurtEnemy }; stepEvolution(sim, dt, evolutionActions); stepNovel(sim, dt, evolutionActions);
+  }
   for (const enemy of sim.enemies) {
     for (const owner of Object.keys(enemy.thunderResiduals ?? {})) { if (enemy.thunderResiduals) enemy.thunderResiduals[owner] = Math.max(0, enemy.thunderResiduals[owner] - dt); }
     for (const [owner, mark] of Object.entries(enemy.thunderMarks ?? {})) {
@@ -851,7 +804,7 @@ export function step(sim: Simulation, dt: number, localPlayerId?: string): void 
   sim.effects = sim.effects.filter(effect => effect.ttl > 0);
   if (sim.presentationOnly) return;
   const wiped = sim.players.every(player => player.hp <= 0);
-  if (wiped) { sim.finished = true; sim.success = false; }
+  if (wiped) { settleClaimedExperience(sim); sim.finished = true; sim.success = false; }
 }
 
 

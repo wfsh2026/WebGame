@@ -1,0 +1,2 @@
+ALTER TABLE "ShopPurchase" ADD COLUMN "tabId" TEXT;
+ALTER TABLE "ShopRefresh" ADD COLUMN "tabId" TEXT;

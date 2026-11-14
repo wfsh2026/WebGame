@@ -2,7 +2,7 @@
   "id": "forest-survival:support/knockback",
   "kind": "support",
   "name": "震退",
-  "host": "weapon",
+  "host": "melee",
   "effect": "knockback",
   "description": "近战命中击退，首领免疫；目标共用击退间隔。3/5/10/15/20级解锁阶段效果，详情见成长路线。"
 }

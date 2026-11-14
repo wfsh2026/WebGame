@@ -3,6 +3,6 @@
   "kind": "support",
   "name": "延续",
   "effect": "duration",
-  "host": "skill",
+  "host": "ranged",
   "description": "战旗持续时间增加30%，耗能增加20%；升级提高持续收益，10级结束时增加1秒衰减退场，20级退场2秒。"
 }

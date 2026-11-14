@@ -1,5 +1,5 @@
 import type { BuildStateData, PlayerView } from '@web-game-world/contracts';
-import { trainBuildItem, applyCharacterGrowth, buildCatalog, characterGrowthRewards, equipmentRuntime, fitLoadout, makePlayer } from '@web-game-world/simulation';
+import { heartCapacity, trainBuildItem, applyCharacterGrowth, buildCatalog, characterGrowthRewards, equipmentRuntime, fitBuildLoadout, makePlayer, equippedIds } from '@web-game-world/simulation';
 import content from '../network/content';
 
 export interface PendingGrowth { choiceId: number; index: number; confirmed: boolean }
@@ -7,6 +7,8 @@ export function predictGrowth(state: BuildStateData, view: PlayerView | undefine
   const choice = state.choices.find(item => item.id === request.choiceId);
   const option = choice?.options[request.index];
   if (!choice || choice.source !== 'level' || !option) return { state, player: view };
+  const equipped = equippedIds(state.loadout);
+  if (option.kind === 'upgrade' && !equipped.includes(option.itemId)) return { state, player: view };
   const next = { ...state, characterRanks: { ...state.characterRanks }, items: state.items.map(item => ({ ...item })), choices: state.choices.filter(item => item.id !== choice.id), upgradeCredits: state.upgradeCredits - 1 };
   const catalog = buildCatalog(content, next.items);
   const item = catalog.find(entry => entry.id === option.itemId);
@@ -28,18 +30,18 @@ export function predictGrowth(state: BuildStateData, view: PlayerView | undefine
       const identity = { id: view.id, name: view.name }; const model = makePlayer(identity, content);
       Object.assign(model, view); model.stats = { ...view.stats }; model.baseStats = { ...view.stats }; model.characterRanks = { ...state.characterRanks };
       for (const entry of characterGrowthRewards) {
-        if (entry.stat === 'manaRecovery') continue;
+        if (entry.stat === 'energyRecoveryBonus') continue;
         const applied = state.characterRanks[entry.id] ?? 0;
         model.baseStats[entry.stat] = entry.percent ? view.stats[entry.stat] / (1 + applied * entry.amount) : view.stats[entry.stat] - applied * entry.amount;
       }
       applyCharacterGrowth(model, character);
-      player = { ...view, stats: model.stats, maxHp: model.maxHp, hp: model.hp, manaRecovery: model.manaRecovery };
+      player = { ...view, stats: model.stats, maxHp: model.maxHp, hp: model.hp, energyRecoveryBonus: model.energyRecoveryBonus };
     }
   }
-  const upgraded = buildCatalog(content, next.items); next.loadout = fitLoadout(next.loadout, upgraded);
+  const upgraded = buildCatalog(content, next.items); next.loadout = fitBuildLoadout(next.loadout, upgraded);
   if (player) {
     const equipment = equipmentRuntime(next.loadout, content, next.items);
-    const capacity = equipment.heartItem?.capacity ?? 0; const energy = Math.min(player.energy, capacity);
+    const capacity = heartCapacity(equipment.heartItem, player.stats?.energyCapacityBonus ?? 0); const energy = Math.min(player.energy, capacity);
     player = { ...player, buildItems: next.items, loadout: next.loadout, capacity, energy, buildRevision: (player.buildRevision ?? 0) + 1 };
   }
   return { state: next, player };

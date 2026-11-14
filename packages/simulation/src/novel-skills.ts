@@ -2,6 +2,7 @@ import { abilityProgress } from './combat-rhythm';
 import type { Effect, Enemy, Player, Simulation, Vec, AbilityState, Projectile } from './index';
 import { recordAbilityHit } from './resonance';
 import { aftershock } from './skill-evolution';
+import { initializeHoming } from './homing';
 
 type Branch = Player['equipment']['branches'][number];
 interface Actions { hurt: (sim: Simulation, hit: { enemy: Enemy; player?: Player; damage: number; source?: Vec; bypassShield?: boolean; flavor?: string; castId?: string }) => void }
@@ -18,7 +19,7 @@ function hit(sim: Simulation, data: { enemy: Enemy; player: Player; effect: Effe
     sim.castHits[groupId] = { ids: [], until: sim.clock + 12 };
     const state = player.abilityStates.find(entry => entry.itemId === effect.sourceId);
     if (state) { const progress = abilityProgress(state); progress.overload = 0; progress.overloadCast = 0; }
-    const notice = { kind: 'skill', sourceId: effect.sourceId ?? '', resonance: effect.resonancePower ?? 0 }; recordAbilityHit(player, notice);
+    const notice = { kind: 'ranged', sourceId: effect.sourceId ?? '', resonance: effect.resonancePower ?? 0 }; recordAbilityHit(player, notice);
   }
   const event = { enemy, player, damage, source: effect, bypassShield: true, flavor: effect.kind, castId: effect.groupId ?? effect.id }; actions.hurt(sim, event);
 }
@@ -62,7 +63,8 @@ export function castNovel(sim: Simulation, data: Cast, actions: Actions): boolea
       const angle = Math.atan2(victim.y - array.y, victim.x - array.x); const count = branch.projectiles + (closing ? 2 : 0);
       for (let index = 0; index < count; index += 1) {
         const heading = angle + (index - (count - 1) / 2) * .2; const vx = Math.cos(heading) * 13; const vy = Math.sin(heading) * 13;
-        const shot: Projectile = { id: `${id}-${targetIndex}-${index}`, castId: id, sourceId: item.id, owner: player.id, effect: 'spirit-sword', x: array.x, y: array.y, vx, vy, ttl: .6, damage: damage * (targets.length > 1 ? .7 : 1) * (closing ? .7 : 1), level, fork: branch.fork, pierces: 1, hitIds: [], resonance: branch.resonance }; sim.projectiles.push(shot);
+        const shot: Projectile = { homing: branch.supportLevels.homing, targetId: victim.id, id: `${id}-${targetIndex}-${index}`, castId: id, sourceId: item.id, owner: player.id, effect: 'spirit-sword', x: array.x, y: array.y, vx, vy, ttl: .6, damage: damage * (targets.length > 1 ? .7 : 1) * (closing ? .7 : 1), level, fork: branch.fork, pierces: 1, hitIds: [], resonance: branch.resonance };
+        initializeHoming(sim, shot); sim.projectiles.push(shot);
       }
     }
   } else {
@@ -105,10 +107,18 @@ export function stepNovel(sim: Simulation, dt: number, actions: Actions): void {
       effect.x = player.x; effect.y = player.y; effect.tick = (effect.tick ?? 0) - dt; if (effect.tick > 0) continue;
       if (player.blocking) { effect.ttl = 0; continue; }
       const pulse = effect.pulses ?? 0; if (pulse >= 5) continue;
-      if (pulse > 0) { const cost = effect.paidCost ?? 0; if (player.energy < cost) { effect.ttl = 0; continue; } player.energy -= cost; }
+      if (pulse > 0) { const cost = (effect.paidCost ?? 0) * (player.focusLeft > 0 ? .8 : 1); if (player.energy < cost) { effect.ttl = 0; continue; } player.energy -= cost; }
       effect.tick = .25; effect.pulses = pulse + 1;
       const previous = sim.enemies.find(enemy => enemy.id === effect.targetId && living(enemy));
-      if (!previous && level >= 15) { const next = sim.enemies.find(enemy => living(enemy) && distance(enemy, player) <= effect.radius); if (next) { const rawLength = distance(player, next); const length = Math.max(.01, rawLength); effect.targetId = next.id; effect.facingX = (next.x - player.x) / length; effect.facingY = (next.y - player.y) / length; } }
+      let target = previous;
+      if (!target && level >= 15) target = sim.enemies.find(enemy => living(enemy) && distance(enemy, player) <= effect.radius);
+      if (target) {
+        const rawLength = distance(player, target);
+        if (rawLength > .001 && rawLength <= effect.radius) {
+          effect.targetId = target.id;
+          effect.facingX = (target.x - player.x) / rawLength; effect.facingY = (target.y - player.y) / rawLength;
+        }
+      }
       for (const enemy of sim.enemies) {
         if (!living(enemy)) continue;
         const x = enemy.x - player.x; const y = enemy.y - player.y; const along = x * (effect.facingX ?? 1) + y * (effect.facingY ?? 0); const across = Math.abs(x * (effect.facingY ?? 0) - y * (effect.facingX ?? 1));

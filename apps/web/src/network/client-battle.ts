@@ -14,6 +14,9 @@ export class ClientBattle {
   submitted = new Map<number, Simulation['players']>();
   private clock = 0;
   private round = 0;
+  private compositionRevision = '';
+  private coverageRevision = '';
+  private scheduleRevision = '';
   private enemies = new Set<string>();
   private builds = new Map<string, number>();
   private defeated = new Map<string, Enemy>();
@@ -30,6 +33,7 @@ export class ClientBattle {
       this.round = raw.state.round;
       this.pending = { ...raw, owner: raw.owner, ack };
       this.owner = raw.owner; this.epoch = raw.epoch; this.sequence = 0; this.builds.clear(); this.enemies.clear();
+      this.compositionRevision = ''; this.coverageRevision = ''; this.scheduleRevision = '';
       this.deathsSent.clear(); this.inputs = [];
     });
     room.onMessage('battle-input', (raw: unknown) => {
@@ -73,6 +77,13 @@ export class ClientBattle {
     const players = structuredClone(sim.players); this.submitted.set(this.sequence, players);
     for (const key of this.submitted.keys()) if (key < this.sequence - 20) this.submitted.delete(key);
     const full = battleState(sim);
+    const director = full.waveDirector;
+    const compositionRevision = director ? `${sim.round}:${director.seed}:${director.current?.signature}:${director.next?.signature}` : '';
+    const coverageRevision = director ? JSON.stringify(director.seen) ?? '' : '';
+    const scheduleRevision = JSON.stringify(full.waveSchedules) ?? '';
+    const waveDirector = compositionRevision !== this.compositionRevision ? director : coverageRevision !== this.coverageRevision ? { seen: director?.seen } : undefined;
+    const waveSchedules = scheduleRevision !== this.scheduleRevision ? full.waveSchedules : undefined;
+    this.compositionRevision = compositionRevision; this.coverageRevision = coverageRevision; this.scheduleRevision = scheduleRevision;
     for (const enemy of sim.defeated) this.defeated.set(enemy.id, enemy);
     const defeated = [...this.defeated.values()]; const deathIds = defeated.map(enemy => enemy.id);
     this.deathsSent.set(this.sequence, deathIds);
@@ -87,7 +98,7 @@ export class ClientBattle {
       const { definition, ...moving } = enemy; return moving;
     });
     this.enemies.clear(); for (const enemy of sim.enemies) this.enemies.add(enemy.id);
-    const state = { ...full, players: moving, enemies, defeated }; const packet = { epoch: this.epoch, sequence: this.sequence, state };
+    const state = { ...full, waveDirector, waveSchedules, players: moving, enemies, defeated }; const packet = { epoch: this.epoch, sequence: this.sequence, state };
     this.room.send('battle-frame', packet);
     sim.defeated = [];
     for (const player of sim.players) { player.growthNotices = []; player.fusionNotices = []; }

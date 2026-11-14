@@ -1,10 +1,12 @@
-import { equipmentCatalog, grantBuildItem } from '@web-game-world/simulation';
+import { expeditionDifficulties, expeditionFloor } from '@web-game-world/simulation';
+import { canCollectDrop, equipmentCatalog, grantBuildItem } from '@web-game-world/simulation';
+import { waveProfile } from '@web-game-world/simulation';
 import type { Enemy, EquipmentItem, Player, Simulation } from '@web-game-world/simulation';
 import type { LootItemData, LootPickupData, LootStateData } from '@web-game-world/contracts';
 
 const consumables = [
   { id: 'life', name: '生命精华', weight: 35 }, { id: 'energy', name: '灵力结晶', weight: 25 },
-  { id: 'mana', name: '魔法露滴', weight: 20 }, { id: 'haste', name: '疾行果实', weight: 8 },
+  { id: 'mana', name: '灵力露滴', weight: 20 }, { id: 'haste', name: '疾行果实', weight: 8 },
   { id: 'shield', name: '护身符', weight: 7 }, { id: 'focus', name: '聚灵符', weight: 5 }
 ];
 const mechanism: Record<string, number[]> = { tree: [1, 1, 1], wolf: [1.1, 1.1, 1.1], archer: [1, 1.15, 1.15], bomb: [1.2, 1, 1.1], shield: [1.1, 1.25, 1.2], hammer: [1.2, 1.35, 1.3], sower: [1.1, 1.3, 1.4], protector: [1.1, 1.4, 1.4], brood: [1.1, 1.4, 1.4], moth: [1.1, 1.35, 1.4] };
@@ -13,6 +15,7 @@ export class GroundLoot {
   ground: LootItemData[] = [];
   pockets = new Map<string, LootStateData>();
   sequence = 0;
+  private born = new Map<string, number>();
   catalog: EquipmentItem[];
   constructor(private sim: Simulation, private picked: (event: LootPickupData) => void) { this.catalog = equipmentCatalog(sim.config); }
   state(id: string): LootStateData {
@@ -20,6 +23,7 @@ export class GroundLoot {
     if (!state) { state = { revision: 0, safe: [], consumables: [] }; this.pockets.set(id, state); }
     return state;
   }
+  clearGround(): void { this.ground = []; this.born.clear(); }
   tick(): void {
     const defeated = this.sim.defeated.splice(0);
     for (const enemy of defeated) this.drop(enemy);
@@ -42,16 +46,21 @@ export class GroundLoot {
     const multipliers = mechanism[enemy.definition.behavior ?? 'tree'] ?? [1, 1, 1];
     const wave = enemy.bornWave ?? this.sim.round;
     const growth = 1 + .8 * (1 - Math.exp(-(wave - 1) / 40));
-    const categories: LootItemData['category'][] = ['consumable', 'insured', 'temporary'];
+    const categories: LootItemData['category'][] = ['consumable', 'temporary'];
     for (let index = 0; index < categories.length; index += 1) {
-      const chance = Math.min(.90, base[index] * multipliers[index] * growth);
+      const sourceIndex = index === 0 ? 0 : 2;
+      const setting = expeditionDifficulties[this.sim.config.difficulty ?? 'normal'];
+      const difficulty = index === 0 ? 1 : setting.loot;
+      const chance = Math.min(.90, base[sourceIndex] * multipliers[sourceIndex] * growth * difficulty);
       if (this.sim.random() >= chance) continue;
       if (index === 0) this.addConsumable(enemy);
       else this.addEquipment(enemy, categories[index]);
     }
   }
   private addConsumable(enemy: Enemy, fixed?: string): void {
-    const wave = enemy.bornWave ?? this.sim.round; const supplies = (wave - 1) % 10 === 5;
+    const wave = enemy.bornWave ?? this.sim.round;
+    const profile = waveProfile(this.sim, wave);
+    const supplies = profile.wave.composition ? profile.wave.composition.pattern === 'supplies' : profile.position === 6;
     const entries = consumables.filter(item => !supplies || ['life', 'energy', 'mana'].includes(item.id)).map(item => ({ value: item, weight: item.weight }));
     const selected = fixed ? consumables.find(item => item.id === fixed) : this.weighted(entries);
     if (!selected) return;
@@ -62,31 +71,44 @@ export class GroundLoot {
   private addEquipment(enemy: Enemy, category: LootItemData['category']): void {
     if (!this.catalog.length) return;
     const behavior = enemy.definition.behavior;
-    const favored = behavior === 'hammer' || behavior === 'shield' ? 'weapon' : behavior === 'archer' || behavior === 'moth' ? 'skill' : behavior === 'sower' || behavior === 'protector' ? 'support' : behavior === 'brood' ? 'heart' : '';
-    const kinds = [{ value: 'heart', weight: 15 }, { value: 'weapon', weight: 25 }, { value: 'skill', weight: 30 }, { value: 'support', weight: 30 }];
+    const favored = behavior === 'hammer' || behavior === 'shield' ? 'melee' : behavior === 'archer' || behavior === 'moth' ? 'ranged' : behavior === 'sower' || behavior === 'protector' ? 'support' : behavior === 'brood' ? 'heart' : '';
+    const kinds = [{ value: 'heart', weight: 15 }, { value: 'melee', weight: 25 }, { value: 'ranged', weight: 30 }, { value: 'support', weight: 30 }];
     const weighted = kinds.map(item => ({ ...item, weight: item.weight * (item.value === favored ? 1.5 : 1) }));
-    const kind = this.weighted(weighted); const candidates = this.catalog.filter(item => item.kind === kind);
+    const kind = this.weighted(weighted); const candidates = this.catalog.filter(item => (item.kind === 'skill' ? item.skillType : item.kind) === kind);
     if (!candidates.length) return;
     const roll = this.sim.random(); const index = Math.floor(roll * candidates.length); const item = candidates[index];
     const wave = enemy.bornWave ?? this.sim.round; const stage = Math.floor((wave - 1) / 10) + 1; const anchor = Math.min(8, stage);
     const grade = this.sim.random(); const rank = enemy.definition.rank;
     const extra = rank === 'boss' ? grade < .5 ? 1 : 2 : rank === 'elite' ? grade < .2 ? 0 : grade < .8 ? 1 : 2 : grade < .8 ? 0 : 1;
-    const rawLevel = anchor + extra + (category === 'temporary' ? 1 : 0);
+    const setting = expeditionDifficulties[this.sim.config.difficulty ?? 'normal'];
+    const floor = expeditionFloor(this.sim.config, wave); const step = Math.floor(floor / 5); const bonus = Math.min(4, step);
+    const rawLevel = anchor + extra + (category === 'temporary' ? 1 : 0) + setting.level + bonus;
     const scaled = item.kind === 'support' ? Math.ceil(rawLevel / 2) : rawLevel; const cap = 20; const level = Math.min(cap, scaled);
-    const data = { definitionId: item.id, name: item.name, category, kind: item.kind, effect: item.effect ?? '', level };
+    const data = { definitionId: item.id, name: item.name, category, kind: item.kind, skillType: item.skillType, effect: item.effect ?? '', level };
     this.place(enemy, data);
   }
   private place(enemy: Enemy, data: Omit<LootItemData, 'id' | 'wave' | 'x' | 'y'>): void {
     this.sequence += 1;
-    const item = { ...data, id: `loot-${this.sequence}`, wave: enemy.bornWave ?? this.sim.round, x: enemy.x, y: enemy.y };
+    const angle = this.sequence * 2.39996; const radius = .3 + this.sequence % 3 * .12;
+    const candidate = { x: enemy.x + Math.cos(angle) * radius, y: enemy.y + Math.sin(angle) * radius };
+    const reachable = canCollectDrop(this.sim.arena, enemy, candidate);
+    const inside = candidate.x > .2 && candidate.y > .2 && candidate.x < this.sim.arena.width - .2 && candidate.y < this.sim.arena.height - .2;
+    const position = reachable && inside ? candidate : enemy;
+    const item = { ...data, id: `loot-${this.sequence}`, wave: enemy.bornWave ?? this.sim.round, x: position.x, y: position.y };
     this.ground.push(item);
+    this.born.set(item.id, this.sim.clock);
   }
   pickup(player: Player): void {
     if (this.sim.finished || player.hp <= 0 || !player.connected) return;
     const state = this.state(player.id); const retained: LootItemData[] = [];
     for (const item of this.ground) {
+      const born = this.born.get(item.id);
+      if (born !== undefined && this.sim.clock - born < .18) { retained.push(item); continue; }
       const dx = item.x - player.x; const dy = item.y - player.y;
       if (dx * dx + dy * dy > .85 * .85) { retained.push(item); continue; }
+      const reachable = canCollectDrop(this.sim.arena, item, player);
+      if (!reachable) { retained.push(item); continue; }
+      const beforeHp = player.hp; const beforeEnergy = player.energy;
       if (item.category === 'temporary') {
         const option = { kind: 'item' as const, itemId: item.definitionId, level: item.level };
         const granted = grantBuildItem(player, option, this.sim.config);
@@ -94,7 +116,9 @@ export class GroundLoot {
       } else if (item.category === 'insured') state.safe.push(item);
       else this.applyConsumable(player, item);
       state.revision += 1;
-      const event = { item, playerId: player.id }; this.picked(event);
+      const shieldReward = item.category === 'consumable' && item.effect === 'shield' ? { grantedShield: player.lootShield } : {};
+      const event = { item, playerId: player.id, recoveredHp: player.hp - beforeHp, recoveredEnergy: player.energy - beforeEnergy, ...shieldReward }; this.picked(event);
+      this.born.delete(item.id);
     }
     this.ground = retained;
   }
@@ -117,7 +141,7 @@ export class GroundLoot {
       const ratio = item.level === 3 ? .5 : .3 * strong;
       player.energy = Math.min(player.capacity, player.energy + player.capacity * ratio);
     } else if (item.effect === 'mana') {
-      player.mp = Math.min(player.maxMp, player.mp + player.maxMp * .2 * strong);
+      player.energy = Math.min(player.capacity, player.energy + player.capacity * .2 * strong);
     } else if (item.effect === 'haste') player.hasteLeft = 10;
     else if (item.effect === 'shield') { player.shieldLeft = 10; player.lootShield = player.maxHp * .15; }
     else if (item.effect === 'focus') player.focusLeft = 10;

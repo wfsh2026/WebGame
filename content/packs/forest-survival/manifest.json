@@ -1,13 +1,14 @@
 {
   "id": "forest-survival",
   "name": "林地围猎",
-  "version": "3.8.0",
-  "schemaVersion": "1",
-  "coreVersion": "1",
+  "version": "5.0.0",
+  "schemaVersion": "3",
+  "coreVersion": "2",
   "entryMap": "maps/hall.json",
   "combatMap": "maps/arena.json",
   "assets": [
-    "assets/arena.webp",
+    "assets/arena-readable.webp",
+    "assets/danger-edge.webp",
     "assets/ranger.svg",
     "assets/normal.svg",
     "assets/swift.svg",
@@ -19,1576 +20,383 @@
     "assets/resonance-atlas.webp",
     "assets/ability-animation.webp",
     "assets/novel-skills.webp",
-    "assets/battle-banners.webp"
+    "assets/battle-banners.webp",
+    "assets/runtime/banner-cloth-v2.webp",
+    "assets/runtime/banner-cloth-v2.json",
+    "assets/runtime/banner-vfx-v2.webp",
+    "assets/runtime/banner-vfx-v2.json",
+    "assets/runtime/hud-buffs.webp",
+    "assets/runtime/dash-icon.webp"
   ],
   "dependencies": [],
   "players": {
     "min": 1,
     "max": 20
   },
-  "rounds": 0,
+  "rounds": 20,
   "roundDuration": 180,
   "restDuration": 5,
-  "maxAlive": 1200,
-  "maxSpawned": 1200,
   "revivalSeconds": 15,
   "waves": [
     {
-      "name": "舒缓开场",
-      "hint": "清理残敌，体验新强化",
+      "name": "入林清扫",
+      "hint": "两侧分批进入，留意最后一批切入",
       "interval": 40,
-      "count": 24,
-      "kinds": [
-        "tree-normal",
-        "wolf-normal",
-        "archer-normal"
-      ],
-      "mix": [
-        {
-          "behavior": "tree",
-          "weight": 75
-        },
-        {
-          "behavior": "wolf",
-          "weight": 15
-        },
-        {
-          "behavior": "archer",
-          "weight": 10
-        }
-      ],
-      "stageMixes": [
-        [
-          {
-            "behavior": "tree",
-            "weight": 75
-          },
-          {
-            "behavior": "wolf",
-            "weight": 15
-          },
-          {
-            "behavior": "archer",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 75
-          },
-          {
-            "behavior": "wolf",
-            "weight": 15
-          },
-          {
-            "behavior": "archer",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 75
-          },
-          {
-            "behavior": "wolf",
-            "weight": 15
-          },
-          {
-            "behavior": "archer",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 75
-          },
-          {
-            "behavior": "wolf",
-            "weight": 15
-          },
-          {
-            "behavior": "archer",
-            "weight": 10
-          }
-        ]
-      ],
-      "eliteChance": 0.02,
-      "bossChance": 0,
-      "guarantee": "none",
-      "healthMultiplier": 1,
-      "damageMultiplier": 1,
-      "squirrels": false,
-      "groups": [
-        {
-          "start": 1,
-          "end": 38,
-          "interval": 4,
-          "minimumInterval": 2.5,
-          "acceleration": 0.15,
-          "min": 2,
-          "max": 4,
-          "behaviors": [
-            "tree",
-            "hammer",
-            "shield"
-          ],
-          "mode": "scattered"
-        },
-        {
-          "start": 8,
-          "end": 37,
-          "interval": 8,
-          "minimumInterval": 5,
-          "acceleration": 0.5,
-          "min": 2,
-          "max": 3,
-          "behaviors": [
-            "wolf",
-            "bomb"
-          ],
-          "mode": "edge"
-        },
-        {
-          "start": 18,
-          "end": 37,
-          "interval": 10,
-          "min": 1,
-          "max": 2,
-          "behaviors": [
-            "archer"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        },
-        {
-          "start": 22,
-          "end": 35,
-          "interval": 15,
-          "min": 1,
-          "max": 1,
-          "behaviors": [
-            "sower",
-            "protector",
-            "brood",
-            "moth"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        }
-      ]
-    },
-    {
-      "name": "机制试探",
-      "hint": "观察机制，通过走位调整攻击目标",
-      "interval": 45,
-      "count": 28,
-      "kinds": [
-        "tree-normal",
-        "archer-normal",
-        "sower-normal"
-      ],
-      "mix": [
-        {
-          "behavior": "tree",
-          "weight": 65
-        },
-        {
-          "behavior": "archer",
-          "weight": 25
-        },
-        {
-          "behavior": "sower",
-          "weight": 10
-        }
-      ],
-      "stageMixes": [
-        [
-          {
-            "behavior": "tree",
-            "weight": 65
-          },
-          {
-            "behavior": "archer",
-            "weight": 25
-          },
-          {
-            "behavior": "sower",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 60
-          },
-          {
-            "behavior": "archer",
-            "weight": 30
-          },
-          {
-            "behavior": "sower",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 70
-          },
-          {
-            "behavior": "wolf",
-            "weight": 20
-          },
-          {
-            "behavior": "brood",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 70
-          },
-          {
-            "behavior": "archer",
-            "weight": 20
-          },
-          {
-            "behavior": "moth",
-            "weight": 10
-          }
-        ]
-      ],
-      "eliteChance": 0.05,
-      "bossChance": 0,
-      "guarantee": "none",
-      "healthMultiplier": 1,
-      "damageMultiplier": 1,
-      "squirrels": false,
-      "groups": [
-        {
-          "start": 1,
-          "end": 43,
-          "interval": 4,
-          "minimumInterval": 2.5,
-          "acceleration": 0.15,
-          "min": 3,
-          "max": 5,
-          "behaviors": [
-            "tree",
-            "hammer",
-            "shield"
-          ],
-          "mode": "scattered"
-        },
-        {
-          "start": 9,
-          "end": 42,
-          "interval": 8,
-          "minimumInterval": 5,
-          "acceleration": 0.5,
-          "min": 2,
-          "max": 3,
-          "behaviors": [
-            "wolf",
-            "bomb"
-          ],
-          "mode": "edge"
-        },
-        {
-          "start": 20,
-          "end": 42,
-          "interval": 10,
-          "min": 1,
-          "max": 2,
-          "behaviors": [
-            "archer"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        },
-        {
-          "start": 25,
-          "end": 40,
-          "interval": 15,
-          "min": 1,
-          "max": 1,
-          "behaviors": [
-            "sower",
-            "protector",
-            "brood",
-            "moth"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        }
-      ]
-    },
-    {
-      "name": "第一轮资源潮",
-      "hint": "脆弱怪群出现，快速清怪获取成长",
-      "interval": 40,
-      "count": 48,
-      "kinds": [
-        "tree-normal",
-        "wolf-normal",
-        "bomb-normal"
-      ],
-      "mix": [
-        {
-          "behavior": "tree",
-          "weight": 80
-        },
-        {
-          "behavior": "wolf",
-          "weight": 10
-        },
-        {
-          "behavior": "bomb",
-          "weight": 10
-        }
-      ],
-      "stageMixes": [
-        [
-          {
-            "behavior": "tree",
-            "weight": 80
-          },
-          {
-            "behavior": "wolf",
-            "weight": 10
-          },
-          {
-            "behavior": "bomb",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 80
-          },
-          {
-            "behavior": "wolf",
-            "weight": 10
-          },
-          {
-            "behavior": "bomb",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 80
-          },
-          {
-            "behavior": "wolf",
-            "weight": 10
-          },
-          {
-            "behavior": "bomb",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 80
-          },
-          {
-            "behavior": "wolf",
-            "weight": 10
-          },
-          {
-            "behavior": "bomb",
-            "weight": 10
-          }
-        ]
-      ],
-      "eliteChance": 0.02,
-      "bossChance": 0,
-      "guarantee": "none",
-      "healthMultiplier": 0.75,
-      "damageMultiplier": 0.85,
-      "squirrels": false,
-      "groups": [
-        {
-          "start": 1,
-          "end": 38,
-          "interval": 4,
-          "minimumInterval": 2.5,
-          "acceleration": 0.15,
-          "min": 4,
-          "max": 6,
-          "behaviors": [
-            "tree",
-            "hammer",
-            "shield"
-          ],
-          "mode": "scattered"
-        },
-        {
-          "start": 8,
-          "end": 37,
-          "interval": 8,
-          "minimumInterval": 5,
-          "acceleration": 0.5,
-          "min": 2,
-          "max": 3,
-          "behaviors": [
-            "wolf",
-            "bomb"
-          ],
-          "mode": "edge"
-        },
-        {
-          "start": 18,
-          "end": 37,
-          "interval": 10,
-          "min": 1,
-          "max": 2,
-          "behaviors": [
-            "archer"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        },
-        {
-          "start": 22,
-          "end": 35,
-          "interval": 15,
-          "min": 1,
-          "max": 1,
-          "behaviors": [
-            "sower",
-            "protector",
-            "brood",
-            "moth"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        }
-      ]
-    },
-    {
-      "name": "混合推进",
-      "hint": "绕过前排，优先拆除保护",
-      "interval": 50,
       "count": 32,
       "kinds": [
-        "tree-normal",
-        "shield-normal",
-        "archer-normal",
-        "protector-normal"
+        "tree-normal"
       ],
-      "mix": [
-        {
-          "behavior": "tree",
-          "weight": 45
-        },
-        {
-          "behavior": "shield",
-          "weight": 20
-        },
-        {
-          "behavior": "archer",
-          "weight": 25
-        },
-        {
-          "behavior": "protector",
-          "weight": 10
-        }
-      ],
-      "stageMixes": [
-        [
-          {
-            "behavior": "tree",
-            "weight": 45
-          },
-          {
-            "behavior": "shield",
-            "weight": 20
-          },
-          {
-            "behavior": "archer",
-            "weight": 25
-          },
-          {
-            "behavior": "protector",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 50
-          },
-          {
-            "behavior": "hammer",
-            "weight": 25
-          },
-          {
-            "behavior": "archer",
-            "weight": 10
-          },
-          {
-            "behavior": "protector",
-            "weight": 15
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 60
-          },
-          {
-            "behavior": "wolf",
-            "weight": 25
-          },
-          {
-            "behavior": "brood",
-            "weight": 15
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 55
-          },
-          {
-            "behavior": "archer",
-            "weight": 30
-          },
-          {
-            "behavior": "moth",
-            "weight": 15
-          }
-        ]
-      ],
-      "eliteChance": 0.08,
-      "bossChance": 0.005,
       "guarantee": "none",
       "healthMultiplier": 1,
       "damageMultiplier": 1,
-      "squirrels": false,
-      "groups": [
-        {
-          "start": 1,
-          "end": 48,
-          "interval": 4,
-          "minimumInterval": 2.5,
-          "acceleration": 0.15,
-          "min": 3,
-          "max": 5,
-          "behaviors": [
-            "tree",
-            "hammer",
-            "shield"
-          ],
-          "mode": "scattered"
-        },
-        {
-          "start": 10,
-          "end": 47,
-          "interval": 8,
-          "minimumInterval": 5,
-          "acceleration": 0.5,
-          "min": 2,
-          "max": 3,
-          "behaviors": [
-            "wolf",
-            "bomb"
-          ],
-          "mode": "edge"
-        },
-        {
-          "start": 22,
-          "end": 47,
-          "interval": 10,
-          "min": 1,
-          "max": 2,
-          "behaviors": [
-            "archer"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        },
-        {
-          "start": 28,
-          "end": 45,
-          "interval": 15,
-          "min": 1,
-          "max": 1,
-          "behaviors": [
-            "sower",
-            "protector",
-            "brood",
-            "moth"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        }
-      ]
+      "composition": {
+        "pattern": "sweep",
+        "budget": 32.0,
+        "batches": 3,
+        "recovery": 7
+      }
     },
     {
-      "name": "精英考验",
-      "hint": "精英必出，处理关键威胁",
-      "interval": 65,
+      "name": "双侧追猎",
+      "hint": "左右交替进攻，提前调整移动方向",
+      "interval": 45,
+      "count": 33,
+      "kinds": [
+        "tree-normal"
+      ],
+      "guarantee": "none",
+      "healthMultiplier": 1,
+      "damageMultiplier": 1,
+      "composition": {
+        "pattern": "alternating",
+        "budget": 41.4,
+        "batches": 3,
+        "recovery": 7
+      }
+    },
+    {
+      "name": "三重敌潮",
+      "hint": "三批递进的低血量敌潮，清出拾取路线",
+      "interval": 50,
+      "count": 72,
+      "kinds": [
+        "tree-normal"
+      ],
+      "guarantee": "none",
+      "healthMultiplier": 0.65,
+      "damageMultiplier": 0.85,
+      "composition": {
+        "pattern": "surge",
+        "budget": 72.0,
+        "batches": 4,
+        "recovery": 8
+      }
+    },
+    {
+      "name": "补给突围",
+      "hint": "少量敌人分批进入，追逐松鼠获得补给",
+      "interval": 40,
+      "count": 16,
+      "kinds": [
+        "tree-normal"
+      ],
+      "guarantee": "none",
+      "healthMultiplier": 1,
+      "damageMultiplier": 1,
+      "composition": {
+        "pattern": "supplies",
+        "budget": 20.0,
+        "batches": 3,
+        "recovery": 7
+      }
+    },
+    {
+      "name": "精英试炼",
+      "hint": "精英提前登场，观察随从与精英的攻击间隙",
+      "interval": 60,
       "count": 24,
       "kinds": [
-        "tree-normal",
-        "wolf-normal",
-        "hammer-normal"
+        "tree-normal"
       ],
-      "mix": [
-        {
-          "behavior": "tree",
-          "weight": 60
-        },
-        {
-          "behavior": "wolf",
-          "weight": 20
-        },
-        {
-          "behavior": "hammer",
-          "weight": 20
-        }
-      ],
-      "stageMixes": [
-        [
-          {
-            "behavior": "tree",
-            "weight": 60
-          },
-          {
-            "behavior": "wolf",
-            "weight": 20
-          },
-          {
-            "behavior": "hammer",
-            "weight": 20
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 60
-          },
-          {
-            "behavior": "wolf",
-            "weight": 20
-          },
-          {
-            "behavior": "hammer",
-            "weight": 20
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 60
-          },
-          {
-            "behavior": "wolf",
-            "weight": 20
-          },
-          {
-            "behavior": "hammer",
-            "weight": 20
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 60
-          },
-          {
-            "behavior": "wolf",
-            "weight": 20
-          },
-          {
-            "behavior": "hammer",
-            "weight": 20
-          }
-        ]
-      ],
-      "eliteChance": 0.15,
-      "bossChance": 0.01,
       "guarantee": "elite",
       "healthMultiplier": 1,
       "damageMultiplier": 1,
-      "squirrels": false,
-      "groups": [
-        {
-          "start": 1,
-          "end": 63,
-          "interval": 4,
-          "minimumInterval": 2.5,
-          "acceleration": 0.15,
-          "min": 2,
-          "max": 4,
-          "behaviors": [
-            "tree",
-            "hammer",
-            "shield"
-          ],
-          "mode": "scattered"
-        },
-        {
-          "start": 13,
-          "end": 62,
-          "interval": 8,
-          "minimumInterval": 5,
-          "acceleration": 0.5,
-          "min": 2,
-          "max": 3,
-          "behaviors": [
-            "wolf",
-            "bomb"
-          ],
-          "mode": "edge"
-        },
-        {
-          "start": 29,
-          "end": 62,
-          "interval": 10,
-          "min": 1,
-          "max": 2,
-          "behaviors": [
-            "archer"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        },
-        {
-          "start": 36,
-          "end": 60,
-          "interval": 15,
-          "min": 1,
-          "max": 1,
-          "behaviors": [
-            "sower",
-            "protector",
-            "brood",
-            "moth"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        },
-        {
-          "start": 46,
-          "end": 46,
-          "interval": 1,
-          "min": 1,
-          "max": 1,
-          "behaviors": [
-            "tree",
-            "wolf",
-            "hammer"
-          ],
-          "mode": "special",
-          "rank": "elite",
-          "priority": true,
-          "repeats": 1
-        }
-      ]
+      "composition": {
+        "pattern": "elite",
+        "budget": 54.86,
+        "batches": 4,
+        "recovery": 9
+      }
     },
     {
-      "name": "战后补给",
-      "hint": "压力回落，追逐松鼠回复生命与灵力",
+      "name": "交错阵列",
+      "hint": "前后两层进场，绕侧处理远程与机制目标",
+      "interval": 50,
+      "count": 30,
+      "kinds": [
+        "tree-normal"
+      ],
+      "guarantee": "none",
+      "healthMultiplier": 1,
+      "damageMultiplier": 1,
+      "composition": {
+        "pattern": "formation",
+        "budget": 53.33,
+        "batches": 4,
+        "recovery": 8
+      }
+    },
+    {
+      "name": "侧翼追猎",
+      "hint": "左右交替进攻，提前调整移动方向",
+      "interval": 55,
+      "count": 40,
+      "kinds": [
+        "tree-normal"
+      ],
+      "guarantee": "none",
+      "healthMultiplier": 1,
+      "damageMultiplier": 1,
+      "composition": {
+        "pattern": "alternating",
+        "budget": 50.6,
+        "batches": 4,
+        "recovery": 8
+      }
+    },
+    {
+      "name": "远近合围",
+      "hint": "前后两层进场，绕侧处理远程与机制目标",
+      "interval": 60,
+      "count": 36,
+      "kinds": [
+        "tree-normal"
+      ],
+      "guarantee": "none",
+      "healthMultiplier": 1,
+      "damageMultiplier": 1,
+      "composition": {
+        "pattern": "formation",
+        "budget": 64.0,
+        "batches": 4,
+        "recovery": 9
+      }
+    },
+    {
+      "name": "补给争夺",
+      "hint": "少量敌人分批进入，追逐松鼠获得补给",
       "interval": 45,
-      "count": 20,
+      "count": 18,
       "kinds": [
-        "tree-normal",
-        "archer-normal"
+        "tree-normal"
       ],
-      "mix": [
-        {
-          "behavior": "tree",
-          "weight": 80
-        },
-        {
-          "behavior": "archer",
-          "weight": 20
-        }
-      ],
-      "stageMixes": [
-        [
-          {
-            "behavior": "tree",
-            "weight": 80
-          },
-          {
-            "behavior": "archer",
-            "weight": 20
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 80
-          },
-          {
-            "behavior": "archer",
-            "weight": 20
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 80
-          },
-          {
-            "behavior": "archer",
-            "weight": 20
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 80
-          },
-          {
-            "behavior": "archer",
-            "weight": 20
-          }
-        ]
-      ],
-      "eliteChance": 0.02,
-      "bossChance": 0,
       "guarantee": "none",
       "healthMultiplier": 1,
       "damageMultiplier": 1,
-      "squirrels": true,
-      "groups": [
-        {
-          "start": 1,
-          "end": 43,
-          "interval": 4,
-          "minimumInterval": 2.5,
-          "acceleration": 0.15,
-          "min": 2,
-          "max": 4,
-          "behaviors": [
-            "tree",
-            "hammer",
-            "shield"
-          ],
-          "mode": "scattered"
-        },
-        {
-          "start": 9,
-          "end": 42,
-          "interval": 8,
-          "minimumInterval": 5,
-          "acceleration": 0.5,
-          "min": 2,
-          "max": 3,
-          "behaviors": [
-            "wolf",
-            "bomb"
-          ],
-          "mode": "edge"
-        },
-        {
-          "start": 20,
-          "end": 42,
-          "interval": 10,
-          "min": 1,
-          "max": 2,
-          "behaviors": [
-            "archer"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        },
-        {
-          "start": 25,
-          "end": 40,
-          "interval": 15,
-          "min": 1,
-          "max": 1,
-          "behaviors": [
-            "sower",
-            "protector",
-            "brood",
-            "moth"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        }
-      ]
+      "composition": {
+        "pattern": "supplies",
+        "budget": 22.5,
+        "batches": 3,
+        "recovery": 7
+      }
     },
     {
-      "name": "机制协同",
-      "hint": "拆解机制组合，保持移动通道",
-      "interval": 50,
-      "count": 32,
+      "name": "第一首领",
+      "hint": "首领先登场，随从分段加入，末段集中输出",
+      "interval": 75,
+      "count": 27,
       "kinds": [
-        "tree-normal",
-        "wolf-normal",
-        "bomb-normal",
-        "brood-normal"
+        "tree-normal"
       ],
-      "mix": [
-        {
-          "behavior": "tree",
-          "weight": 55
-        },
-        {
-          "behavior": "wolf",
-          "weight": 20
-        },
-        {
-          "behavior": "bomb",
-          "weight": 15
-        },
-        {
-          "behavior": "brood",
-          "weight": 10
-        }
-      ],
-      "stageMixes": [
-        [
-          {
-            "behavior": "tree",
-            "weight": 55
-          },
-          {
-            "behavior": "wolf",
-            "weight": 20
-          },
-          {
-            "behavior": "bomb",
-            "weight": 15
-          },
-          {
-            "behavior": "brood",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 45
-          },
-          {
-            "behavior": "wolf",
-            "weight": 20
-          },
-          {
-            "behavior": "archer",
-            "weight": 15
-          },
-          {
-            "behavior": "sower",
-            "weight": 10
-          },
-          {
-            "behavior": "protector",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 45
-          },
-          {
-            "behavior": "wolf",
-            "weight": 20
-          },
-          {
-            "behavior": "bomb",
-            "weight": 15
-          },
-          {
-            "behavior": "brood",
-            "weight": 10
-          },
-          {
-            "behavior": "protector",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 45
-          },
-          {
-            "behavior": "wolf",
-            "weight": 20
-          },
-          {
-            "behavior": "archer",
-            "weight": 15
-          },
-          {
-            "behavior": "moth",
-            "weight": 10
-          },
-          {
-            "behavior": "sower",
-            "weight": 10
-          }
-        ]
-      ],
-      "eliteChance": 0.1,
-      "bossChance": 0.01,
-      "guarantee": "none",
-      "healthMultiplier": 1,
-      "damageMultiplier": 1,
-      "squirrels": false,
-      "groups": [
-        {
-          "start": 1,
-          "end": 48,
-          "interval": 4,
-          "minimumInterval": 2.5,
-          "acceleration": 0.15,
-          "min": 3,
-          "max": 5,
-          "behaviors": [
-            "tree",
-            "hammer",
-            "shield"
-          ],
-          "mode": "scattered"
-        },
-        {
-          "start": 10,
-          "end": 47,
-          "interval": 8,
-          "minimumInterval": 5,
-          "acceleration": 0.5,
-          "min": 2,
-          "max": 3,
-          "behaviors": [
-            "wolf",
-            "bomb"
-          ],
-          "mode": "edge"
-        },
-        {
-          "start": 22,
-          "end": 47,
-          "interval": 10,
-          "min": 1,
-          "max": 2,
-          "behaviors": [
-            "archer"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        },
-        {
-          "start": 28,
-          "end": 45,
-          "interval": 15,
-          "min": 1,
-          "max": 1,
-          "behaviors": [
-            "sower",
-            "protector",
-            "brood",
-            "moth"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        }
-      ]
-    },
-    {
-      "name": "第二轮资源潮",
-      "hint": "抓紧积累成长，完成首领战前强化",
-      "interval": 40,
-      "count": 52,
-      "kinds": [
-        "tree-normal",
-        "wolf-normal",
-        "archer-normal"
-      ],
-      "mix": [
-        {
-          "behavior": "tree",
-          "weight": 75
-        },
-        {
-          "behavior": "wolf",
-          "weight": 15
-        },
-        {
-          "behavior": "archer",
-          "weight": 10
-        }
-      ],
-      "stageMixes": [
-        [
-          {
-            "behavior": "tree",
-            "weight": 75
-          },
-          {
-            "behavior": "wolf",
-            "weight": 15
-          },
-          {
-            "behavior": "archer",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 75
-          },
-          {
-            "behavior": "wolf",
-            "weight": 15
-          },
-          {
-            "behavior": "archer",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 75
-          },
-          {
-            "behavior": "wolf",
-            "weight": 15
-          },
-          {
-            "behavior": "archer",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 75
-          },
-          {
-            "behavior": "wolf",
-            "weight": 15
-          },
-          {
-            "behavior": "archer",
-            "weight": 10
-          }
-        ]
-      ],
-      "eliteChance": 0.03,
-      "bossChance": 0,
-      "guarantee": "none",
-      "healthMultiplier": 0.75,
-      "damageMultiplier": 0.85,
-      "squirrels": false,
-      "groups": [
-        {
-          "start": 1,
-          "end": 38,
-          "interval": 4,
-          "minimumInterval": 2.5,
-          "acceleration": 0.15,
-          "min": 5,
-          "max": 7,
-          "behaviors": [
-            "tree",
-            "hammer",
-            "shield"
-          ],
-          "mode": "scattered"
-        },
-        {
-          "start": 8,
-          "end": 37,
-          "interval": 8,
-          "minimumInterval": 5,
-          "acceleration": 0.5,
-          "min": 2,
-          "max": 3,
-          "behaviors": [
-            "wolf",
-            "bomb"
-          ],
-          "mode": "edge"
-        },
-        {
-          "start": 18,
-          "end": 37,
-          "interval": 10,
-          "min": 1,
-          "max": 2,
-          "behaviors": [
-            "archer"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        },
-        {
-          "start": 22,
-          "end": 35,
-          "interval": 15,
-          "min": 1,
-          "max": 1,
-          "behaviors": [
-            "sower",
-            "protector",
-            "brood",
-            "moth"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        }
-      ]
-    },
-    {
-      "name": "首领前哨",
-      "hint": "清残怪、选择奖励，下一波 Boss 必出",
-      "interval": 50,
-      "count": 24,
-      "kinds": [
-        "tree-normal",
-        "shield-normal",
-        "archer-normal",
-        "moth-normal"
-      ],
-      "mix": [
-        {
-          "behavior": "tree",
-          "weight": 60
-        },
-        {
-          "behavior": "shield",
-          "weight": 15
-        },
-        {
-          "behavior": "archer",
-          "weight": 15
-        },
-        {
-          "behavior": "moth",
-          "weight": 10
-        }
-      ],
-      "stageMixes": [
-        [
-          {
-            "behavior": "tree",
-            "weight": 60
-          },
-          {
-            "behavior": "shield",
-            "weight": 15
-          },
-          {
-            "behavior": "archer",
-            "weight": 15
-          },
-          {
-            "behavior": "moth",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 70
-          },
-          {
-            "behavior": "archer",
-            "weight": 20
-          },
-          {
-            "behavior": "sower",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 70
-          },
-          {
-            "behavior": "archer",
-            "weight": 20
-          },
-          {
-            "behavior": "brood",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 70
-          },
-          {
-            "behavior": "archer",
-            "weight": 20
-          },
-          {
-            "behavior": "moth",
-            "weight": 10
-          }
-        ]
-      ],
-      "eliteChance": 0.12,
-      "bossChance": 0.015,
-      "guarantee": "none",
-      "healthMultiplier": 1,
-      "damageMultiplier": 1,
-      "squirrels": false,
-      "groups": [
-        {
-          "start": 1,
-          "end": 48,
-          "interval": 4,
-          "minimumInterval": 2.5,
-          "acceleration": 0.15,
-          "min": 2,
-          "max": 4,
-          "behaviors": [
-            "tree",
-            "hammer",
-            "shield"
-          ],
-          "mode": "scattered"
-        },
-        {
-          "start": 10,
-          "end": 47,
-          "interval": 8,
-          "minimumInterval": 5,
-          "acceleration": 0.5,
-          "min": 2,
-          "max": 3,
-          "behaviors": [
-            "wolf",
-            "bomb"
-          ],
-          "mode": "edge"
-        },
-        {
-          "start": 22,
-          "end": 47,
-          "interval": 10,
-          "min": 1,
-          "max": 2,
-          "behaviors": [
-            "archer"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        },
-        {
-          "start": 28,
-          "end": 45,
-          "interval": 15,
-          "min": 1,
-          "max": 1,
-          "behaviors": [
-            "sower",
-            "protector",
-            "brood",
-            "moth"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        }
-      ]
-    },
-    {
-      "name": "Boss 高峰",
-      "hint": "Boss 必出，协同作战，保持队伍存活",
-      "interval": 85,
-      "count": 20,
-      "kinds": [
-        "tree-normal",
-        "wolf-normal",
-        "archer-normal",
-        "sower-normal"
-      ],
-      "mix": [
-        {
-          "behavior": "tree",
-          "weight": 60
-        },
-        {
-          "behavior": "wolf",
-          "weight": 10
-        },
-        {
-          "behavior": "archer",
-          "weight": 20
-        },
-        {
-          "behavior": "sower",
-          "weight": 10
-        }
-      ],
-      "stageMixes": [
-        [
-          {
-            "behavior": "tree",
-            "weight": 60
-          },
-          {
-            "behavior": "wolf",
-            "weight": 10
-          },
-          {
-            "behavior": "archer",
-            "weight": 20
-          },
-          {
-            "behavior": "sower",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 60
-          },
-          {
-            "behavior": "wolf",
-            "weight": 10
-          },
-          {
-            "behavior": "archer",
-            "weight": 20
-          },
-          {
-            "behavior": "sower",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 60
-          },
-          {
-            "behavior": "wolf",
-            "weight": 10
-          },
-          {
-            "behavior": "archer",
-            "weight": 20
-          },
-          {
-            "behavior": "sower",
-            "weight": 10
-          }
-        ],
-        [
-          {
-            "behavior": "tree",
-            "weight": 60
-          },
-          {
-            "behavior": "wolf",
-            "weight": 10
-          },
-          {
-            "behavior": "archer",
-            "weight": 20
-          },
-          {
-            "behavior": "sower",
-            "weight": 10
-          }
-        ]
-      ],
-      "eliteChance": 0.2,
-      "bossChance": 0.02,
       "guarantee": "boss",
       "healthMultiplier": 1,
       "damageMultiplier": 1,
-      "squirrels": false,
-      "groups": [
-        {
-          "start": 1,
-          "end": 83,
-          "interval": 4,
-          "minimumInterval": 2.5,
-          "acceleration": 0.15,
-          "min": 2,
-          "max": 4,
-          "behaviors": [
-            "tree",
-            "hammer",
-            "shield"
-          ],
-          "mode": "scattered"
-        },
-        {
-          "start": 17,
-          "end": 82,
-          "interval": 8,
-          "minimumInterval": 5,
-          "acceleration": 0.5,
-          "min": 2,
-          "max": 3,
-          "behaviors": [
-            "wolf",
-            "bomb"
-          ],
-          "mode": "edge"
-        },
-        {
-          "start": 38,
-          "end": 82,
-          "interval": 10,
-          "min": 1,
-          "max": 2,
-          "behaviors": [
-            "archer"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        },
-        {
-          "start": 47,
-          "end": 80,
-          "interval": 15,
-          "min": 1,
-          "max": 1,
-          "behaviors": [
-            "sower",
-            "protector",
-            "brood",
-            "moth"
-          ],
-          "mode": "special",
-          "rank": "normal"
-        },
-        {
-          "start": 47,
-          "end": 47,
-          "interval": 1,
-          "min": 1,
-          "max": 1,
-          "behaviors": [
-            "tree",
-            "wolf",
-            "archer"
-          ],
-          "mode": "special",
-          "rank": "boss",
-          "priority": true,
-          "repeats": 1
-        }
-      ]
+      "composition": {
+        "pattern": "boss",
+        "budget": 66.67,
+        "batches": 5,
+        "recovery": 11
+      }
+    },
+    {
+      "name": "多路入侵",
+      "hint": "两侧分批进入，留意最后一批切入",
+      "interval": 60,
+      "count": 48,
+      "kinds": [
+        "tree-normal"
+      ],
+      "guarantee": "none",
+      "healthMultiplier": 1,
+      "damageMultiplier": 1,
+      "composition": {
+        "pattern": "sweep",
+        "budget": 48.0,
+        "batches": 4,
+        "recovery": 9
+      }
+    },
+    {
+      "name": "毒区交火",
+      "hint": "前后两层进场，绕侧处理远程与机制目标",
+      "interval": 65,
+      "count": 39,
+      "kinds": [
+        "tree-normal"
+      ],
+      "guarantee": "none",
+      "healthMultiplier": 1,
+      "damageMultiplier": 1,
+      "composition": {
+        "pattern": "formation",
+        "budget": 69.33,
+        "batches": 5,
+        "recovery": 10
+      }
+    },
+    {
+      "name": "巢群推进",
+      "hint": "三批递进的低血量敌潮，清出拾取路线",
+      "interval": 70,
+      "count": 100,
+      "kinds": [
+        "tree-normal"
+      ],
+      "guarantee": "none",
+      "healthMultiplier": 0.65,
+      "damageMultiplier": 0.85,
+      "composition": {
+        "pattern": "surge",
+        "budget": 100.8,
+        "batches": 5,
+        "recovery": 10
+      }
+    },
+    {
+      "name": "补给险径",
+      "hint": "少量敌人分批进入，追逐松鼠获得补给",
+      "interval": 50,
+      "count": 20,
+      "kinds": [
+        "tree-normal"
+      ],
+      "guarantee": "none",
+      "healthMultiplier": 1,
+      "damageMultiplier": 1,
+      "composition": {
+        "pattern": "supplies",
+        "budget": 25.0,
+        "batches": 4,
+        "recovery": 8
+      }
+    },
+    {
+      "name": "精英会猎",
+      "hint": "精英提前登场，观察随从与精英的攻击间隙",
+      "interval": 80,
+      "count": 32,
+      "kinds": [
+        "tree-normal"
+      ],
+      "guarantee": "elite",
+      "healthMultiplier": 1,
+      "damageMultiplier": 1,
+      "composition": {
+        "pattern": "elite",
+        "budget": 73.14,
+        "batches": 6,
+        "recovery": 12
+      }
+    },
+    {
+      "name": "密集敌潮",
+      "hint": "三批递进的低血量敌潮，清出拾取路线",
+      "interval": 65,
+      "count": 94,
+      "kinds": [
+        "tree-normal"
+      ],
+      "guarantee": "none",
+      "healthMultiplier": 0.65,
+      "damageMultiplier": 0.85,
+      "composition": {
+        "pattern": "surge",
+        "budget": 93.6,
+        "batches": 5,
+        "recovery": 10
+      }
+    },
+    {
+      "name": "援护阵列",
+      "hint": "前后两层进场，绕侧处理远程与机制目标",
+      "interval": 70,
+      "count": 42,
+      "kinds": [
+        "tree-normal"
+      ],
+      "guarantee": "none",
+      "healthMultiplier": 1,
+      "damageMultiplier": 1,
+      "composition": {
+        "pattern": "formation",
+        "budget": 74.67,
+        "batches": 5,
+        "recovery": 10
+      }
+    },
+    {
+      "name": "多向夹击",
+      "hint": "左右交替进攻，提前调整移动方向",
+      "interval": 75,
+      "count": 54,
+      "kinds": [
+        "tree-normal"
+      ],
+      "guarantee": "none",
+      "healthMultiplier": 1,
+      "damageMultiplier": 1,
+      "composition": {
+        "pattern": "alternating",
+        "budget": 69.0,
+        "batches": 5,
+        "recovery": 11
+      }
+    },
+    {
+      "name": "终战补给",
+      "hint": "少量敌人分批进入，追逐松鼠获得补给",
+      "interval": 50,
+      "count": 20,
+      "kinds": [
+        "tree-normal"
+      ],
+      "guarantee": "none",
+      "healthMultiplier": 1,
+      "damageMultiplier": 1,
+      "composition": {
+        "pattern": "supplies",
+        "budget": 25.0,
+        "batches": 4,
+        "recovery": 8
+      }
+    },
+    {
+      "name": "林地主宰",
+      "hint": "首领先登场，随从分段加入，末段集中输出",
+      "interval": 95,
+      "count": 34,
+      "kinds": [
+        "tree-normal"
+      ],
+      "guarantee": "boss",
+      "healthMultiplier": 1,
+      "damageMultiplier": 1,
+      "composition": {
+        "pattern": "boss",
+        "budget": 84.44,
+        "batches": 6,
+        "recovery": 12
+      }
     }
   ],
   "ruleTemplate": "cooperative-survival-v1",
@@ -1609,10 +417,9 @@
     "capacity": 30,
     "interval": 1,
     "recovery": 10,
-    "manaCost": 4,
     "slots": 2
   },
-  "weapon": {
+  "meleeSkill": {
     "interval": 0.65,
     "cost": 3,
     "coefficient": 1.1,
@@ -1620,7 +427,7 @@
     "range": 9,
     "supportSlots": 1
   },
-  "skill": {
+  "rangedSkill": {
     "interval": 3.6,
     "cost": 8,
     "coefficient": 1.5,
@@ -1629,7 +436,7 @@
   },
   "supportFiles": [],
   "support": {
-    "host": "weapon",
+    "host": "melee",
     "costMultiplier": 0.8,
     "damageMultiplier": 0.85
   },
@@ -1656,7 +463,7 @@
       "rank": "elite",
       "hp": 198,
       "speed": 1.65,
-      "radius": 0.48,
+      "radius": 0.66,
       "damage": 24,
       "windup": 0.8,
       "recovery": 1.1,
@@ -1670,7 +477,7 @@
       "rank": "boss",
       "hp": 540,
       "speed": 1.65,
-      "radius": 0.48,
+      "radius": 0.96,
       "damage": 32,
       "windup": 0.8,
       "recovery": 1.1,
@@ -1698,7 +505,7 @@
       "rank": "elite",
       "hp": 168,
       "speed": 2.85,
-      "radius": 0.48,
+      "radius": 0.66,
       "damage": 30,
       "windup": 0.95,
       "recovery": 1.4,
@@ -1712,7 +519,7 @@
       "rank": "boss",
       "hp": 456,
       "speed": 2.85,
-      "radius": 0.48,
+      "radius": 0.96,
       "damage": 38,
       "windup": 0.95,
       "recovery": 1.4,
@@ -1740,7 +547,7 @@
       "rank": "elite",
       "hp": 528,
       "speed": 1.2,
-      "radius": 0.48,
+      "radius": 0.66,
       "damage": 62,
       "windup": 1.35,
       "recovery": 2.0,
@@ -1754,7 +561,7 @@
       "rank": "boss",
       "hp": 1440,
       "speed": 1.2,
-      "radius": 0.48,
+      "radius": 0.96,
       "damage": 80,
       "windup": 1.35,
       "recovery": 2.0,
@@ -1782,7 +589,7 @@
       "rank": "elite",
       "hp": 396,
       "speed": 1.2,
-      "radius": 0.48,
+      "radius": 0.66,
       "damage": 30,
       "windup": 1.0,
       "recovery": 1.5,
@@ -1796,7 +603,7 @@
       "rank": "boss",
       "hp": 1080,
       "speed": 1.2,
-      "radius": 0.48,
+      "radius": 0.96,
       "damage": 38,
       "windup": 1.0,
       "recovery": 1.5,
@@ -1824,7 +631,7 @@
       "rank": "elite",
       "hp": 198,
       "speed": 1.5,
-      "radius": 0.48,
+      "radius": 0.66,
       "damage": 24,
       "windup": 1.1,
       "recovery": 1.8,
@@ -1838,7 +645,7 @@
       "rank": "boss",
       "hp": 540,
       "speed": 1.5,
-      "radius": 0.48,
+      "radius": 0.96,
       "damage": 32,
       "windup": 1.1,
       "recovery": 1.8,
@@ -1866,7 +673,7 @@
       "rank": "elite",
       "hp": 132,
       "speed": 1.725,
-      "radius": 0.48,
+      "radius": 0.66,
       "damage": 60,
       "windup": 1.6,
       "recovery": 1.5,
@@ -1880,7 +687,7 @@
       "rank": "boss",
       "hp": 360,
       "speed": 1.725,
-      "radius": 0.48,
+      "radius": 0.96,
       "damage": 76,
       "windup": 1.6,
       "recovery": 1.5,
@@ -1908,7 +715,7 @@
       "rank": "elite",
       "hp": 286,
       "speed": 1.35,
-      "radius": 0.48,
+      "radius": 0.66,
       "damage": 20,
       "windup": 1.7,
       "recovery": 4.2,
@@ -1922,7 +729,7 @@
       "rank": "boss",
       "hp": 780,
       "speed": 1.35,
-      "radius": 0.48,
+      "radius": 0.96,
       "damage": 26,
       "windup": 1.7,
       "recovery": 4.2,
@@ -1950,7 +757,7 @@
       "rank": "elite",
       "hp": 242,
       "speed": 1.65,
-      "radius": 0.48,
+      "radius": 0.66,
       "damage": 2,
       "windup": 1.0,
       "recovery": 3.0,
@@ -1964,7 +771,7 @@
       "rank": "boss",
       "hp": 660,
       "speed": 1.65,
-      "radius": 0.48,
+      "radius": 0.96,
       "damage": 4,
       "windup": 1.0,
       "recovery": 3.0,
@@ -1992,7 +799,7 @@
       "rank": "elite",
       "hp": 506,
       "speed": 0.975,
-      "radius": 0.48,
+      "radius": 0.66,
       "damage": 2,
       "windup": 2.3,
       "recovery": 6,
@@ -2006,7 +813,7 @@
       "rank": "boss",
       "hp": 1380,
       "speed": 0.975,
-      "radius": 0.48,
+      "radius": 0.96,
       "damage": 4,
       "windup": 2.3,
       "recovery": 6,
@@ -2034,7 +841,7 @@
       "rank": "elite",
       "hp": 308,
       "speed": 1.5,
-      "radius": 0.48,
+      "radius": 0.66,
       "damage": 44,
       "windup": 2.2,
       "recovery": 5,
@@ -2048,7 +855,7 @@
       "rank": "boss",
       "hp": 840,
       "speed": 1.5,
-      "radius": 0.48,
+      "radius": 0.96,
       "damage": 58,
       "windup": 2.2,
       "recovery": 5,
@@ -2076,7 +883,7 @@
       "rank": "elite",
       "hp": 220,
       "speed": 4.05,
-      "radius": 0.48,
+      "radius": 0.66,
       "damage": 2,
       "windup": 0.8,
       "recovery": 1,
@@ -2090,7 +897,7 @@
       "rank": "boss",
       "hp": 600,
       "speed": 4.05,
-      "radius": 0.48,
+      "radius": 0.96,
       "damage": 4,
       "windup": 0.8,
       "recovery": 1,
@@ -2111,20 +918,20 @@
       "path": "hearts/ocean.json"
     },
     {
-      "id": "forest-survival:weapon/longblade",
-      "path": "weapons/longblade.json"
+      "id": "forest-survival:skill/longblade",
+      "path": "skills/longblade.json"
     },
     {
-      "id": "forest-survival:weapon/dual-blades",
-      "path": "weapons/dual-blades.json"
+      "id": "forest-survival:skill/dual-blades",
+      "path": "skills/dual-blades.json"
     },
     {
-      "id": "forest-survival:weapon/spear",
-      "path": "weapons/spear.json"
+      "id": "forest-survival:skill/spear",
+      "path": "skills/spear.json"
     },
     {
-      "id": "forest-survival:weapon/hammer",
-      "path": "weapons/hammer.json"
+      "id": "forest-survival:skill/hammer",
+      "path": "skills/hammer.json"
     },
     {
       "id": "forest-survival:skill/flying-blade",
@@ -2171,8 +978,8 @@
       "path": "hearts/cycle.json"
     },
     {
-      "id": "forest-survival:weapon/thunder-staff",
-      "path": "weapons/thunder-staff.json"
+      "id": "forest-survival:skill/thunder-staff",
+      "path": "skills/thunder-staff.json"
     },
     {
       "id": "forest-survival:skill/thunder-seal",
@@ -2253,7 +1060,16 @@
     {
       "id": "forest-survival:support/concentrate",
       "path": "supports/concentrate.json"
+    },
+    {
+      "id": "forest-survival:support/homing",
+      "path": "supports/homing.json"
     }
   ],
-  "cycleWaves": true
+  "cycleWaves": false,
+  "expedition": {
+    "stages": 20,
+    "hellStages": 20,
+    "hellSeconds": 60
+  }
 }

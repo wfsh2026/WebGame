@@ -1,11 +1,12 @@
 import type { EquipmentItem } from './equipment';
 
 const milestones: Record<string, { level: number; text: string }[]> = {
-  "banner-power": [{"level": 5, "text": "旗阵范围扩大20%"}, {"level": 10, "text": "每8秒入阵可强化下一次直接攻击20%"}, {"level": 15, "text": "持续驻留逐步提高旗帜强度，最多20%"}, {"level": 20, "text": "每6秒军威脉冲，下一次直接攻击额外强化30%"}],
-  "banner-tempo": [{"level": 5, "text": "旗帜持续时间增加3秒"}, {"level": 10, "text": "持续驻留逐步提高旗帜强度，最多25%"}, {"level": 15, "text": "离阵后基础保留时间增加至2秒"}, {"level": 20, "text": "每6秒进入1.5秒急攻，旗帜强度提高30%"}],
-  "banner-wind": [{"level": 5, "text": "旗阵范围扩大20%"}, {"level": 10, "text": "穿过旗阵的己方投射物也能获得飞行加速"}, {"level": 15, "text": "改善已有追踪能力的追星弹转向"}, {"level": 20, "text": "旗帜消失后留下2秒衰减风场"}],
-  "banner-energy": [{"level": 5, "text": "旗帜持续时间增加3秒"}, {"level": 10, "text": "每8秒入阵可强化下一次心法恢复20%"}, {"level": 15, "text": "灵力低于25%时旗帜强度提高25%"}, {"level": 20, "text": "每6秒归元脉冲，下一次心法恢复额外强化30%"}],
-  "banner-guard": [{"level": 5, "text": "旗阵范围扩大20%"}, {"level": 10, "text": "驻留并停止移动时生成5%最大生命护盾，间隔6秒"}, {"level": 15, "text": "护盾破裂后1.5秒强化减伤"}, {"level": 20, "text": "每6秒进入1.5秒坚守，减伤效果增强50%"}],
+  homing: [{ level: 5, text: '转向速度提高至210度/秒' }, { level: 10, text: '转向240度/秒，索敌半径3.5米' }, { level: 15, text: '转向速度提高至270度/秒' }, { level: 20, text: '转向300度/秒，索敌半径4米；耗能与伤害代价保留' }],
+  "banner-power": [{"level": 5, "text": "旗阵与军威冲击范围扩大20%"}, {"level": 10, "text": "每8秒入阵可强化下一次直接攻击20%"}, {"level": 15, "text": "持续驻留逐步提高旗帜强度，最多20%"}, {"level": 20, "text": "每6秒军威脉冲强化下一次直接攻击30%，1.5秒内旗阵攻击提高30%"}],
+  "banner-tempo": [{"level": 5, "text": "旗帜持续时间增加3秒，延长自动点刺"}, {"level": 10, "text": "持续驻留逐步提高旗帜强度，最多25%"}, {"level": 15, "text": "离阵后基础保留时间增加至2秒"}, {"level": 20, "text": "每6秒进入1.5秒急攻，旗帜强度与点刺伤害提高30%"}],
+  "banner-wind": [{"level": 5, "text": "旗阵与风刃覆盖范围扩大20%"}, {"level": 10, "text": "穿过旗阵的己方投射物也能获得飞行加速"}, {"level": 15, "text": "改善已有追踪能力的追星弹转向"}, {"level": 20, "text": "每6秒强化风刃30%，持续1.5秒；旗帜消失后留下2秒衰减风场"}],
+  "banner-energy": [{"level": 5, "text": "旗帜持续时间增加3秒，延长内收灵潮"}, {"level": 10, "text": "每8秒入阵可强化下一次心法恢复20%"}, {"level": 15, "text": "灵力低于25%时旗帜强度提高25%"}, {"level": 20, "text": "每6秒归元脉冲强化下一次心法恢复30%，1.5秒内灵潮伤害提高30%"}],
+  "banner-guard": [{"level": 5, "text": "旗阵与地脉震击范围扩大20%"}, {"level": 10, "text": "驻留并停止移动时生成5%最大生命护盾，间隔6秒"}, {"level": 15, "text": "阵内护盾破裂后1.5秒强化减伤，追加150%伤害的反击震波"}, {"level": 20, "text": "每6秒进入1.5秒坚守，减伤效果增强50%，震击伤害提高30%"}],
   "duration": [{"level": 5, "text": "延长持续时间的收益提高"}, {"level": 10, "text": "到期增加1秒衰减退场"}, {"level": 15, "text": "持续时间进一步增长"}, {"level": 20, "text": "衰减退场延长至2秒"}],
   "linger": [{"level": 5, "text": "提高离阵保留时间和效果强度"}, {"level": 10, "text": "进一步延长余韵"}, {"level": 15, "text": "离阵增益保留强度继续提高"}, {"level": 20, "text": "余韵额外约3.4秒，保留约80%强度"}],
   "twin": [{"level": 5, "text": "支持两面旗阵分开覆盖队友"}, {"level": 10, "text": "旧旗存在时新旗布置间隔缩短15%"}, {"level": 15, "text": "保持双旗上限，同类不叠加"}, {"level": 20, "text": "旧旗存在时新旗布置间隔缩短25%"}],
@@ -155,28 +156,28 @@ const milestones: Record<string, { level: number; text: string }[]> = {
     {"level": 20, "text": "强化共鸣同时使接收攻击消耗降低20%"}
   ],
   "stream": [
-    {"level": 5, "text": "恢复魔法成本降低8%"},
-    {"level": 10, "text": "恢复魔法成本降低15%"},
-    {"level": 15, "text": "低于25%储量时额外转换20%，间隔4秒，正常付费"},
-    {"level": 20, "text": "低储量额外转换提高至40%"}
+    {"level": 5, "text": "连接能力灵力消耗降低8%"},
+    {"level": 10, "text": "连接能力灵力消耗降低15%"},
+    {"level": 15, "text": "低于25%储量时额外恢复20%，间隔4秒"},
+    {"level": 20, "text": "低储量额外恢复提高至40%"}
   ],
   "spring": [
     {"level": 5, "text": "基础恢复间隔缩短10%"},
     {"level": 10, "text": "基础恢复间隔缩短20%"},
     {"level": 15, "text": "持续低储量1秒后急涌2秒，恢复间隔再缩短20%"},
-    {"level": 20, "text": "急涌恢复间隔缩短35%，正常按转换量付费"}
+    {"level": 20, "text": "急涌恢复间隔缩短35%"}
   ],
   "ocean": [
     {"level": 5, "text": "容量额外提高12%"},
     {"level": 10, "text": "容量额外提高25%"},
-    {"level": 15, "text": "低储量后下一次恢复额外转换50%，间隔6秒"},
-    {"level": 20, "text": "低储量额外转换提高至80%，正常付费"}
+    {"level": 15, "text": "低储量后下一次恢复额外恢复50%，间隔6秒"},
+    {"level": 20, "text": "低储量额外恢复提高至80%"}
   ],
   "cycle": [
     {"level": 5, "text": "增加能力槽，近远交替强化下次恢复"},
     {"level": 10, "text": "增加能力槽，交替供能随等级成长"},
     {"level": 15, "text": "每完成3次有效交替，强化2次正常恢复15%"},
-    {"level": 20, "text": "强化3次正常恢复30%，正常付费"}
+    {"level": 20, "text": "强化3次正常恢复30%"}
   ]
 };
 function growthKey(item: EquipmentItem): string { const id = item.definitionId ?? item.id; const parts = id.split('/'); return item.effect ?? parts[parts.length - 1]; }

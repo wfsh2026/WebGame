@@ -1,3 +1,4 @@
+import { expeditionDifficultySchema } from '@web-game-world/contracts';
 import { Client } from 'colyseus.js';
 import { z } from 'zod';
 import { profileSchema } from '@web-game-world/contracts';
@@ -14,12 +15,12 @@ export async function request(path: string, options: { token?: string; body?: un
 }
 const loginResultFields = { token: z.string(), profile: profileSchema };
 export const loginResultSchema = z.object(loginResultFields);
-const roomItemFields = { roomId: z.string(), clients: z.number(), maxClients: z.number(), name: z.string() };
+const roomItemFields = { difficulty: expeditionDifficultySchema.default('normal'), roomId: z.string(), clients: z.number(), maxClients: z.number(), name: z.string() };
 const roomItemSchema = z.object(roomItemFields);
 export const roomListSchema = z.array(roomItemSchema);
-const runHistoryFields = { status: z.string(), createdAt: z.string() };
+const runHistoryFields = { difficulty: expeditionDifficultySchema.default('normal'), status: z.string(), createdAt: z.string() };
 const runHistorySchema = z.object(runHistoryFields);
-const historyItemFields = { runId: z.string(), settled: z.boolean(), coins: z.number(), materials: z.number(), run: runHistorySchema };
+const historyItemFields = { outcome: z.string().default('active'), baseCleared: z.boolean().default(false), hellFloor: z.number().int().min(0).max(20).default(0), runId: z.string(), settled: z.boolean(), coins: z.number(), materials: z.number(), run: runHistorySchema };
 const historyItemSchema = z.object(historyItemFields);
 export const historySchema = z.array(historyItemSchema);
 export function roomClient(): Client { const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:'; const endpoint = `${protocol}//${location.host}${base}room`; return new Client(endpoint); }

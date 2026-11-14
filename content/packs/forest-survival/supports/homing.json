@@ -1,0 +1,11 @@
+{
+  "id": "forest-survival:support/homing",
+  "kind": "support",
+  "name": "寻踪",
+  "host": "ranged",
+  "effect": "homing",
+  "requiresProjectile": true,
+  "costMultiplier": 1.2,
+  "damageMultiplier": 0.85,
+  "description": "辅助火球、寒棘、雷印符、飞刃去程和剑阵剑弹。飞出0.8米后追踪附近敌人，失去目标时在前方120度内重新索敌；基础3米、180度/秒。5/10/15/20级改善转向，10/20级扩大索敌。耗能增加20%，伤害降低15%；不延长寿命，不增加命中次数，星芒术不兼容。"
+}

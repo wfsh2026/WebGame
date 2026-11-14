@@ -1,0 +1,17 @@
+.notices { position: absolute; z-index: 14; left: 50%; bottom: 265px; transform: translateX(-50%); width: 80%; max-width: 660px; pointer-events: none; text-align: center; font-family: 'Songti SC', SimSun, serif; }
+.row { display: grid; grid-template-rows: 1fr; animation: pickup-life 2200ms linear both; }
+.clip { min-height: 0; overflow: hidden; }
+.text { padding: 5px 0; color: #fff0cb; font-size: clamp(14px, 1.3vw, 20px); font-weight: 600; line-height: 1.5; letter-spacing: .3px; overflow-wrap: anywhere; text-shadow: 0 1px 3px #17120d, 0 2px 5px #0009; transition: opacity 200ms; }
+.row:nth-last-child(3) .text { opacity: .58; }
+.row:nth-last-child(2) .text { opacity: .82; }
+.prefix { color: #e5e5d9; font-weight: 500; }
+.paren { color: #e9e8d9; font-weight: 500; }
+.count { color: #e5e5d9; font-size: .8em; }
+@keyframes pickup-life {
+  0% { grid-template-rows: 0fr; opacity: 0; transform: translateY(9px); }
+  8%, 86% { grid-template-rows: 1fr; opacity: 1; transform: translateY(0); }
+  100% { grid-template-rows: 0fr; opacity: 0; transform: translateY(-9px); }
+}
+@media (prefers-reduced-motion: reduce) { .row { animation: none; } .text { transition: none; } }
+@media (max-width:600px) { .notices { bottom: 220px; width: 94%; }.text { font-size: 13px; } }
+@media (max-height:500px) and (min-width:601px) { .notices { bottom: 170px; }.text { font-size: 13px; } }

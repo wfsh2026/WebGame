@@ -2,7 +2,7 @@
   "id": "forest-survival:support/execution-spread",
   "kind": "support",
   "name": "处决扩散",
-  "host": "skill",
+  "host": "ranged",
   "effect": "execution-spread",
   "description": "寒棘或雷印符直接击杀后传播状态至附近2个目标；3级传播距离4米，5级传播3个目标。初始宿主伤害降低10%，耗能增加15%；传播不造成伤害、不连锁。升级减轻伤害折损。"
 }

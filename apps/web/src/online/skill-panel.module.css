@@ -23,6 +23,7 @@
 .items { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; max-height:440px; overflow-y:auto; padding:3px; }
 .items .item { min-width:0; display:flex; flex-direction:column; align-items:center; gap:7px; text-align:center; padding:12px 6px; }
 .item b { font-size:15px; }.item span,.item small { font-size:12px; }
+.items .item[data-changed=true] { border-color:#d8c079; box-shadow:inset 0 0 12px #d8c07918; }.item .upgraded { font-size:13px; color:#c8e4a4; }
 .comparison { margin-top:18px; padding:16px; border:1px solid #a88a55; border-radius:8px; background:#0e211cc9; }
 .compareColumns { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 .compareColumns article { min-width:0; padding:12px; border:1px solid #65745a; border-radius:5px; }
@@ -34,3 +35,5 @@
 
 /* Keep long names and decimal values within their cards. */
  .panel { overflow-wrap:anywhere; } .inventory,.item > *,.facts span { min-width:0; max-width:100%; } .facts > div { flex-wrap:wrap; } .node .nodeLabel { width:90px; max-width:150%; white-space:normal; line-height:1.2; }
+
+.node[data-dormant=true] { opacity: .6; border-style: dashed; }

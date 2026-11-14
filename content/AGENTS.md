@@ -9,11 +9,10 @@
 | 物品等级、槽位解锁、局内构筑成长 | [构筑成长规则](../docs/gameplay/build-growth.md)，再按具体内容类型读取 |
 | 创建内容包、清单、依赖或发布 | [内容包规则](rules/packs.md) |
 | 心法、灵力池、供能和能力连接槽 | [心法规则](rules/hearts.md) |
-| 武器、攻击间隔和武器辅助格 | [武器规则](rules/weapons.md) |
 | 辅助技能、辅助物品和效果修饰 | [辅助规则](rules/supports.md) |
 | 角色创作、初始属性、点数分配 | [角色规则](rules/characters.md) |
 | 地图、碰撞、出生点、地图对象 | [地图规则](rules/maps.md) |
-| 技能、投射物、增益配置 | [技能规则](rules/skills.md) |
+| 近战与远程技能、攻击间隔、辅助格、AI 设计与构筑组合 | [技能规则](rules/skills.md) |
 | 怪物属性、行为与掉落引用 | [怪物规则](rules/enemies.md) |
 | 秘境事件、刷怪、阶段与目标 | [事件规则](rules/events.md) |
 | 图片、动画、音效和资源预算 | [资源规则](rules/assets.md) |
@@ -23,6 +22,6 @@
 
 一次任务涉及多个类型时组合读取。需要新增机制、修改格式或影响奖励时，按类型规则内的链接继续读取相应领域规范。
 
-具体参数未确定时保持待定，不自行扩展为既定平台规则。当前已有 `forest-survival` 首包及受限 JSON/Zod 校验，通用内容平台尚未完成，范围见 [当前实现](../docs/implementation/limitations.md)。
+文档内容的明确性遵守 [文档维护规则](../docs/development.md#文档维护)。当前已有 `forest-survival` 首包及受限 JSON/Zod 校验，通用内容平台尚未完成，范围见 [当前实现](../docs/implementation/limitations.md)。
 
-角色、怪物、武器攻击与技能表现设计均须先读 [实体显示与控制](../docs/gameplay/entity-controls.md)，遵守统一圆形实体、固定画像及独立攻击特效的表现边界。
+角色、怪物、技能表现设计均须先读 [实体显示与控制](../docs/gameplay/entity-controls.md)，遵守统一圆形实体、固定画像及独立攻击特效的表现边界。

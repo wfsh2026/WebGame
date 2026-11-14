@@ -3,9 +3,9 @@ import type { Effect } from '@web-game-world/simulation';
 import type { BattleViewport } from './battle-entities';
 import fontUrl from './assets/fonts/Kalam-Regular.ttf';
 
-type Kind = 'normal' | 'heavy' | 'kill' | 'hurt' | 'absorb' | 'block';
+type Kind = 'normal' | 'heavy' | 'kill' | 'hurt' | 'absorb' | 'block' | 'perfect-block';
 interface Label { target: string; amount: number; count: number; kind: Kind; start: number; updated: number; x: number; y: number; lane: number; height: number; text: Phaser.GameObjects.Text; tag: Phaser.GameObjects.Text }
-const colors: Record<Kind, string> = { normal: '#fff0ce', heavy: '#ffd881', kill: '#ffcf74', hurt: '#ff9a86', absorb: '#c4f5ff', block: '#c4f5ff' };
+const colors: Record<Kind, string> = { normal: '#fff0ce', heavy: '#ffd881', kill: '#ffcf74', hurt: '#ff9a86', absorb: '#c4f5ff', block: '#c4f5ff', 'perfect-block': '#fff1b2' };
 let fontReady = false;
 let fontLoading: Promise<void> | undefined;
 function loadFont(): void {
@@ -23,9 +23,9 @@ export class DamageLabels {
 
   add(effect: Effect, context: { mine: boolean; heavy: boolean; height: number }): void {
     const amount = effect.kind === 'absorb' ? effect.absorbed ?? 0 : effect.damage ?? 0;
-    if (amount <= 0 && effect.kind !== 'block') return;
+    if (amount <= 0 && effect.kind !== 'block' && effect.kind !== 'perfect-block') return;
     const now = this.scene.time.now;
-    const kind: Kind = effect.kind === 'absorb' ? 'absorb' : effect.kind === 'block' ? 'block' : context.mine ? 'hurt' : effect.killed ? 'kill' : context.heavy ? 'heavy' : 'normal';
+    const kind: Kind = effect.kind === 'absorb' ? 'absorb' : effect.kind === 'block' ? 'block' : effect.kind === 'perfect-block' ? 'perfect-block' : context.mine ? 'hurt' : effect.killed ? 'kill' : context.heavy ? 'heavy' : 'normal';
     const offensive = kind === 'normal' || kind === 'heavy' || kind === 'kill';
     const existing = this.labels.find(label => label.target === effect.targetId && now - label.updated < 160 && now - label.start < 450 && (label.kind === kind || offensive && (label.kind === 'normal' || label.kind === 'heavy')));
     if (existing) {
@@ -62,9 +62,9 @@ export class DamageLabels {
       if (remaining <= 0) { this.release(item); return false; }
       const size = item.kind === 'kill' ? 38 : item.kind === 'heavy' ? 36 : item.kind === 'hurt' ? 30 : 28;
       const value = Math.round(item.amount); const amount = item.amount > 0 && value === 0 ? '<1' : String(value);
-      const label = item.kind === 'hurt' ? `−${amount}` : amount;
-      const tag = item.kind === 'kill' ? '击破' : item.kind === 'absorb' ? '吸收' : item.kind === 'block' ? '格挡' : item.count > 1 ? `${item.count}次` : '';
-      const family = fontReady ? 'CombatHand' : 'cursive';
+      const label = item.kind === 'perfect-block' ? '精防' : item.kind === 'hurt' ? `−${amount}` : amount;
+      const tag = item.kind === 'kill' ? '击破' : item.kind === 'absorb' ? '吸收' : item.kind === 'block' ? '格挡' : item.kind === 'perfect-block' ? '反击 · 伤害×2' : item.count > 1 ? `${item.count}次` : '';
+      const family = item.kind === 'perfect-block' ? 'KaiTi, STKaiti, Microsoft YaHei, sans-serif' : fontReady ? 'CombatHand' : 'cursive';
       if (item.text.style.fontFamily !== family) item.text.setFontFamily(family);
       if (item.text.style.fontSize !== `${size}px`) item.text.setFontSize(size);
       const color = colors[item.kind];

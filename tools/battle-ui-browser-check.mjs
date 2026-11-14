@@ -65,7 +65,7 @@ try {
   const reward = page.getByRole('button', { name: /存活/ });
   await reward.hover(); await page.getByRole('heading', { name: '生存奖励' }).waitFor();
   await page.mouse.move(750, 600); await page.getByRole('heading', { name: '生存奖励' }).waitFor({ state: 'hidden' });
-  const equipped = page.getByRole('region', { name: '已装备武器与技能' });
+  const equipped = page.getByRole('region', { name: '已装备近战与远程技能' });
   const equippedCount = await equipped.getByRole('img').count(); assert.equal(equippedCount, 2);
   const dashHints = await page.getByText('Shift 冲刺', { exact: true }).count(); assert.equal(dashHints, 0);
   const movementHints = await page.getByText('WASD 移动 · 自动攻击', { exact: true }).count(); assert.equal(movementHints, 0);

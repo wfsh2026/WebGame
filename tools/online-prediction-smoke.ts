@@ -19,7 +19,7 @@ const world = new PresentationWorld(player.id); const initial = snapshot(server)
 const input = { sequence: 1, x: 1, y: 0, block: false, dash: false };
 world.update(input, 1000 / 60);
 assert.ok((world.localPlayer?.x ?? 0) > 15, '没有回包也必须在第一帧响应移动');
-assert.equal(world.localPlayer?.weaponCount, 1, '自动攻击不等待服务器回包');
+assert.equal(world.localPlayer?.meleeCount, 1, '自动攻击不等待服务器回包');
 const firstShot = world.simulation.projectiles[0]; const firstShotX = firstShot.x; const firstEnemyX = world.simulation.enemies[0].x;
 for (let frame = 0; frame < 5; frame += 1) world.update(input, 1000 / 60);
 assert.ok(world.simulation.projectiles[0].x > firstShotX + 0.5, '投射物必须在两次网络快照之间持续移动');

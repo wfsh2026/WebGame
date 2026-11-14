@@ -1,0 +1,23 @@
+{
+  "source": "AI-generated using built-in image_gen, 2026-11-14",
+  "usage": "Seven transparent character level frames, a level plaque and eight neutral tintable VFX; 4x4 atlas, 256px cells",
+  "display": "Player frames 40–96px; loot VFX 12–90px, independent transforms with shared textures",
+  "layout": [
+    "bronze",
+    "iron",
+    "silver",
+    "gold",
+    "crystal",
+    "starlight",
+    "maximum",
+    "plaque",
+    "halo",
+    "spark",
+    "trail",
+    "level-up",
+    "absorb",
+    "motes",
+    "ground",
+    "wisp"
+  ]
+}

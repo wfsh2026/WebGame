@@ -1,32 +1,41 @@
-import type { BuildStateData, PlayerView, Snapshot } from '@web-game-world/contracts';
-import { buildCatalog, waveProfile } from '@web-game-world/simulation';
+import { useEffect, useState } from 'react';
+import type { BuildStateData, Snapshot } from '@web-game-world/contracts';
+import { buildCatalog, equipmentRuntime } from '@web-game-world/simulation';
 import content from '../network/content';
-import { EquipmentIcon } from '../hud/equipment-icon';
+import { ShopIcon } from '../lobby/camp/shop-icon';
 import portrait from '../character-creator/assets/adventurer.webp';
-import s from './wave-preparation.module.css';
+import { RewardDialog } from './reward-dialog';
+import w from './wave-rewards.module.css';
 
-interface Props { snapshot: Snapshot; state: BuildStateData; player?: PlayerView; unseen: number; ready: (ready: boolean) => void; remind: () => void; open: (tab: 'level' | 'wave' | 'skills') => void }
+interface Props { state: BuildStateData; added: number; upgraded: Record<string, { before: number; after: number }>; open: (id?: string) => void }
+
 export function WavePreparation(props: Props) {
-  const preparation = props.snapshot.preparation;
-  if (!preparation) return null;
-  const participants = props.snapshot.players.filter(player => preparation.participantIds.includes(player.id));
-  const ready = props.player ? preparation.readyIds.includes(props.player.id) : false;
-  const context = { config: content }; const next = waveProfile(context, props.snapshot.round + 1);
   const catalog = buildCatalog(content, props.state.items);
-  const heart = catalog.find(item => item.id === props.state.loadout.heart);
-  const minutes = Math.floor(Math.max(0, props.snapshot.serverTime - preparation.startedAt) / 60000);
-  const seconds = Math.floor(Math.max(0, props.snapshot.serverTime - preparation.startedAt) / 1000) % 60;
-  const secondsText = String(seconds).padStart(2, '0');
-  const waiting = participants.filter(player => !preparation.readyIds.includes(player.id));
-  return <section className={s.preparation}><p className={s.subtitle}>第 {props.snapshot.round} 波已完成 · 整理奖励与构筑，准备好后再出发</p><div className={s.layout}>
-    <div><div className={s.cards}>
-      <article><EquipmentIcon kind="weapon" effect="slash" size={100} /><h3>升级奖励 ×{props.state.upgradeCredits}</h3><p>强化已有能力</p><button onClick={() => props.open('level')}>选择成长</button></article>
-      <article><EquipmentIcon kind="skill" effect="star" size={100} /><h3>波次奖励 ×{props.state.waveCredits}</h3><p>补足构筑与新能力</p><button onClick={() => props.open('wave')}>领取奖励</button></article>
-      <article><EquipmentIcon kind="heart" size={100} /><h3>新获得物品 ×{props.unseen}</h3><p>查看掉落与替换对比</p><button onClick={() => props.open('skills')}>整理构筑</button></article>
-    </div><div className={s.build}><h3>当前构筑</h3><p>本波金币 +10 · 已累计 {props.snapshot.results.filter(result => result.success).length * 10} · 最终结算发放</p><div className={s.branches}>
-      <button onClick={() => props.open('skills')}><EquipmentIcon kind="heart" effect={heart?.effect} size={54} /><b>{heart?.name ?? '未装备心法'}</b><small>{heart ? `Lv.${heart.level}` : '点击装配'}</small></button>
-      {props.state.loadout.slots.map((slot, index) => { const ability = catalog.find(item => item.id === slot?.itemId); return <button key={index} onClick={() => props.open('skills')}>{ability && <EquipmentIcon kind={ability.kind} effect={ability.effect} size={45} />}<b>{ability?.name ?? `能力槽 ${index + 1}`}</b><small>{ability ? `Lv.${ability.level}` : '空槽'}</small><span className={s.gems}>{slot?.supports.map((id, socket) => { const gem = catalog.find(item => item.id === id); return gem ? <span key={socket} title={gem.name}><EquipmentIcon kind="support" effect={gem.effect} size={24} /></span> : <small key={socket}>空</small>; })}</span></button>; })}
-    </div></div></div>
-    <aside className={s.team}><h3>队伍准备 {preparation.readyIds.length} / {participants.length}</h3><p>已等待 {minutes}:{secondsText}</p><div className={s.roster}>{participants.map(player => { const done = preparation.readyIds.includes(player.id); const status = !player.connected ? '重连中' : done ? '已准备' : player.hp <= 0 ? '灵魂 · 未准备' : '未准备'; return <div key={player.id} data-ready={done} title={`${player.name} · ${status}`}><img src={portrait} alt="" /><b>{done ? '✓' : '○'}</b><span>{player.name}</span><small>{status}</small></div>; })}</div><details><summary>查看未准备队员 · {waiting.length}</summary>{waiting.map(player => <p key={player.id}>{player.name} · {player.connected ? '等待准备' : '等待重连，宽限期结束后退出名单'}</p>)}</details><button disabled={preparation.reminded || waiting.length === 0} onClick={props.remind}>{preparation.reminded ? '本波已提醒' : '提醒准备'}</button></aside>
-  </div><footer className={s.footer}><div><b>下一波 · 第 {props.snapshot.round + 1} 波 · {next.wave.name}</b><p>{next.wave.hint}</p><small>未选奖励会保留。准备时间不累计生存收益，消耗品拾取即用。</small></div><div><strong>{preparation.countdown > 0 ? `${Math.ceil(preparation.countdown)} 秒后开战` : ready ? '等待队友准备' : '你尚未准备'}</strong><button className={s.ready} onClick={() => props.ready(!ready)}>{ready ? '取消准备' : participants.length === 1 ? '开始下一波' : '准备完成'}</button><small>全员准备后 3 秒开战，倒计时期间可取消。</small></div></footer></section>;
+  const runtime = equipmentRuntime(props.state.loadout, content, props.state.items);
+  const items = catalog.filter(item => item.id === props.state.loadout.heart || props.state.loadout.slots.some(slot => slot?.itemId === item.id));
+  return <section className={w.buildStrip} aria-label="构筑变化与调整"><div className={w.buildItems}>{items.map(item => {
+    const definition = { ...item, id: item.definitionId ?? item.id };
+    const active = item.kind === 'heart' || runtime.branches.some(branch => branch.item.id === item.id);
+    const upgrade = props.upgraded[item.id];
+    return <button key={item.id} data-active={active} onClick={() => props.open(item.id)} title={`${item.name}${active ? '' : ' · 尚未激活'}`}><ShopIcon item={definition} size={43} /><span>{item.name}<small>{upgrade ? `Lv.${upgrade.before} → ${upgrade.after}` : `Lv.${item.level}`}{!active && ' · 待激活'}</small></span></button>;
+  })}</div><button className={w.link} onClick={() => props.open()}>调整构筑{props.added > 0 && ` · 新增 ${props.added}`} ›</button></section>;
+}
+
+export function WaveTeam(props: { snapshot: Snapshot; connected: boolean; remind: () => void }) {
+  const [opened, setOpened] = useState(false);
+  const [pending, setPending] = useState(false);
+  const preparation = props.snapshot.preparation;
+  useEffect(() => { setPending(false); }, [preparation?.reminded, props.snapshot.round, props.connected]);
+  useEffect(() => { if (!pending) return; const timer = window.setTimeout(() => setPending(false), 8000); return () => window.clearTimeout(timer); }, [pending]);
+  if (!preparation || preparation.participantIds.length <= 1) return null;
+  const participants = props.snapshot.players.filter(player => preparation.participantIds.includes(player.id));
+  const waiting = preparation.participantIds.length - preparation.readyIds.length;
+  const missing = preparation.participantIds.filter(id => !participants.some(player => player.id === id));
+  function remind(): void { if (pending || preparation?.reminded || !props.connected) return; setPending(true); props.remind(); }
+  return <div className={w.team}><button className={w.teamSummary} onClick={() => setOpened(true)}>队伍准备 <b>{preparation.readyIds.length}/{preparation.participantIds.length}</b> ›</button><div className={w.roster}>{participants.slice(0, 5).map(player => {
+    const ready = preparation.readyIds.includes(player.id);
+    return <span key={player.id} title={`${player.name} · ${!player.connected ? '重连中' : ready ? '已准备' : '未准备'}`}><img src={portrait} alt={player.name} /><b data-ready={ready}>{ready ? '✓' : '·'}</b></span>;
+  })}{participants.length > 5 && <button className={w.link} onClick={() => setOpened(true)}>+{participants.length - 5}</button>}</div><button className={w.link} disabled={pending || preparation.reminded || waiting <= 0 || !props.connected} onClick={remind}>{preparation.reminded ? '已提醒' : pending ? '正在提醒…' : '提醒'}</button>
+    {opened && <RewardDialog title="队伍准备状态" close={() => setOpened(false)}>{participants.map(player => <p key={player.id}>{player.name} · {!player.connected ? '重连中' : preparation.readyIds.includes(player.id) ? '已准备' : '未准备'}</p>)}{missing.map(id => <p key={id}>同行者 · 等待状态同步</p>)}</RewardDialog>}
+  </div>;
 }

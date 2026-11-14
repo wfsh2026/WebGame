@@ -1,0 +1,15 @@
+{
+  "id": "forest-survival:skill/thunder-staff",
+  "kind": "skill",
+  "name": "引雷长棍",
+  "effect": "thunder-staff",
+  "interval": 1.55,
+  "cost": 8.455,
+  "coefficient": 1.55,
+  "range": 2.3,
+  "angle": 120,
+  "supportSlots": 1,
+  "delivery": "melee",
+  "description": "120度横扫，引爆自己的雷印，半径1.2米；5级横扫150度、雷爆半径1.5米；10级横扫180度、雷爆半径1.8米。雷爆不连锁。",
+  "skillType": "melee"
+}

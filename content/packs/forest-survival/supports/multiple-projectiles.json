@@ -2,7 +2,7 @@
   "id": "forest-survival:support/multiple-projectiles",
   "kind": "support",
   "name": "多重投射",
-  "host": "skill",
+  "host": "ranged",
   "effect": "multiple",
   "description": "1级3枚、3级4枚、5级5枚扇形投射物；耗能分别增加60%/80%/100%，单弹伤害降低。同次施放对同一目标只结算一次。"
 }

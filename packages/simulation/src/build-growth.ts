@@ -1,18 +1,18 @@
 import { abilityProgress } from './combat-rhythm';
 import { abilityUnlock } from './ability-growth';
 import { applyCharacterGrowth } from './character-growth';
-import { prepareLevelChoices } from './level-rewards';
+import { prepareLevelChoices, levelOptions } from './level-rewards';
 import { updateResonance } from './resonance';
-import { trainBuildItem, buildCatalog, equipmentCatalog, equipmentRuntime, equippedIds, fitLoadout, supportCompatible } from './equipment';
+import { canonicalEquipmentId, heartCapacity, trainBuildItem, buildCatalog, equipmentCatalog, equipmentRuntime, equippedIds, fitBuildLoadout, supportCompatible } from './equipment';
 import type { BuildItem, EquipmentLoadout, EquipmentItem } from './equipment';
 import type { Player, Simulation, SimConfig } from './index';
 
 export interface GrowthOption { kind: 'upgrade' | 'item' | 'refine' | 'character'; itemId: string; level: number }
-export interface GrowthChoice { earnedLevel?: number; wave?: number; keyWave?: boolean; id: number; source: 'level' | 'wave' | 'link'; options: GrowthOption[] }
+export interface GrowthChoice { hellEntry?: boolean; earnedLevel?: number; wave?: number; keyWave?: boolean; id: number; source: 'level' | 'wave' | 'link'; options: GrowthOption[]; refreshCount?: number }
 export function experienceNeeded(level: number): number { return 16 + (level - 1) * 8; }
 export function refreshBuild(player: Player, config: SimConfig): void {
   const catalog = buildCatalog(config, player.buildItems);
-  player.loadout = fitLoadout(player.loadout, catalog);
+  player.loadout = fitBuildLoadout(player.loadout, catalog);
   const previous = player.equipment;
   player.equipment = equipmentRuntime(player.loadout, config, player.buildItems);
   const oldHeart = previous.heartItem?.id; const newHeart = player.equipment.heartItem?.id;
@@ -29,38 +29,20 @@ export function refreshBuild(player: Player, config: SimConfig): void {
   const equipped = player.equipment.branches.map(branch => branch.item.id);
   for (const state of player.abilityStates) if (!equipped.includes(state.itemId)) { state.progress = undefined; const progress = abilityProgress(state); progress.origin = state.count; }
   if (oldHeart !== newHeart) player.heartProgress = undefined;
-  player.capacity = player.equipment.heartItem?.capacity ?? 0;
+  player.capacity = heartCapacity(player.equipment.heartItem, player.stats.energyCapacityBonus);
   player.energy = Math.min(player.energy, player.capacity);
   // Keep timers on unequipped item instances so swapping cannot reset attacks.
   const interval = player.equipment.heartItem?.interval ?? 1;
   player.heartWait = Math.max(player.heartWait, interval);
   updateResonance(player, 0);
-  grantCompanionChoice(player, config);
   player.buildRevision += 1;
-}
-function grantCompanionChoice(player: Player, config: SimConfig): void {
-  const slots = player.equipment.heartItem?.slots ?? 1;
-  player.companionMilestones ??= [];
-  for (let milestone = 2; milestone <= slots; milestone += 1) {
-  if (player.companionMilestones.includes(milestone)) continue;
-  const branches = player.equipment.branches;
-  const hasWeapon = branches.some(branch => branch.item.kind === 'weapon');
-  const hasSkill = branches.some(branch => branch.item.kind === 'skill');
-  const desired = hasWeapon && !hasSkill ? 'skill' : hasSkill && !hasWeapon ? 'weapon' : '';
-  const catalog = equipmentCatalog(config);
-  const preferred = desired === 'skill' ? 'thunder-seal' : 'thunder-staff';
-  const available = catalog.filter(item => desired ? item.kind === desired : item.kind === 'weapon' || item.kind === 'skill');
-  available.sort((a, b) => Number(b.effect === preferred) - Number(a.effect === preferred));
-  const candidates = available.slice(0, 3);
-  const options: GrowthOption[] = candidates.map(item => ({ kind: 'item', itemId: item.id, level: 1 }));
-  if (!options.length) return;
-  player.companionMilestones.push(milestone); player.choiceSequence += 1;
-  player.choices.push({ id: player.choiceSequence, source: 'link', options });
-  }
 }
 export function initializeBuild(player: Player, data: { ids: string[]; items?: BuildItem[]; config: SimConfig }): void {
   const unique = new Set(data.ids);
-  player.buildItems = data.items ? data.items.map(item => ({ ...item, bonus: 0, experience: 0 })) : [...unique].map(id => ({ id, definitionId: id, level: 1, bonus: 0 }));
+  player.buildItems = data.items ? data.items.map(item => {
+    const definitionId = canonicalEquipmentId(item.definitionId);
+    return { ...item, definitionId, bonus: 0, experience: 0 };
+  }) : [...unique].map(id => ({ id, definitionId: id, level: 1, bonus: 0 }));
   refreshBuild(player, data.config);
   player.energy = player.capacity;
   for (const state of player.abilityStates) state.remaining = 0;
@@ -128,7 +110,11 @@ export function grantBuildItem(player: Player, option: GrowthOption, config: Sim
 }
 export function awardCombatGrowth(sim: Simulation, player: Player, kill: boolean): void {
   if (sim.presentationOnly) return;
-  player.experience += kill ? 8 : 4;
+  grantExperience(sim, player, kill ? 4 : 2);
+}
+export function grantExperience(sim: Simulation, player: Player, amount: number): void {
+  if (sim.presentationOnly || amount <= 0 || player.level >= 100) return;
+  player.experience += amount;
   let threshold = experienceNeeded(player.level);
   while (player.experience >= threshold && player.level < 100) {
     player.experience -= threshold; player.level += 1; player.upgradeCredits += 1;
@@ -140,7 +126,7 @@ function waveOptions(sim: Simulation, player: Player): GrowthOption[] {
   const catalog = equipmentCatalog(sim.config);
   const current = buildCatalog(sim.config, player.buildItems);
   const equipped = equippedIds(player.loadout);
-  const abilities = current.filter(item => equipped.includes(item.id) && (item.kind === 'weapon' || item.kind === 'skill'));
+  const abilities = current.filter(item => equipped.includes(item.id) && (item.kind === 'skill'));
   const emptyAbility = player.loadout.slots.some(slot => !slot);
   const compatible = catalog.filter(item => item.kind === 'support' && abilities.some(ability => supportCompatible(item, ability)));
   const openBranches = player.loadout.slots.filter(slot => slot && slot.supports.some(id => !id));
@@ -150,7 +136,7 @@ function waveOptions(sim: Simulation, player: Player): GrowthOption[] {
     const already = slot.supports.some(id => current.find(item => item.id === id)?.definitionId === gem.id);
     return !already && supportCompatible(gem, ability);
   }));
-  const abilityPool = catalog.filter(item => item.kind === 'weapon' || item.kind === 'skill');
+  const abilityPool = catalog.filter(item => item.kind === 'skill');
   const gapPool = emptyAbility ? abilityPool : gapGems.length ? gapGems : compatible.length ? compatible : abilityPool;
   const keyWave = sim.round % 3 === 0;
   const tier = 1 + Math.floor((sim.round - 1) / 3);
@@ -167,7 +153,7 @@ function waveOptions(sim: Simulation, player: Player): GrowthOption[] {
   const randomPool = keyWave ? catalog : catalog.filter(item => item.kind !== 'heart');
   addItem(randomPool, keyWave ? 1 : 0);
   if (keyWave) {
-    const eligible = current.filter(item => (item.level ?? 1) < 20);
+    const eligible = current.filter(item => equipped.includes(item.id) && (item.kind === 'heart' || item.kind === 'skill') && (item.level ?? 1) < 20);
     const kinds = eligible.map(item => item.kind);
     const categories = [...new Set(kinds)];
     const sampled = sample(sim, categories); const category = sampled[0];
@@ -187,6 +173,22 @@ export function awardWaveGrowth(sim: Simulation): void {
     player.choices.push(choice); player.buildRevision += 1;
   }
 }
+function hellGrowthOptions(sim: Simulation, player: Player): GrowthOption[] {
+  const options = levelOptions(sim, player);
+  if (options.length >= 3) return options;
+  const fallback = waveOptions(sim, player);
+  for (const option of fallback) {
+    if (options.some(entry => entry.kind === option.kind && entry.itemId === option.itemId)) continue;
+    options.push(option); if (options.length === 3) break;
+  }
+  return options;
+}
+export function awardHellGrowth(sim: Simulation, player: Player): void {
+  const options = hellGrowthOptions(sim, player);
+  player.waveCredits += 1; player.choiceSequence += 1;
+  const choice: GrowthChoice = { id: player.choiceSequence, source: 'wave', wave: sim.round, hellEntry: true, options };
+  player.choices.unshift(choice); player.buildRevision += 1;
+}
 export function chooseGrowth(sim: Simulation, player: Player, request: { choiceId: number; index: number; targetId?: string }): string {
   const choice = player.choices.find(entry => entry.id === request.choiceId);
   const option = choice?.options[request.index];
@@ -195,17 +197,9 @@ export function chooseGrowth(sim: Simulation, player: Player, request: { choiceI
   if (option.kind === 'character') applyCharacterGrowth(player, option.itemId);
   else if (option.kind === 'refine') {
     const catalog = buildCatalog(sim.config, player.buildItems);
-    const eligible = catalog.filter(item => item.kind === option.itemId && (item.level ?? 1) < 20);
-    if (!eligible.length) {
-      const replacements = waveOptions(sim, player);
-      const alternative = replacements.find(item => item.kind === 'item');
-      if (alternative) {
-        const tier = 1 + Math.floor(((choice.wave ?? 1) - 1) / 3);
-        alternative.level = Math.min(alternative.level, tier);
-        choice.options[request.index] = alternative; player.buildRevision += 1;
-      }
-      return '该类别已无可强化物品，奖励已替换，请重新选择';
-    }
+    const equipped = equippedIds(player.loadout);
+    const eligible = catalog.filter(item => equipped.includes(item.id) && item.kind === option.itemId && (item.kind === 'heart' || item.kind === 'skill') && (item.level ?? 1) < 20);
+    if (!eligible.length) return '当前没有该类别的已装配强化目标，请调整构筑或付费刷新';
     const target = eligible.find(item => item.id === request.targetId);
     const instance = player.buildItems.find(item => item.id === target?.id);
     if (!target || !instance) return '请选择该类别中尚未满级的物品';
@@ -215,6 +209,8 @@ export function chooseGrowth(sim: Simulation, player: Player, request: { choiceI
     const catalog = buildCatalog(sim.config, player.buildItems);
     const current = catalog.find(item => item.id === option.itemId);
     const maximum = 20;
+    const equipped = equippedIds(player.loadout);
+    if (!equipped.includes(option.itemId)) return '请先装备该技能，再领取强化，或刷新候选项';
     if (!instance || !current || (current.level ?? 1) >= maximum) applyCharacterGrowth(player, 'vitality');
     else trainBuildItem(instance);
   } else if (!grantBuildItem(player, option, sim.config)) return '局内储备已满，请先整理储备';
@@ -236,8 +232,8 @@ export function changeBuild(player: Player, data: { loadout: EquipmentLoadout; r
   const ids = equippedIds(data.loadout); const owned = new Set(player.buildItems.map(item => item.id));
   const unique = new Set(ids);
   if (unique.size !== ids.length || ids.some(id => !owned.has(id))) return '物品不存在或重复装配';
-  const fitted = fitLoadout(data.loadout, catalog);
-  // Explicitly return overflow and incompatible gems to reserve.
+  const fitted = fitBuildLoadout(data.loadout, catalog);
+  // Keep dormant equipment assigned until its heart or skill reaches the activation level.
   player.loadout = fitted; mergeBuildItems(player, config); refreshBuild(player, config);
   return '';
 }
@@ -252,4 +248,14 @@ export function discardBuildItem(player: Player, id: string): string {
   player.buildItems = player.buildItems.filter(item => item.id !== id);
   player.buildRevision += 1;
   return '';
+}
+
+export function refreshedGrowthOptions(sim: Simulation, player: Player, choice: GrowthChoice): GrowthOption[] {
+  if (choice.hellEntry) return hellGrowthOptions(sim, player);
+  if (choice.source === 'wave') {
+    const original = sim.round;
+    sim.round = choice.wave ?? original;
+    try { return waveOptions(sim, player); } finally { sim.round = original; }
+  }
+  return levelOptions(sim, player);
 }

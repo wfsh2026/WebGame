@@ -13,7 +13,7 @@ const attributes: { id: Attribute; name: string; hint: string; icon: string }[] 
   { id: 'power', name: '力量', hint: '物理攻击 +2', icon: '力' },
   { id: 'magic', name: '魔力', hint: '魔法攻击 +2', icon: '法' },
   { id: 'vitality', name: '体力', hint: '生命 +10 · 物防 +1', icon: '体' },
-  { id: 'spirit', name: '灵力', hint: '魔法 +5 · 魔防 +1', icon: '灵' },
+  { id: 'spirit', name: '精神', hint: '灵力上限 +5 · 魔防 +1', icon: '灵' },
   { id: 'movement', name: '移动', hint: '移动速度 +0.015 m/s', icon: '行' },
   { id: 'haste', name: '攻速', hint: '攻击 / 施法倍率各 +0.01', icon: '速' },
   { id: 'luck', name: '幸运', hint: '影响指定概率事件', icon: '运' }
@@ -25,7 +25,7 @@ const magePoints: Points = { power: 0, magic: 7, vitality: 3, spirit: 3, movemen
 
 interface CreatorProps { onCreate?: (build: CharacterBuild) => Promise<void>; onExit?: () => void }
 const statLabels = [
-  { key: 'maxHp', label: '生命', digits: 0, icon: '♥' }, { key: 'maxMp', label: '魔法', digits: 0, icon: '◆' },
+  { key: 'maxHp', label: '生命', digits: 0, icon: '♥' }, { key: 'energyCapacityBonus', label: '灵力容量加成', digits: 0, icon: '◆' },
   { key: 'physicalAttack', label: '物攻', digits: 0, icon: '⚔' }, { key: 'magicalAttack', label: '魔攻', digits: 0, icon: '✧' },
   { key: 'physicalDefense', label: '物防', digits: 0, icon: '⬡' }, { key: 'magicalDefense', label: '魔防', digits: 0, icon: '⬡' },
   { key: 'movementSpeed', label: '移速', digits: 3, icon: '➶' }, { key: 'attackSpeed', label: '攻速', digits: 2, icon: '⚡' },
@@ -36,7 +36,7 @@ export function CharacterCreator({ onCreate, onExit }: CreatorProps) {
   const [points, setPoints] = useState<Points>(startingPoints);
   const [selected, setSelected] = useState<string[]>(['brute', 'weapon', 'frail']);
   const [name, setName] = useState('断锋');
-  const [description, setDescription] = useState('以生命为锋，换取更凌厉的武器攻势。');
+  const [description, setDescription] = useState('以生命为锋，换取更凌厉的近战技能攻势。');
   const [filter, setFilter] = useState('all');
   const [direction, setDirection] = useState('fighter');
   const [notice, setNotice] = useState('');
@@ -85,8 +85,8 @@ export function CharacterCreator({ onCreate, onExit }: CreatorProps) {
   function preset(kind: string): void {
     if (saving) return;
     if (kind === 'pure') { setPoints(purePoints); setSelected([]); setName('逐风者'); setDescription('没有额外天赋，将全部预算投入基础属性。'); }
-    else if (kind === 'mage') { const list = ['arcane', 'casting', 'frail']; setPoints(magePoints); setSelected(list); setName('烬语'); setDescription('牺牲生命储备，专注法术威力与施法速度。'); }
-    else { const list = ['brute', 'weapon', 'frail']; setPoints(startingPoints); setSelected(list); setName('断锋'); setDescription('以生命为锋，换取更凌厉的武器攻势。'); }
+    else if (kind === 'mage') { const list = ['arcane', 'casting', 'frail']; setPoints(magePoints); setSelected(list); setName('烬语'); setDescription('牺牲生命储备，专注远程技能威力与远程速度。'); }
+    else { const list = ['brute', 'weapon', 'frail']; setPoints(startingPoints); setSelected(list); setName('断锋'); setDescription('以生命为锋，换取更凌厉的近战技能攻势。'); }
     setDirection(kind); setNotice('');
   }
   function reset(): void { preset('fighter'); setFilter('all'); setNotice('已恢复初始设计'); }
@@ -136,7 +136,7 @@ export function CharacterCreator({ onCreate, onExit }: CreatorProps) {
   const filters = [{ id: 'all', name: '全部', count: 10 }, { id: 'positive', name: '增益', count: 7 }, { id: 'negative', name: '弱点', count: 3 }];
   const renderFilter = (item: typeof filters[number]) => <button type="button" key={item.id} aria-pressed={filter === item.id} className={filter === item.id ? s.activeFilter : ''} onClick={() => setFilter(item.id)}>{item.name}<small>{item.count}</small></button>;
   const filterButtons = filters.map(renderFilter);
-  const presets = [{ id: 'fighter', name: '武器专精' }, { id: 'mage', name: '法术专精' }, { id: 'pure', name: '纯粹属性' }];
+  const presets = [{ id: 'fighter', name: '近战专精' }, { id: 'mage', name: '远程专精' }, { id: 'pure', name: '纯粹属性' }];
   const renderPreset = (item: typeof presets[number]) => <button type="button" key={item.id} aria-pressed={direction === item.id} className={direction === item.id ? s.activePreset : ''} onClick={() => preset(item.id)}>{item.name}</button>;
   const presetButtons = presets.map(renderPreset);
   const modalOpen = closePrompt || completed;
